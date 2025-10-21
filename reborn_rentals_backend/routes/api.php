@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
-
+use App\Http\Controllers\API\ContactController;
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
@@ -17,9 +17,12 @@ Route::prefix('auth')->group(function () {
 // Categories
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::post('/categories', [CategoryController::class, 'store']);
-Route::get('/categories/{id}', [CategoryController::class, 'show']);
-Route::put('/categories/{id}', [CategoryController::class, 'update']);
-Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
-
-// Route::apiResource('products', App\Http\Controllers\API\ProductController::class);
-// Route::apiResource('users', App\Http\Controllers\API\UserController::class);
+Route::get('/category/{id}', [CategoryController::class, 'show']);
+Route::put('/category/{id}', [CategoryController::class, 'update']);
+Route::delete('/category/{id}', [CategoryController::class, 'destroy']);
+// Contacts
+Route::get('/contacts', [ContactController::class, 'index']);
+Route::post('/contact', [ContactController::class, 'store']);
+Route::get('/contact/{id}', [ContactController::class, 'show']);
+Route::put('/contact/{id}', [ContactController::class, 'update']);
+Route::delete('/contact/{id}', [ContactController::class, 'destroy']);
