@@ -6,6 +6,7 @@ use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\ContactController;
 use App\Http\Controllers\API\PaymentInfoController;
 use App\Http\Controllers\API\CuponController;
+use App\Http\Controllers\API\ProductController;
 
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
@@ -41,3 +42,9 @@ Route::post('/coupon', [CuponController::class, 'store']);
 Route::get('/coupon/{id}', [CuponController::class, 'show']);
 Route::put('/coupon/{id}', [CuponController::class, 'update']);
 Route::delete('/coupon/{id}', [CuponController::class, 'destroy']);
+// Products
+Route::get('/products', [ProductController::class, 'index']);
+Route::post('/product', [ProductController::class, 'store']);
+Route::get('/product/{id}', [ProductController::class, 'show']);
+Route::put('/product/{id}', [ProductController::class, 'update']);
+Route::delete('/product/{id}', [ProductController::class, 'destroy']);
