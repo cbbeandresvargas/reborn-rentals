@@ -22,15 +22,14 @@ return new class extends Migration
             $table->foreignId('product_id')
                   ->constrained('products')
                   ->cascadeOnUpdate()
-                  ->restrictOnDelete(); // o cascadeOnDelete() si quieres borrar en cascada
+                  ->restrictOnDelete(); 
 
             $table->unsignedInteger('quantity');
             $table->decimal('unit_price', 10, 2);
-            $table->decimal('line_total', 10, 2); // unit_price * quantity (opcional si lo calculas)
+            $table->decimal('line_total', 10, 2); 
 
             $table->timestamps();
-
-            // Evita duplicar el mismo producto en la misma orden (opcional)
+            
             $table->unique(['order_id', 'product_id']);
         });
     }

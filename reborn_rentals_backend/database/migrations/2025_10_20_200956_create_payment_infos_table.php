@@ -21,10 +21,10 @@ return new class extends Migration
                   ->nullOnDelete();
 
             // Campos de tarjeta (los que usa tu factory/seeder)
-            $table->string('card_holder_name');
-            $table->string('card_number', 32);      // string para no perder ceros
-            $table->string('card_expiration', 7);   // "MM/YY" o "MM/YYYY"
-            $table->unsignedSmallInteger('cvv');
+            $table->string('card_holder_name')->nullable();
+            $table->string('card_number', 32)->nullable();
+            $table->string('card_expiration', 7)->nullable();
+            $table->unsignedSmallInteger('cvv')->nullable();
 
             $table->timestamps();
         });
