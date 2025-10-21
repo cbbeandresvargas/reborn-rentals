@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+// 👇 Importa el contrato de JWT (fork recomendado)
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -50,8 +51,31 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     public function paymentInfos()
     {
         return $this->hasMany(\App\Models\PaymentInfo::class);
+    }
+
+    /* =========================
+     |  Métodos requeridos JWT
+     |=========================*/
+
+    /**
+     * Identificador principal que irá dentro del token (sub).
+     * Normalmente el ID del usuario.
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Claims personalizados que quieras agregar al token.
+     * Devuelve un array; déjalo vacío si no necesitas extras.
+     */
+    public function getJWTCustomClaims(): array
+    {
+        return [];
     }
 }
