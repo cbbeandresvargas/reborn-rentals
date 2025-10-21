@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
-use App\Models\Product;
-use App\Models\Category;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class CuponController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
-        {
-        $products = Product::with('category')->paginate(10);
-        return view('products.index', compact('products'));
+    {
+        //
     }
 
     /**
