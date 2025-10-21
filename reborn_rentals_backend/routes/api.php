@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\ContactController;
+use App\Http\Controllers\API\PaymentInfoController;
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
@@ -26,3 +27,9 @@ Route::post('/contact', [ContactController::class, 'store']);
 Route::get('/contact/{id}', [ContactController::class, 'show']);
 Route::put('/contact/{id}', [ContactController::class, 'update']);
 Route::delete('/contact/{id}', [ContactController::class, 'destroy']);
+// Payment Info
+Route::get('/paymentInfos', [PaymentInfoController::class, 'index']);
+Route::post('/paymentInfo', [PaymentInfoController::class, 'store']);
+Route::get('/paymentInfo/{id}', [PaymentInfoController::class, 'show']);
+Route::put('/paymentInfo/{id}', [PaymentInfoController::class, 'update']);
+Route::delete('/paymentInfo/{id}', [PaymentInfoController::class, 'destroy']);
