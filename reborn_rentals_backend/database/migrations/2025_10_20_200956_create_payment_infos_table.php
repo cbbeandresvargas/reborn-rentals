@@ -13,10 +13,19 @@ return new class extends Migration
     {
         Schema::create('payment_infos', function (Blueprint $table) {
             $table->id();
-            $table->string('cardholder_name');
-            $table->string('card_number');
-            $table->string('card_expiration');
-            $table->smallInteger('cvv');
+
+            // FK al usuario (nullable, por si no siempre hay user)
+            $table->foreignId('user_id')
+                  ->nullable()
+                  ->constrained('users')
+                  ->nullOnDelete();
+
+            // Campos de tarjeta (los que usa tu factory/seeder)
+            $table->string('card_holder_name');
+            $table->string('card_number', 32);      // string para no perder ceros
+            $table->string('card_expiration', 7);   // "MM/YY" o "MM/YYYY"
+            $table->unsignedSmallInteger('cvv');
+
             $table->timestamps();
         });
     }

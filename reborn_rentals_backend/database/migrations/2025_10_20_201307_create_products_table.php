@@ -13,15 +13,20 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->index();
             $table->text('description')->nullable();
-            $table->decimal('price', 8, 2); 
-            $table->string('image_url')->nullable();
-            $table->boolean('active')->default(true);            
-            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
+            $table->decimal('price', 10, 2);
+            $table->string('image_url', 2048)->nullable();
+            $table->boolean('active')->default(true);
+            $table->foreignId('category_id')
+            ->nullable()
+            ->constrained('categories')
+            ->nullOnDelete()
+            ->cascadeOnUpdate();
             $table->timestamps();
         });
     }
+    
 
     /**
      * Reverse the migrations.

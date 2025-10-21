@@ -24,11 +24,18 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'name'              => $this->faker->firstName(),
+            'last_name'         => $this->faker->lastName(),
+            'second_last_name'  => $this->faker->lastName(),
+            'phone_number'      => $this->faker->unique()->numerify('+591########'), // ajusta a tu formato
+            'address'           => $this->faker->address(),
+            'email'             => $this->faker->unique()->safeEmail(),
+            'username'          => $this->faker->unique()->userName(),
+            'password'          => bcrypt('password'), // o Hash::make('password')
+            
+            // Si tu migración mantiene estas columnas, puedes incluirlas:
+            // 'email_verified_at' => now(),
+            // 'remember_token'    => Str::random(10),
         ];
     }
 

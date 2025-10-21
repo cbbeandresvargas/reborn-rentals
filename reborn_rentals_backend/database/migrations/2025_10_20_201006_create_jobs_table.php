@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('jobs', function (Blueprint $table) {
             $table->id();
             $table->decimal('latitude', 10, 7);
-            $table->longitude('latitude', 10, 7);
+            $table->decimal('longitude', 10, 7);
             $table->date('date');
             $table->time('time');
             $table->text('notes')->nullable();
-            $table->bool('status');
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }

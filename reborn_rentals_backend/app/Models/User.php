@@ -19,7 +19,12 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'last_name',
+        'second_last_name',
+        'phone_number',
+        'address',
         'email',
+        'username',
         'password',
     ];
 
@@ -44,5 +49,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function paymentInfos()
+    {
+        return $this->hasMany(\App\Models\PaymentInfo::class);
     }
 }
