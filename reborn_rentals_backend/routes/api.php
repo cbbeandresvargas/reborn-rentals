@@ -5,6 +5,8 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\ContactController;
 use App\Http\Controllers\API\PaymentInfoController;
+use App\Http\Controllers\API\CuponController;
+
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
@@ -33,3 +35,9 @@ Route::post('/paymentInfo', [PaymentInfoController::class, 'store']);
 Route::get('/paymentInfo/{id}', [PaymentInfoController::class, 'show']);
 Route::put('/paymentInfo/{id}', [PaymentInfoController::class, 'update']);
 Route::delete('/paymentInfo/{id}', [PaymentInfoController::class, 'destroy']);
+// Coupons
+Route::get('/coupons', [CuponController::class, 'index']);
+Route::post('/coupon', [CuponController::class, 'store']);
+Route::get('/coupon/{id}', [CuponController::class, 'show']);
+Route::put('/coupon/{id}', [CuponController::class, 'update']);
+Route::delete('/coupon/{id}', [CuponController::class, 'destroy']);
