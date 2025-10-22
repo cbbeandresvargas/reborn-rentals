@@ -1,38 +1,56 @@
 <?php
 
 namespace App\Http\Controllers\API;
-use Illuminate\Validation\Rule;
+
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Category;
+use App\Helpers\AuthHelper;
+
 class CategoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * GET /api/categories
+     * Público: lista todas las categorías.
      */
     public function index()
     {
-        $category = Category::all();
-        if (!$category) {
-            return response()->json(['message' => 'Categorias aún no tiene datos registrados'], 404);
+        $categories = Category::all();
+
+        if ($categories->isEmpty()) {
+            return response()->json(['message' => 'No existen categorías registradas aún.'], 404);
         }
-        return response()->json($category);
+
+        return response()->json($categories, 200);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * POST /api/categories
+     * Protegido: solo admin puede crear.
      */
     public function store(Request $request)
     {
+        auth()->shouldUse('api');
+        $user = auth('api')->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'No autenticado.'], 401);
+        }
+
+        if (!AuthHelper::isAdmin($user)) {
+            return response()->json(['message' => 'No autorizado.'], 403);
+        }
+
         $validator = Validator::make($request->all(), [
-        'name'        => 'required|string|max:255',
-        'description' => 'nullable|string',
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'message' => 'Error de validación',
+                'message' => 'Error de validación.',
                 'errors'  => $validator->errors(),
             ], 422);
         }
@@ -41,58 +59,82 @@ class CategoryController extends Controller
 
         return response()->json($category, 201);
     }
-     /**
-      *  Display the specified resource.
+
+    /**
+     * GET /api/category/{id}
+     * Público: cualquier usuario puede ver detalles.
      */
     public function show($id)
     {
         $category = Category::find($id);
+
         if (!$category) {
-            return response()->json(['message' => 'Categoría no encontrada'], 404);
+            return response()->json(['message' => 'Categoría no encontrada.'], 404);
         }
-        return response()->json($category, 200);    
+
+        return response()->json($category, 200);
     }
 
     /**
-     * Update the specified resource in storage.
+     * PUT /api/category/{id}
+     * Protegido: solo admin puede actualizar.
      */
     public function update(Request $request, $id)
     {
-         // Buscar la categoría por su ID
-            $category = Category::find($id);
+        auth()->shouldUse('api');
+        $user = auth('api')->user();
 
-            // Si no existe, devolver error 404
-            if (!$category) {
-                return response()->json(['message' => 'Categoría no encontrada'], 404);
-            }
+        if (!$user) {
+            return response()->json(['message' => 'No autenticado.'], 401);
+        }
 
-            // Validar los datos recibidos
-            $validated = $request->validate([
-                'name' => [
-                    'sometimes', 'required', 'string', 'max:255',
-                    Rule::unique('categories', 'name')->ignore($category->id),
-                ],
-                'description' => ['sometimes', 'nullable', 'string'],
-            ]);
+        if (!AuthHelper::isAdmin($user)) {
+            return response()->json(['message' => 'No autorizado.'], 403);
+        }
 
-            // Actualizar el modelo con los campos validados
-            $category->update($validated);
+        $category = Category::find($id);
+        if (!$category) {
+            return response()->json(['message' => 'Categoría no encontrada.'], 404);
+        }
 
-            // Devolver el objeto actualizado
-            return response()->json($category->fresh(), 200);
+        $validated = $request->validate([
+            'name' => [
+                'sometimes', 'required', 'string', 'max:255',
+                Rule::unique('categories', 'name')->ignore($category->id),
+            ],
+            'description' => ['sometimes', 'nullable', 'string'],
+        ]);
+
+        $category->update($validated);
+
+        return response()->json($category->fresh(), 200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * DELETE /api/category/{id}
+     * Protegido: solo admin puede eliminar.
      */
     public function destroy($id)
     {
+        auth()->shouldUse('api');
+        $user = auth('api')->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'No autenticado.'], 401);
+        }
+
+        if (!AuthHelper::isAdmin($user)) {
+            return response()->json(['message' => 'No autorizado.'], 403);
+        }
+
         $category = Category::find($id);
+
         if (!$category) {
-            return response()->json(['message' => 'Categoría no encontrada'], 404);
+            return response()->json(['message' => 'Categoría no encontrada.'], 404);
         }
 
         $category->delete();
-        return response()->json(['message' => 'Categoría eliminada correctamente'], 200);
+
+        return response()->json(['message' => 'Categoría eliminada correctamente.'], 200);
     }
 }

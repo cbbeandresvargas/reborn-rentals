@@ -6,80 +6,126 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Helpers\AuthHelper;
+
 class ProductController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * GET /api/products
+     * Público: lista productos (paginado) con filtros opcionales.
+     * Filtros: ?q=, ?category_id=, ?active=1
      */
-    public function index()
+    public function index(Request $request)
     {
-       $product = Product::with('category')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $q = Product::query()->with('category:id,name');
 
-        return response()->json($product, 200);
+        if ($request->filled('q')) {
+            $term = $request->input('q');
+            $q->where(function ($w) use ($term) {
+                $w->where('name', 'like', "%{$term}%")
+                  ->orWhere('description', 'like', "%{$term}%");
+            });
+        }
+
+        if ($request->filled('category_id')) {
+            $q->where('category_id', (int)$request->input('category_id'));
+        }
+
+        if ($request->filled('active')) {
+            $q->where('active', (bool)$request->boolean('active'));
+        }
+
+        $products = $q->orderByDesc('created_at')->paginate(15);
+
+        return response()->json($products, 200);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * POST /api/product
+     * Protegido: solo ADMIN puede crear.
      */
     public function store(Request $request)
     {
-        
+        auth()->shouldUse('api');
+        $user = auth('api')->user();
+        if (!$user) return response()->json(['message' => 'No autenticado'], 401);
+        if (!AuthHelper::isAdmin($user)) return response()->json(['message' => 'No autorizado'], 403);
+
         $validated = $request->validate([
-            'name'        => ['required', 'string', 'max:255', 'unique:products,name'],
-            'description' => ['nullable', 'string'],
-            'price'       => ['required', 'numeric', 'min:0'],
-            'image_url'   => ['nullable', 'string', 'max:500'],
-            'active'      => ['boolean'],
-            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
+            'name'        => ['required','string','max:255','unique:products,name'],
+            'description' => ['nullable','string'],
+            'price'       => ['required','numeric','min:0'],
+            'image_url'   => ['nullable','string','max:500'],
+            'active'      => ['sometimes','boolean'],
+            'category_id' => ['nullable','integer','exists:categories,id'],
         ]);
 
         $product = Product::create($validated);
 
-        return response()->json($product, 201);
+        return response()->json($product->load('category:id,name'), 201);
     }
 
     /**
-     * Display the specified resource.
+     * GET /api/product/{id}
+     * Público: ver detalle de producto.
      */
-    public function show( $id)
+    public function show($id)
     {
-        $product = Product::find($id);
+        $product = Product::with('category:id,name')->find($id);
         if (!$product) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
-        }        
+        }
         return response()->json($product, 200);
     }
 
-    public function update(Request $request,$id)
+    /**
+     * PUT /api/product/{id}
+     * Protegido: solo ADMIN puede actualizar.
+     */
+    public function update(Request $request, $id)
     {
+        auth()->shouldUse('api');
+        $user = auth('api')->user();
+        if (!$user) return response()->json(['message' => 'No autenticado'], 401);
+        if (!AuthHelper::isAdmin($user)) return response()->json(['message' => 'No autorizado'], 403);
+
         $product = Product::find($id);
         if (!$product) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
+
         $validated = $request->validate([
-            'name'        => ['required', 'string', 'max:255', Rule::unique('products')->ignore($product->id)],
-            'description' => ['nullable', 'string'],
-            'price'       => ['required', 'numeric', 'min:0'],
-            'image_url'   => ['nullable', 'string', 'max:500'],
-            'active'      => ['boolean'],
-            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
+            'name'        => ['sometimes','required','string','max:255', Rule::unique('products','name')->ignore($product->id)],
+            'description' => ['sometimes','nullable','string'],
+            'price'       => ['sometimes','required','numeric','min:0'],
+            'image_url'   => ['sometimes','nullable','string','max:500'],
+            'active'      => ['sometimes','boolean'],
+            'category_id' => ['sometimes','nullable','integer','exists:categories,id'],
         ]);
+
         $product->update($validated);
-        return response()->json($product, 200);
+
+        return response()->json($product->fresh()->load('category:id,name'), 200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * DELETE /api/product/{id}
+     * Protegido: solo ADMIN puede eliminar.
      */
     public function destroy($id)
     {
+        auth()->shouldUse('api');
+        $user = auth('api')->user();
+        if (!$user) return response()->json(['message' => 'No autenticado'], 401);
+        if (!AuthHelper::isAdmin($user)) return response()->json(['message' => 'No autorizado'], 403);
+
         $product = Product::find($id);
         if (!$product) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
+
         $product->delete();
-        return response()->json(['message' => 'Producto eliminado correctamente'], 200);
+
+        return response()->json(null, 204);
     }
 }

@@ -9,17 +9,11 @@ use App\Models\Product;
 use App\Models\Cupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\AuthHelper;
 use Carbon\Carbon;
 
 class OrderController extends Controller
 {
-    // ===== Utilidad: detectar admin =====
-    // Ajusta según tu implementación: campo 'role', Spatie, etc.
-    private function isAdmin($user): bool
-    {
-        return (bool) data_get($user, 'is_admin', false);
-    }
-
     // GET /api/orders -> lista mis órdenes o todas si es admin (paginado + filtros)
     public function index(Request $request)
     {
@@ -27,7 +21,7 @@ class OrderController extends Controller
         $user = auth('api')->user();
         if (!$user) return response()->json(['message' => 'No autenticado'], 401);
 
-        $isAdmin = $this->isAdmin($user);
+        $isAdmin = AuthHelper::isAdmin($user);
 
         $q = Order::with([
             'user:id,name,email',
@@ -65,26 +59,26 @@ class OrderController extends Controller
 
     // GET /api/orders/{id}
     public function show($id)
-{
-    auth()->shouldUse('api');
-    $user = auth('api')->user();
-    if (!$user) return response()->json(['message' => 'No autenticado'], 401);
+    {
+        auth()->shouldUse('api');
+        $user = auth('api')->user();
+        if (!$user) return response()->json(['message' => 'No autenticado'], 401);
 
-    $isAdmin = $this->isAdmin($user);
+        $isAdmin = AuthHelper::isAdmin($user);
 
-    if ($isAdmin) {
-        // Admin puede ver cualquier orden
-        $order = Order::with([
-            'user:id,name,email',
-            'job:id',
-            'cupon:id,code,discount_type,discount_value,min_order_total,max_uses,starts_at,expires_at,is_active',
-            'items:id,order_id,product_id,quantity,unit_price,line_total',
-            'items.product:id,name,price',
-        ])->find($id);
+        if ($isAdmin) {
+            // Admin puede ver cualquier orden
+            $order = Order::with([
+                'user:id,name,email',
+                'job:id',
+                'cupon:id,code,discount_type,discount_value,min_order_total,max_uses,starts_at,expires_at,is_active',
+                'items:id,order_id,product_id,quantity,unit_price,line_total',
+                'items.product:id,name,price',
+            ])->find($id);
 
-        if (!$order) return response()->json(['message' => 'Orden no encontrada'], 404);
-        return response()->json($order, 200);
-    }
+            if (!$order) return response()->json(['message' => 'Orden no encontrada'], 404);
+            return response()->json($order, 200);
+        }
 
         // Usuario normal: buscar solo entre sus órdenes
         $order = Order::with([
@@ -186,7 +180,7 @@ class OrderController extends Controller
         $user = auth('api')->user();
         if (!$user) return response()->json(['message' => 'No autenticado'], 401);
 
-        $isAdmin = $this->isAdmin($user);
+        $isAdmin = AuthHelper::isAdmin($user);
 
         $order = Order::with('items')->find($id);
         if (!$order) return response()->json(['message' => 'Orden no encontrada'], 404);
@@ -289,7 +283,7 @@ class OrderController extends Controller
         $user = auth('api')->user();
         if (!$user) return response()->json(['message' => 'No autenticado'], 401);
 
-        $isAdmin = $this->isAdmin($user);
+        $isAdmin = AuthHelper::isAdmin($user);
 
         $order = Order::find($id);
         if (!$order) return response()->json(['message' => 'Orden no encontrada'], 404);

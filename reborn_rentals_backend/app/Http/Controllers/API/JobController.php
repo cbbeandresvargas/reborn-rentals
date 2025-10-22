@@ -5,35 +5,56 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Job;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Helpers\AuthHelper;
 
 class JobController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * GET /api/jobs
+     * Público: lista de jobs (paginada).
      */
-    public function index()
+    public function index(Request $request)
     {
-        $jobs = Job::all();
-        if (!$jobs) {
-            return response()->json(['message' => 'Jobs aún no tiene datos registrados'], 404);
-        }   
-        return response()->json($jobs);
+        $q = Job::query();
+
+        // Filtros opcionales
+        if ($request->filled('status')) {
+            $q->where('status', (bool)$request->boolean('status'));
+        }
+        if ($request->filled('date')) {
+            $q->whereDate('date', $request->input('date'));
+        }
+
+        $jobs = $q->orderByDesc('created_at')->paginate(15);
+
+        // Si prefieres 404 cuando no hay registros, descomenta:
+        // if ($jobs->isEmpty()) {
+        //     return response()->json(['message' => 'Jobs aún no tiene datos registrados'], 404);
+        // }
+
+        return response()->json($jobs, 200);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * POST /api/job
+     * Solo ADMIN.
      */
     public function store(Request $request)
     {
+        // Autenticación vía JWT y verificación admin
+        auth()->shouldUse('api');
+        $user = auth('api')->user();
+        if (!$user) return response()->json(['message' => 'No autenticado'], 401);
+        if (!AuthHelper::isAdmin($user)) return response()->json(['message' => 'No autorizado'], 403);
+
         $validated = $request->validate([
             'latitude'  => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'date'      => ['required', 'date'],
             'time'      => ['required', 'string', 'max:10'],
             'notes'     => ['nullable', 'string'],
-            'status'    => ['boolean'],
+            'status'    => ['sometimes', 'boolean'],
         ]);
 
         $job = Job::create($validated);
@@ -42,7 +63,8 @@ class JobController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * GET /api/job/{id}
+     * Público.
      */
     public function show($id)
     {
@@ -54,10 +76,16 @@ class JobController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * PUT /api/job/{id}
+     * Solo ADMIN.
      */
     public function update(Request $request, $id)
     {
+        auth()->shouldUse('api');
+        $user = auth('api')->user();
+        if (!$user) return response()->json(['message' => 'No autenticado'], 401);
+        if (!AuthHelper::isAdmin($user)) return response()->json(['message' => 'No autorizado'], 403);
+
         $job = Job::find($id);
         if (!$job) {
             return response()->json(['message' => 'Job no encontrado'], 404);
@@ -68,26 +96,32 @@ class JobController extends Controller
             'longitude' => ['sometimes', 'numeric', 'between:-180,180'],
             'date'      => ['sometimes', 'date'],
             'time'      => ['sometimes', 'string', 'max:10'],
-            'notes'     => ['nullable', 'string'],
-            'status'    => ['boolean'],
+            'notes'     => ['sometimes', 'nullable', 'string'],
+            'status'    => ['sometimes', 'boolean'],
         ]);
 
         $job->update($validated);
 
-        return response()->json($job, 200);
+        return response()->json($job->fresh(), 200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * DELETE /api/job/{id}
+     * Solo ADMIN.
      */
     public function destroy($id)
     {
+        auth()->shouldUse('api');
+        $user = auth('api')->user();
+        if (!$user) return response()->json(['message' => 'No autenticado'], 401);
+        if (!AuthHelper::isAdmin($user)) return response()->json(['message' => 'No autorizado'], 403);
+
         $job = Job::find($id);
         if (!$job) {
             return response()->json(['message' => 'Job no encontrado'], 404);
         }
 
         $job->delete();
-        return response()->json(['message' => 'Job eliminado correctamente'], 200);   
+        return response()->json(null, 204);
     }
 }
