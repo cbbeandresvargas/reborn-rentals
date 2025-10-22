@@ -19,6 +19,12 @@ Route::prefix('auth')->group(function () {
         Route::post('profile', [AuthController::class, 'profile']);
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('refresh', [AuthController::class, 'refresh']);
+        //USERS
+        Route::get('users', [UserController::class, 'index']);
+        Route::post('user', [UserController::class, 'store']);
+        Route::get('user/{id}', [UserController::class, 'show']);
+        Route::put('user/{id}', [UserController::class, 'update']);
+        Route::delete('user/{id}', [UserController::class, 'destroy']);
     });
 });
 // Categories
