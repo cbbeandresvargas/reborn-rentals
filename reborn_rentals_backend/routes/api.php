@@ -9,7 +9,7 @@ use App\Http\Controllers\API\CuponController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\JobController;
-
+use App\Http\Controllers\API\UserController;
 
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
@@ -26,6 +26,15 @@ Route::prefix('auth')->group(function () {
         Route::put('user/{id}', [UserController::class, 'update']);
         Route::delete('user/{id}', [UserController::class, 'destroy']);
     });
+});
+
+Route::middleware('auth:api')->group(function () {
+    /// Orders
+        Route::get('/orders', [OrderController::class, 'index']);
+        Route::post('/order', [OrderController::class, 'store']);
+        Route::get('/order/{id}', [OrderController::class, 'show']);
+        Route::put('/order/{id}', [OrderController::class, 'update']);
+        Route::delete('/order/{id}', [OrderController::class, 'destroy']);
 });
 // Categories
 Route::get('/categories', [CategoryController::class, 'index']);
@@ -63,9 +72,3 @@ Route::post('/job', [JobController::class, 'store']);
 Route::get('/job/{id}', [JobController::class, 'show']);
 Route::put('/job/{id}', [JobController::class, 'update']);
 Route::delete('/job/{id}', [JobController::class, 'destroy']);
-// Orders
-Route::get('/orders', [OrderController::class, 'index']);
-Route::post('/order', [OrderController::class, 'store']);
-Route::get('/order/{id}', [OrderController::class, 'show']);
-Route::put('/order/{id}', [OrderController::class, 'update']);
-Route::delete('/order/{id}', [OrderController::class, 'destroy']);
