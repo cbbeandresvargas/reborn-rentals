@@ -75,8 +75,8 @@ class CuponController extends Controller
     {
         $q = Cupon::query();
 
-        if ($request->filled('active')) {
-            $q->where('is_active', (bool)$request->boolean('active'));
+        if ($request->has('active')) {
+        $q->where('is_active', $request->boolean('active'));
         }
 
         if ($request->filled('code')) {

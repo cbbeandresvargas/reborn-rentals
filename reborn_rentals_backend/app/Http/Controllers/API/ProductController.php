@@ -101,8 +101,8 @@ class ProductController extends Controller
             $q->where('category_id', (int)$request->input('category_id'));
         }
 
-        if ($request->filled('active')) {
-            $q->where('active', (bool)$request->boolean('active'));
+        if ($request->has('active')) {
+            $q->where('active', $request->boolean('active'));
         }
 
         $products = $q->orderByDesc('created_at')->paginate(15);
