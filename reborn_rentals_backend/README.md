@@ -49,55 +49,60 @@ composer install
 3️⃣ Configurar el entorno
 
 Copia el archivo .env.example a .env:
-
+```
 cp .env.example .env
-
+```
 
 Edita .env y asegúrate de configurar:
-
+```
 APP_NAME=RebornRentals
 APP_URL=http://localhost:8000
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=reborn_rentals
-DB_USERNAME=root
-DB_PASSWORD=
+DB_CONNECTION=sqlite
 
+```
+---
 # JWT
+```
 JWT_SECRET=
 
+```
+---
 # Swagger
+```
 L5_SWAGGER_CONST_HOST=${APP_URL}
-
+```
 
 Luego genera la clave JWT:
-
+```
 php artisan jwt:secret
-
+```
 
 Y la clave de aplicación Laravel:
-
+```
 php artisan key:generate
+```
 
-4️⃣ Migrar la base de datos
+# 4️⃣ Migrar la base de datos
+```
 php artisan migrate --seed
-
-
+```
 (El seed puede crear un usuario administrador por defecto, verifica el seeder correspondiente.)
+---
 
-▶️ Ejecución del servidor
+# ▶️ Ejecución del servidor
+```
 php artisan serve
-
-
+```
+```
 Por defecto la API correrá en:
 👉 http://localhost:8000
-
-🔐 Autenticación JWT
+```
+---
+# 🔐 Autenticación JWT
 
 El flujo básico es:
-
+```
 Registro – /api/auth/register
 
 {
@@ -107,7 +112,6 @@ Registro – /api/auth/register
   "password_confirmation": "123456"
 }
 
-
 Login – /api/auth/login
 Respuesta:
 
@@ -116,25 +120,26 @@ Respuesta:
   "token_type": "bearer",
   "expires_in": 3600
 }
-
+```
 
 En cada petición autenticada añade el header:
 
 Authorization: Bearer TU_TOKEN_JWT
 
-📘 Documentación Swagger
+---
+# 📘 Documentación Swagger
 Generar documentación
 
 Si realizas cambios en las rutas o anotaciones Swagger:
-
+```
 php artisan l5-swagger:generate
-
+```
 Ver documentación
 
 Inicia el servidor y accede a:
-
+```
 👉 http://localhost:8000/api/documentation
-
+```
 Ahí podrás:
 
 Explorar todos los endpoints.
@@ -152,7 +157,9 @@ Bearer TU_TOKEN_JWT
 
 Luego podrás ejecutar cualquier endpoint protegido directamente desde la interfaz.
 
-🧠 Estructura principal del proyecto
+---
+# 🧠 Estructura principal del proyecto
+```
 app/
  ├── Helpers/
  │   └── AuthHelper.php
@@ -172,8 +179,10 @@ app/
  ├── Models/
  └── Swagger/
      └── OpenApi.php      ← Configuración base de Swagger
-
-🧾 Ejemplo de endpoints principales
+```
+---
+# 🧾 Ejemplo de endpoints principales
+```
 Recurso	Método	Ruta	Rol
 Auth	POST	/api/auth/login	Público
 Auth	POST	/api/auth/register	Público
@@ -182,24 +191,30 @@ Productos	POST	/api/product	Admin
 Órdenes	GET	/api/orders	Admin/Usuario
 Usuarios	GET	/api/auth/users	Admin
 Categorías	POST	/api/categories	Admin
-🧰 Comandos útiles
+```
+---
+# 🧰 Comandos útiles
+
 Acción	Comando
 Generar claves JWT	php artisan jwt:secret
 Generar documentación Swagger	php artisan l5-swagger:generate
 Limpiar cachés	php artisan optimize:clear
 Migrar BD	php artisan migrate
 Ejecutar servidor local	php artisan serve
-🧑‍💻 Contribución
+
+---
+# 🧑‍💻 Contribución
 
 Crea una rama de desarrollo:
-
+```
 git checkout -b feature/nueva-funcionalidad
-
+```
 
 Haz tus cambios y confírmalos.
 
 Envía un Pull Request con una descripción clara.
 
-🛡️ Licencia
+---
+# 🛡️ Licencia
 
 Este proyecto se distribuye bajo la licencia MIT.
