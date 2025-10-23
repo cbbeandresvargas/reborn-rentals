@@ -1,6 +1,101 @@
 ---
 import Layout from "../layouts/Layout.astro";
 ---
+
 <Layout>
+  <style>
+    /* Estilos mínimos para maquetar columnas y espaciados */
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+    h1 { font-size: 28px; margin: 0 0 24px; }
+    h2 { font-size: 20px; margin: 24px 0 8px; }
+    ul { margin: 0; padding-left: 18px; }
+    li { margin: 6px 0; }
+    a { text-decoration: underline; color: inherit; }
+    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr; gap: 16px 32px; }
+    .section { margin-bottom: 36px; }
+    @media (min-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+      .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    }
+  </style>
+
+  <main class="container">
     <h1>Site Map</h1>
+
+    <!-- Fila 1: Products / About Us -->
+    <section class="section grid-2">
+      <div>
+        <h2>Products</h2>
+        <ul>
+          <li><a href="/products/washout-pans">Washout Pans</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2>About Us</h2>
+        <ul>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/corporate">Corporate</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Fila 2: Products / About Us -->
+    <section class="section grid-2">
+      <div>
+        <h2>Products</h2>
+        <ul>
+          <li><a href="/sitemap">Site Map</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/careers">Careers</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2>About Us</h2>
+        <ul>
+          <li><a href="/legal/terms">Terms &amp; Conditions</a></li>
+          <li><a href="/legal/privacy">Privacy Policy</a></li>
+          <li><a href="/legal/fees">Fees &amp; Surcharges</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Affiliate Links (3 columnas) -->
+    <section class="section">
+      <h2>Affiliate Links</h2>
+      <div class="grid-3">
+        <ul>
+          <li><a href="https://grb-group.com">grb-group.com</a></li>
+          <li><a href="https://svaneholmhotel.se">svaneholmhotel.se</a></li>
+          <li><a href="https://reborndevelopments.com">reborndevelopments.com</a></li>
+          <li><a href="https://rebornhotels.com">rebornhotels.com</a></li>
+          <li><a href="https://igloow.com">igloow.com</a></li>
+          <li><a href="https://reborn-realty.com">reborn-realty.com</a></li>
+          <li><a href="https://slatefort.com">slatefort.com</a></li>
+        </ul>
+
+        <ul>
+          <li><a href="https://reborn-alpha.com">reborn-alpha.com</a></li>
+          <li><a href="https://reborn-bravo.com">reborn-bravo.com</a></li>
+          <li><a href="https://reborn-charlie.com">reborn-charlie.com</a></li>
+          <li><a href="https://reborn-delta.com">reborn-delta.com</a></li>
+          <li><a href="https://rebornbank.com">rebornbank.com</a></li>
+          <li><a href="https://rekaliber.com">rekaliber.com</a></li>
+          <li><a href="https://refistack.com">refistack.com</a></li>
+        </ul>
+
+        <ul>
+          <li><a href="https://rbcmswusa.grb-group.com">rbcmswusa.grb-group.com</a></li>
+          <li><a href="https://rbcmneusa.grb-group.com">rbcmneusa.grb-group.com</a></li>
+          <li><a href="https://rbcmuk.grb-group.com">rbcmuk.grb-group.com</a></li>
+          <li><a href="https://rbcmche.ch">rbcmche.ch</a></li>
+          <li><a href="https://rbcmind.grb-group.com">rbcmind.grb-group.com</a></li>
+          <li><a href="https://mytropolskyi.com">mytropolskyi.com</a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
 </Layout>

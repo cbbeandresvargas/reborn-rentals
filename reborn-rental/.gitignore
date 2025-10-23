@@ -1,0 +1,54 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build output
+dist/
+.output/
+.vercel/
+.netlify/
+functions/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.log
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Astro specific
+.cache/
+astro.config.mjs.timestamp-*
+astro.config.ts.timestamp-*
+
+# Test / Coverage
+coverage/
+.vitest/
+.jest/
+*.spec.ts
+*.test.ts
+*.spec.js
+*.test.js
+
+# Optional: if you use TypeScript
+*.tsbuildinfo
+
+# Optional: if deploying via adapters
+/.vercel_build_output/
+/.netlify/
