@@ -8,12 +8,82 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Helpers\AuthHelper;
 
+/**
+ * @OA\Tag(
+ *   name="Products",
+ *   description="Gestión de productos. Endpoints públicos y protegidos con JWT (admin)."
+ * )
+ *
+ * @OA\Schema(
+ *   schema="CategoryMini",
+ *   type="object",
+ *   @OA\Property(property="id", type="integer", example=3),
+ *   @OA\Property(property="name", type="string", example="Herramientas")
+ * )
+ *
+ * @OA\Schema(
+ *   schema="ProductResource",
+ *   type="object",
+ *   @OA\Property(property="id", type="integer", example=15),
+ *   @OA\Property(property="name", type="string", example="Taladro Inalámbrico"),
+ *   @OA\Property(property="description", type="string", nullable=true, example="Taladro 18V con dos baterías"),
+ *   @OA\Property(property="price", type="number", format="float", example=129.90),
+ *   @OA\Property(property="image_url", type="string", nullable=true, example="https://cdn.example.com/p/taladro.jpg"),
+ *   @OA\Property(property="active", type="boolean", example=true),
+ *   @OA\Property(property="category_id", type="integer", nullable=true, example=3),
+ *   @OA\Property(property="category", ref="#/components/schemas/CategoryMini"),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ *
+ * @OA\Schema(
+ *   schema="ProductStoreRequest",
+ *   type="object",
+ *   required={"name","price"},
+ *   @OA\Property(property="name", type="string", example="Taladro Inalámbrico"),
+ *   @OA\Property(property="description", type="string", nullable=true, example="Taladro 18V con dos baterías"),
+ *   @OA\Property(property="price", type="number", format="float", example=129.90),
+ *   @OA\Property(property="image_url", type="string", nullable=true, example="https://cdn.example.com/p/taladro.jpg"),
+ *   @OA\Property(property="active", type="boolean", example=true),
+ *   @OA\Property(property="category_id", type="integer", nullable=true, example=3)
+ * )
+ *
+ * @OA\Schema(
+ *   schema="ProductUpdateRequest",
+ *   type="object",
+ *   @OA\Property(property="name", type="string", example="Taladro 18V Pro"),
+ *   @OA\Property(property="description", type="string", example="Versión actualizada con maletín"),
+ *   @OA\Property(property="price", type="number", format="float", example=149.50),
+ *   @OA\Property(property="image_url", type="string", example="https://cdn.example.com/p/taladro-pro.jpg"),
+ *   @OA\Property(property="active", type="boolean", example=false),
+ *   @OA\Property(property="category_id", type="integer", nullable=true, example=4)
+ * )
+ */
 class ProductController extends Controller
 {
     /**
-     * GET /api/products
-     * Público: lista productos (paginado) con filtros opcionales.
-     * Filtros: ?q=, ?category_id=, ?active=1
+     * Listado paginado de productos (público) con filtros.
+     *
+     * @OA\Get(
+     *   path="/api/products",
+     *   tags={"Products"},
+     *   @OA\Parameter(name="q", in="query", description="Texto a buscar en nombre/descripcion", @OA\Schema(type="string")),
+     *   @OA\Parameter(name="category_id", in="query", description="Filtra por categoría", @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="active", in="query", description="1 activos / 0 inactivos", @OA\Schema(type="boolean")),
+     *   @OA\Response(
+     *     response=200,
+     *     description="OK",
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(property="current_page", type="integer", example=1),
+     *       @OA\Property(
+     *         property="data",
+     *         type="array",
+     *         @OA\Items(ref="#/components/schemas/ProductResource")
+     *       )
+     *     )
+     *   )
+     * )
      */
     public function index(Request $request)
     {
@@ -41,8 +111,18 @@ class ProductController extends Controller
     }
 
     /**
-     * POST /api/product
-     * Protegido: solo ADMIN puede crear.
+     * Crear producto (solo ADMIN).
+     *
+     * @OA\Post(
+     *   path="/api/product",
+     *   tags={"Products"},
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/ProductStoreRequest")),
+     *   @OA\Response(response=201, description="Creado", @OA\JsonContent(ref="#/components/schemas/ProductResource")),
+     *   @OA\Response(response=401, description="No autenticado"),
+     *   @OA\Response(response=403, description="No autorizado"),
+     *   @OA\Response(response=422, description="Error de validación")
+     * )
      */
     public function store(Request $request)
     {
@@ -66,8 +146,15 @@ class ProductController extends Controller
     }
 
     /**
-     * GET /api/product/{id}
-     * Público: ver detalle de producto.
+     * Ver detalle de producto (público).
+     *
+     * @OA\Get(
+     *   path="/api/product/{id}",
+     *   tags={"Products"},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ProductResource")),
+     *   @OA\Response(response=404, description="Producto no encontrado")
+     * )
      */
     public function show($id)
     {
@@ -79,8 +166,20 @@ class ProductController extends Controller
     }
 
     /**
-     * PUT /api/product/{id}
-     * Protegido: solo ADMIN puede actualizar.
+     * Actualizar producto (solo ADMIN).
+     *
+     * @OA\Put(
+     *   path="/api/product/{id}",
+     *   tags={"Products"},
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/ProductUpdateRequest")),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ProductResource")),
+     *   @OA\Response(response=401, description="No autenticado"),
+     *   @OA\Response(response=403, description="No autorizado"),
+     *   @OA\Response(response=404, description="Producto no encontrado"),
+     *   @OA\Response(response=422, description="Error de validación")
+     * )
      */
     public function update(Request $request, $id)
     {
@@ -109,8 +208,18 @@ class ProductController extends Controller
     }
 
     /**
-     * DELETE /api/product/{id}
-     * Protegido: solo ADMIN puede eliminar.
+     * Eliminar producto (solo ADMIN).
+     *
+     * @OA\Delete(
+     *   path="/api/product/{id}",
+     *   tags={"Products"},
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=204, description="Eliminado"),
+     *   @OA\Response(response=401, description="No autenticado"),
+     *   @OA\Response(response=403, description="No autorizado"),
+     *   @OA\Response(response=404, description="Producto no encontrado")
+     * )
      */
     public function destroy($id)
     {

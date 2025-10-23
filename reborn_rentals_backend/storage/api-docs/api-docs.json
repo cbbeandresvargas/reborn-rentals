@@ -1,0 +1,2699 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API – Proyecto X",
+        "description": "Documentación de la API con autenticación JWT (Bearer).",
+        "contact": {
+            "email": "soporte@tudominio.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "Servidor base"
+        }
+    ],
+    "paths": {
+        "/api/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registrar un nuevo usuario",
+                "description": "Registrar usuario",
+                "operationId": "eb3623f9bcd09a1dacbefaac07aed1bb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Fernando"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "ferchex@correo.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "minLength": 6,
+                                        "example": "secret123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario registrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User registered successfully"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/UserPublic"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                }
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Iniciar sesión y obtener token JWT",
+                "description": "Login y obtener token JWT",
+                "operationId": "f77777235d676b651c9465807d8f9485",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "ferchex@correo.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthTokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/auth/profile": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Obtener el perfil del usuario autenticado",
+                "description": "Perfil de usuario autenticado",
+                "operationId": "8e43034ac8f3aaaf5c015750b446596b",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserPublic"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Cerrar sesión (invalidar token)",
+                "description": "Logout (invalidar token)",
+                "operationId": "c4b3c6f1776909e546a421283c044ac3",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfully logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refrescar el token JWT",
+                "description": "Refrescar token JWT",
+                "operationId": "a11d4212c7e49cbf5852d9bb2e3d5054",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthTokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/categories": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Listar categorías (público)",
+                "description": "GET /api/categories\nPúblico: lista todas las categorías.",
+                "operationId": "8e17a9627dbed245cf032f867569cf11",
+                "responses": {
+                    "200": {
+                        "description": "Listado de categorías",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Category"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No existen categorías registradas aún"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Crear categoría (admin)",
+                "description": "POST /api/categories\nProtegido: solo admin puede crear.",
+                "operationId": "2140f330d926c3e118cab9391dc4ff42",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Electrodomésticos"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Linea blanca y cocina",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Creada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/category/{id}": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Ver una categoría (público)",
+                "description": "GET /api/category/{id}\nPúblico: cualquier usuario puede ver detalles.",
+                "operationId": "5135d626104e86ea9910eb51763b8d4d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Categoría no encontrada"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Actualizar categoría (admin)",
+                "description": "PUT /api/category/{id}\nProtegido: solo admin puede actualizar.",
+                "operationId": "6aea2996a1d8d5708b6b26adca6b0f86",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Electrónica y audio"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Audio, video y gadgets",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Actualizada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Categoría no encontrada"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Eliminar categoría (admin)",
+                "description": "DELETE /api/category/{id}\nProtegido: solo admin puede eliminar.",
+                "operationId": "19bebec474ebd26750dd56af34eac8fd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminada"
+                    },
+                    "200": {
+                        "description": "Eliminada (mensaje)"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Categoría no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/contacts": {
+            "get": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Listar contactos (solo admin)",
+                "description": "GET /api/contacts\nProtegido: solo ADMIN puede listar.",
+                "operationId": "f048e8911c1179d582ccfc371a498d78",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Búsqueda por nombre/apellido/teléfono",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado paginado de contactos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Contact"
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 32
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 15
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/contact": {
+            "post": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Crear contacto (público)",
+                "description": "POST /api/contact\nPúblico: cualquier usuario puede crear un contacto.",
+                "operationId": "ef87352f3aced2578ea632fa6ea5901d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "first_name",
+                                    "last_name",
+                                    "phone_number"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Juan"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Pérez"
+                                    },
+                                    "phone_number": {
+                                        "type": "string",
+                                        "maxLength": 20,
+                                        "example": "+59170000000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Contact"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                }
+            }
+        },
+        "/api/contact/{id}": {
+            "get": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Ver contacto por ID (solo admin)",
+                "description": "GET /api/contact/{id}\nProtegido: solo ADMIN puede ver un contacto.",
+                "operationId": "878cd8f1edc589bc6a1ec34a904f6b55",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 7
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Contact"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Contacto no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Actualizar contacto (solo admin)",
+                "description": "PUT /api/contact/{id}\nProtegido: solo ADMIN puede actualizar.",
+                "operationId": "25ae0312e4499122b537a1e0ac716a75",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 7
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Juan"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Pérez"
+                                    },
+                                    "phone_number": {
+                                        "type": "string",
+                                        "maxLength": 20,
+                                        "example": "+59170000000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Contact"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Contacto no encontrado"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Eliminar contacto (solo admin)",
+                "description": "DELETE /api/contact/{id}\nProtegido: solo ADMIN puede eliminar.",
+                "operationId": "3f6ad823c8115e55d154544f0299d934",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 7
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Contacto no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/coupons": {
+            "get": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Listar cupones (público, con filtros)",
+                "description": "GET /api/coupons\nPúblico: lista de cupones (paginada) con filtros opcionales.\n?active=1           -> solo activos\n?valid_now=1        -> dentro de la ventana de fechas y activos\n?code=ABC           -> filtra por código exacto",
+                "operationId": "f1a034f2e1cbd1a29f68d018232da738",
+                "parameters": [
+                    {
+                        "name": "active",
+                        "in": "query",
+                        "description": "Filtrar por activos (true/false)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "valid_now",
+                        "in": "query",
+                        "description": "Filtrar cupones válidos ahora (rango de fechas y activos)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "description": "Código exacto del cupón",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado paginado de cupones",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Coupon"
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 15
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/coupon": {
+            "post": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Crear cupón (solo admin)",
+                "description": "POST /api/coupon\nSolo ADMIN.",
+                "operationId": "2a9a343b99640b423cbb09dd515faf2d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code",
+                                    "discount_type",
+                                    "discount_value"
+                                ],
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 50,
+                                        "example": "BLACKFRIDAY"
+                                    },
+                                    "discount_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "percent",
+                                            "fixed"
+                                        ],
+                                        "example": "percent"
+                                    },
+                                    "discount_value": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 15
+                                    },
+                                    "max_uses": {
+                                        "type": "integer",
+                                        "example": 500,
+                                        "nullable": true
+                                    },
+                                    "min_order_total": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 100,
+                                        "nullable": true
+                                    },
+                                    "starts_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2025-11-20T00:00:00Z",
+                                        "nullable": true
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2025-11-30T23:59:59Z",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Coupon"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/coupon/{id}": {
+            "get": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Ver cupón por ID (público)",
+                "description": "GET /api/coupon/{id}\nPúblico.",
+                "operationId": "3100616aa5158cc4e647bfb39157a1d9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 3
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Coupon"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Cupón no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Actualizar cupón (solo admin)",
+                "description": "PUT /api/coupon/{id}\nSolo ADMIN.",
+                "operationId": "b2a4e1e9a154a7e92ea406977dfe1156",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 3
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 50,
+                                        "example": "CYBERMONDAY"
+                                    },
+                                    "discount_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "percent",
+                                            "fixed"
+                                        ],
+                                        "example": "fixed"
+                                    },
+                                    "discount_value": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 25
+                                    },
+                                    "max_uses": {
+                                        "type": "integer",
+                                        "example": 250,
+                                        "nullable": true
+                                    },
+                                    "min_order_total": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 80,
+                                        "nullable": true
+                                    },
+                                    "starts_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Coupon"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Cupón no encontrado"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Eliminar cupón (solo admin)",
+                "description": "DELETE /api/coupon/{id}\nSolo ADMIN.",
+                "operationId": "e717dbe41d30024d51bb68a5f53f5bc4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 3
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Cupón no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/jobs": {
+            "get": {
+                "tags": [
+                    "Jobs"
+                ],
+                "summary": "Listar trabajos (público, con filtros opcionales)",
+                "description": "GET /api/jobs\nPúblico: lista de jobs (paginada).",
+                "operationId": "2a1f2306c8b5239d199c9a5bf97c9ced",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por estado (true/false)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Filtrar por fecha exacta (YYYY-MM-DD)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado paginado de jobs",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Job"
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 12
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 15
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/job": {
+            "post": {
+                "tags": [
+                    "Jobs"
+                ],
+                "summary": "Crear trabajo (solo admin)",
+                "description": "POST /api/job\nSolo ADMIN.",
+                "operationId": "69c15ec33d635f6de9628e023432e17d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "latitude",
+                                    "longitude",
+                                    "date",
+                                    "time"
+                                ],
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": -17.383
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": -66.145
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-10-22"
+                                    },
+                                    "time": {
+                                        "type": "string",
+                                        "example": "09:30"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Revisión técnica programada",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Job"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/job/{id}": {
+            "get": {
+                "tags": [
+                    "Jobs"
+                ],
+                "summary": "Obtener detalle de un trabajo (público)",
+                "description": "GET /api/job/{id}\nPúblico.",
+                "operationId": "fac5f3cb23bb16122c03c6cf61b87380",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 12
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Job"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Job no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Jobs"
+                ],
+                "summary": "Actualizar trabajo (solo admin)",
+                "description": "PUT /api/job/{id}\nSolo ADMIN.",
+                "operationId": "99bdcfa4a946696444857482b0f0fe2a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 12
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": -17.4
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": -66.18
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-10-23"
+                                    },
+                                    "time": {
+                                        "type": "string",
+                                        "example": "14:00"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Cambio de locación y hora"
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Job"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Job no encontrado"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Jobs"
+                ],
+                "summary": "Eliminar trabajo (solo admin)",
+                "description": "DELETE /api/job/{id}\nSolo ADMIN.",
+                "operationId": "28fa567d616ec3a50685b09976006092",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 12
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Job no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/paymentInfos": {
+            "get": {
+                "tags": [
+                    "PaymentInfos"
+                ],
+                "summary": "Listado paginado (admin ve todas; usuario solo las suyas).",
+                "operationId": "727529904ba8814880b3867718c90a4a",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "(Solo admin) filtra por usuario",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PaymentInfoResource"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/paymentInfo": {
+            "post": {
+                "tags": [
+                    "PaymentInfos"
+                ],
+                "summary": "Crear una tarjeta (admin puede crear para cualquiera; user solo para sí mismo).",
+                "operationId": "423d0e74cb44b057aa76a4714f1032b7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PaymentInfoStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentInfoResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Validación / duplicado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/paymentInfo/{paymentInfo}": {
+            "get": {
+                "tags": [
+                    "PaymentInfos"
+                ],
+                "summary": "Ver una tarjeta por ID (admin cualquiera; user solo suya).",
+                "operationId": "271a54865c263e78853e067c6b30cf9c",
+                "parameters": [
+                    {
+                        "name": "paymentInfo",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentInfoResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "PaymentInfos"
+                ],
+                "summary": "Actualizar una tarjeta (admin cualquiera; user solo suya).",
+                "operationId": "abfb585277d967e97328f2b4716a37be",
+                "parameters": [
+                    {
+                        "name": "paymentInfo",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PaymentInfoUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentInfoResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "422": {
+                        "description": "Validación / duplicado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "PaymentInfos"
+                ],
+                "summary": "Eliminar una tarjeta (admin cualquiera; user solo suya).",
+                "operationId": "55e4473f9d7e94bac5fa27d432b5065a",
+                "parameters": [
+                    {
+                        "name": "paymentInfo",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Listado paginado de productos (público) con filtros.",
+                "operationId": "ab015cc2055ac75e6d23c628675c26e7",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Texto a buscar en nombre/descripcion",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Filtra por categoría",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "active",
+                        "in": "query",
+                        "description": "1 activos / 0 inactivos",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ProductResource"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/product": {
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Crear producto (solo ADMIN).",
+                "operationId": "e1b5c7a826de2bf44f2c55c40d08f264",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/product/{id}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Ver detalle de producto (público).",
+                "operationId": "13d13e14590d6caa9dc274faf9e41e54",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Producto no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Actualizar producto (solo ADMIN).",
+                "operationId": "f937d708495cbd446df2c04f4824f8f5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Producto no encontrado"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Eliminar producto (solo ADMIN).",
+                "operationId": "d5c4d8dbfdf3da1299d9cd1b76df6523",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Producto no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Listar usuarios (solo admin) o ver perfil propio.",
+                "operationId": "19cd421b8eb85e26cf16b0d9540a0002",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Buscar por nombre, email o username",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Tamaño de página (solo admin)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        },
+                                        {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/UserResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/user": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Crear un usuario (solo admin).",
+                "operationId": "1b109512fb8ca10f46d3c39b7da2ecce",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/user/{id}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Ver detalles de usuario (propio o admin).",
+                "operationId": "20b2195a90130ead8e75ef1381cbfb52",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Actualizar usuario (propio o admin).",
+                "operationId": "ef617beb39335513f38fb35e42a6037c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Eliminar usuario (solo admin).",
+                "operationId": "8d2e4e718249eea93750ff2a6fe27da0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminado correctamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AuthTokenResponse": {
+                "properties": {
+                    "access_token": {
+                        "type": "string",
+                        "example": "eyJ0eXAiOiJKV1QiLCJh..."
+                    },
+                    "token_type": {
+                        "type": "string",
+                        "example": "bearer"
+                    },
+                    "expires_in": {
+                        "type": "integer",
+                        "example": 3600
+                    }
+                },
+                "type": "object"
+            },
+            "UserPublic": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 23
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Fernando"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "ferchex@correo.com"
+                    },
+                    "is_admin": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "TokenTTLSeconds": {
+                "description": "Estructura de respuesta del token",
+                "type": "integer",
+                "example": 3600
+            },
+            "Category": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Electrónica"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Gadgets y dispositivos",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-10-22T12:34:56Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-10-22T12:34:56Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Contact": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 7
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "Juan"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Pérez"
+                    },
+                    "phone_number": {
+                        "type": "string",
+                        "example": "+59170000000"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Coupon": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "code": {
+                        "type": "string",
+                        "example": "BIENVENIDO10"
+                    },
+                    "discount_type": {
+                        "type": "string",
+                        "enum": [
+                            "percent",
+                            "fixed"
+                        ],
+                        "example": "percent"
+                    },
+                    "discount_value": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 10
+                    },
+                    "max_uses": {
+                        "type": "integer",
+                        "example": 100,
+                        "nullable": true
+                    },
+                    "min_order_total": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 50,
+                        "nullable": true
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-10-01T00:00:00Z",
+                        "nullable": true
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-12-31T23:59:59Z",
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Job": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": -17.383
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": -66.145
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-10-22"
+                    },
+                    "time": {
+                        "type": "string",
+                        "example": "09:30"
+                    },
+                    "notes": {
+                        "type": "string",
+                        "example": "Revisión de equipo en sitio.",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PaymentInfoResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 23
+                    },
+                    "card_holder_name": {
+                        "type": "string",
+                        "example": "Fernando Perez"
+                    },
+                    "card_number_mask": {
+                        "type": "string",
+                        "example": "**** **** **** 4242"
+                    },
+                    "card_expiration": {
+                        "type": "string",
+                        "example": "12/27"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PaymentInfoStoreRequest": {
+                "required": [
+                    "user_id",
+                    "card_holder_name",
+                    "card_number",
+                    "card_expiration"
+                ],
+                "properties": {
+                    "user_id": {
+                        "description": "Si no eres admin, debe ser tu mismo ID.",
+                        "type": "integer",
+                        "example": 23
+                    },
+                    "card_holder_name": {
+                        "type": "string",
+                        "example": "Fernando Perez"
+                    },
+                    "card_number": {
+                        "type": "string",
+                        "example": "4242424242424242"
+                    },
+                    "card_expiration": {
+                        "type": "string",
+                        "example": "12/27"
+                    }
+                },
+                "type": "object"
+            },
+            "PaymentInfoUpdateRequest": {
+                "properties": {
+                    "user_id": {
+                        "type": "integer",
+                        "example": 23
+                    },
+                    "card_holder_name": {
+                        "type": "string",
+                        "example": "F. Perez"
+                    },
+                    "card_number": {
+                        "type": "string",
+                        "example": "4000000000000002"
+                    },
+                    "card_expiration": {
+                        "type": "string",
+                        "example": "01/28"
+                    }
+                },
+                "type": "object"
+            },
+            "CategoryMini": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Herramientas"
+                    }
+                },
+                "type": "object"
+            },
+            "ProductResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Taladro Inalámbrico"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Taladro 18V con dos baterías",
+                        "nullable": true
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 129.9
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "example": "https://cdn.example.com/p/taladro.jpg",
+                        "nullable": true
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "category_id": {
+                        "type": "integer",
+                        "example": 3,
+                        "nullable": true
+                    },
+                    "category": {
+                        "$ref": "#/components/schemas/CategoryMini"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ProductStoreRequest": {
+                "required": [
+                    "name",
+                    "price"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Taladro Inalámbrico"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Taladro 18V con dos baterías",
+                        "nullable": true
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 129.9
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "example": "https://cdn.example.com/p/taladro.jpg",
+                        "nullable": true
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "category_id": {
+                        "type": "integer",
+                        "example": 3,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ProductUpdateRequest": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Taladro 18V Pro"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Versión actualizada con maletín"
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 149.5
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "example": "https://cdn.example.com/p/taladro-pro.jpg"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "category_id": {
+                        "type": "integer",
+                        "example": 4,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "UserResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Fernando Almaraz"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Almaraz",
+                        "nullable": true
+                    },
+                    "second_last_name": {
+                        "type": "string",
+                        "example": "De la Quintana",
+                        "nullable": true
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "ferchex@example.com"
+                    },
+                    "username": {
+                        "type": "string",
+                        "example": "ferchex"
+                    },
+                    "phone_number": {
+                        "type": "string",
+                        "example": "+59177777777",
+                        "nullable": true
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "Cochabamba, Bolivia",
+                        "nullable": true
+                    },
+                    "is_admin": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "UserStoreRequest": {
+                "required": [
+                    "name",
+                    "email",
+                    "username",
+                    "password",
+                    "password_confirmation"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Fernando Almaraz"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Almaraz"
+                    },
+                    "second_last_name": {
+                        "type": "string",
+                        "example": "De la Quintana"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "ferchex@example.com"
+                    },
+                    "username": {
+                        "type": "string",
+                        "example": "ferchex"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "123456"
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "example": "123456"
+                    },
+                    "is_admin": {
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "type": "object"
+            },
+            "UserUpdateRequest": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Fer Almaraz"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "ferchex@fusionpax.com"
+                    },
+                    "username": {
+                        "type": "string",
+                        "example": "ferchex"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "654321"
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "example": "654321"
+                    },
+                    "is_admin": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Envia el token como: Bearer {tu_token_jwt}",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Autenticación con JWT"
+        },
+        {
+            "name": "Categories",
+            "description": "Endpoints para categorías"
+        },
+        {
+            "name": "Contacts",
+            "description": "Gestión de contactos"
+        },
+        {
+            "name": "Coupons",
+            "description": "Gestión de cupones"
+        },
+        {
+            "name": "Jobs",
+            "description": "Gestión de trabajos o tareas geolocalizadas"
+        },
+        {
+            "name": "PaymentInfos",
+            "description": "Gestión de tarjetas / info de pago. Requiere JWT."
+        },
+        {
+            "name": "Products",
+            "description": "Gestión de productos. Endpoints públicos y protegidos con JWT (admin)."
+        },
+        {
+            "name": "Users",
+            "description": "Gestión de usuarios: autenticación, perfil, y administración (solo admin)."
+        }
+    ]
+}
