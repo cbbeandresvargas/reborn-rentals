@@ -1,61 +1,204 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏗️ Reborn Rentals Backend API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API REST desarrollada en **Laravel 11** con autenticación **JWT**, roles de usuario (admin / cliente) y documentación generada con **L5-Swagger (OpenAPI 3)**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Características principales
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Autenticación con **JSON Web Tokens (JWT)**.
+- Roles de usuario (`admin` y `usuario`).
+- CRUD completo de:
+  - Usuarios
+  - Categorías
+  - Productos
+  - Cupones
+  - Pedidos (Orders)
+  - Contactos
+  - Jobs
+  - Información de pago
+- Documentación interactiva con **Swagger UI**.
+- Filtros, paginación y validación avanzada.
+- Compatible con MySQL, SQLite o PostgreSQL.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🧩 Requisitos previos
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Asegúrate de tener instalado:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- PHP >= 8.2  
+- Composer >= 2.x  
+- Laravel CLI (`composer global require laravel/installer`)
+- SQLite / MySQL / PostgreSQL  
+- Git
+- Opcional: Postman / Insomnia para pruebas adicionales
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## ⚙️ Instalación
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 1️⃣ Clonar el repositorio
 
-### Premium Partners
+```bash
+git clone https://github.com/tuusuario/reborn_rentals_backend.git
+cd reborn_rentals_backend
+### 2️⃣ Instalar dependencias
+composer install
+3️⃣ Configurar el entorno
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Copia el archivo .env.example a .env:
 
-## Contributing
+cp .env.example .env
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Code of Conduct
+Edita .env y asegúrate de configurar:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+APP_NAME=RebornRentals
+APP_URL=http://localhost:8000
 
-## Security Vulnerabilities
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=reborn_rentals
+DB_USERNAME=root
+DB_PASSWORD=
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# JWT
+JWT_SECRET=
 
-## License
+# Swagger
+L5_SWAGGER_CONST_HOST=${APP_URL}
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+Luego genera la clave JWT:
+
+php artisan jwt:secret
+
+
+Y la clave de aplicación Laravel:
+
+php artisan key:generate
+
+4️⃣ Migrar la base de datos
+php artisan migrate --seed
+
+
+(El seed puede crear un usuario administrador por defecto, verifica el seeder correspondiente.)
+
+▶️ Ejecución del servidor
+php artisan serve
+
+
+Por defecto la API correrá en:
+👉 http://localhost:8000
+
+🔐 Autenticación JWT
+
+El flujo básico es:
+
+Registro – /api/auth/register
+
+{
+  "name": "Fer Almaraz",
+  "email": "fer@example.com",
+  "password": "123456",
+  "password_confirmation": "123456"
+}
+
+
+Login – /api/auth/login
+Respuesta:
+
+{
+  "access_token": "JWT_TOKEN",
+  "token_type": "bearer",
+  "expires_in": 3600
+}
+
+
+En cada petición autenticada añade el header:
+
+Authorization: Bearer TU_TOKEN_JWT
+
+📘 Documentación Swagger
+Generar documentación
+
+Si realizas cambios en las rutas o anotaciones Swagger:
+
+php artisan l5-swagger:generate
+
+Ver documentación
+
+Inicia el servidor y accede a:
+
+👉 http://localhost:8000/api/documentation
+
+Ahí podrás:
+
+Explorar todos los endpoints.
+
+Ver modelos de request/response.
+
+Probar llamadas reales con el token JWT.
+
+Ejemplo de autenticación en Swagger UI
+
+Haz clic en el botón "Authorize" y coloca:
+
+Bearer TU_TOKEN_JWT
+
+
+Luego podrás ejecutar cualquier endpoint protegido directamente desde la interfaz.
+
+🧠 Estructura principal del proyecto
+app/
+ ├── Helpers/
+ │   └── AuthHelper.php
+ ├── Http/
+ │   ├── Controllers/
+ │   │   └── API/
+ │   │       ├── AuthController.php
+ │   │       ├── UserController.php
+ │   │       ├── ProductController.php
+ │   │       ├── CategoryController.php
+ │   │       ├── OrderController.php
+ │   │       ├── CuponController.php
+ │   │       ├── JobController.php
+ │   │       ├── ContactController.php
+ │   │       └── PaymentInfoController.php
+ │   └── Middleware/
+ ├── Models/
+ └── Swagger/
+     └── OpenApi.php      ← Configuración base de Swagger
+
+🧾 Ejemplo de endpoints principales
+Recurso	Método	Ruta	Rol
+Auth	POST	/api/auth/login	Público
+Auth	POST	/api/auth/register	Público
+Productos	GET	/api/products	Público
+Productos	POST	/api/product	Admin
+Órdenes	GET	/api/orders	Admin/Usuario
+Usuarios	GET	/api/auth/users	Admin
+Categorías	POST	/api/categories	Admin
+🧰 Comandos útiles
+Acción	Comando
+Generar claves JWT	php artisan jwt:secret
+Generar documentación Swagger	php artisan l5-swagger:generate
+Limpiar cachés	php artisan optimize:clear
+Migrar BD	php artisan migrate
+Ejecutar servidor local	php artisan serve
+🧑‍💻 Contribución
+
+Crea una rama de desarrollo:
+
+git checkout -b feature/nueva-funcionalidad
+
+
+Haz tus cambios y confírmalos.
+
+Envía un Pull Request con una descripción clara.
+
+🛡️ Licencia
+
+Este proyecto se distribuye bajo la licencia MIT.
