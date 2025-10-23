@@ -43,6 +43,7 @@ Asegúrate de tener instalado:
 ```bash
 git clone https://github.com/tuusuario/reborn_rentals_backend.git
 cd reborn_rentals_backend
+```
 ### 2️⃣ Instalar dependencias
 composer install
 3️⃣ Configurar el entorno
