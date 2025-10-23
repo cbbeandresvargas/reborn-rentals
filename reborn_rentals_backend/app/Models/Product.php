@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
-{   
-    use HasFactory; 
+{
+    use HasFactory;
+    // use SoftDeletes;
+
     protected $fillable = [
         'name',
         'description',
@@ -18,10 +21,15 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
-        'active' => 'boolean',
+        'price'       => 'decimal:2',
+        'active'      => 'boolean',
+        'category_id' => 'integer',    // ✅ recomendado
     ];
 
+    // Carga ansiosa opcional si casi siempre expones la categoría
+    // protected $with = ['category:id,name'];
+
+    // Relaciones
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -37,5 +45,27 @@ class Product extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    // Scopes para limpiar el controlador index()
+    public function scopeSearch($q, ?string $term)
+    {
+        if (!$term) return $q;
+        return $q->where(fn($w) =>
+            $w->where('name', 'like', "%{$term}%")
+              ->orWhere('description', 'like', "%{$term}%")
+        );
+    }
+
+    public function scopeByCategory($q, $categoryId)
+    {
+        if (!$categoryId) return $q;
+        return $q->where('category_id', (int) $categoryId);
+    }
+
+    public function scopeActiveFlag($q, $active)
+    {
+        if (is_null($active)) return $q;
+        return $q->where('active', (bool) $active);
     }
 }

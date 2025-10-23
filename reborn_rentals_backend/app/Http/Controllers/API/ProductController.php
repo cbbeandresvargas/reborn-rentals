@@ -87,25 +87,13 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $q = Product::query()->with('category:id,name');
+        $q = Product::query()->with('category:id,name')
+            ->search($request->input('q'))
+            ->byCategory($request->input('category_id'))
+            ->when($request->has('active'), fn($qq) => $qq->activeFlag($request->boolean('active')))
+            ->orderByDesc('created_at');
 
-        if ($request->filled('q')) {
-            $term = $request->input('q');
-            $q->where(function ($w) use ($term) {
-                $w->where('name', 'like', "%{$term}%")
-                  ->orWhere('description', 'like', "%{$term}%");
-            });
-        }
-
-        if ($request->filled('category_id')) {
-            $q->where('category_id', (int)$request->input('category_id'));
-        }
-
-        if ($request->has('active')) {
-            $q->where('active', $request->boolean('active'));
-        }
-
-        $products = $q->orderByDesc('created_at')->paginate(15);
+        $products = $q->paginate(15);
 
         return response()->json($products, 200);
     }
