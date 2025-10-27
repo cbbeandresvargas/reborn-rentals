@@ -1,10 +1,678 @@
 ---
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from "../layouts/Layout.astro";
+import { ShoppingCart } from "@lucide/astro";
 ---
 
 <Layout>
-	<h1>Hola mundo</h1>
+  <!-- Subnavbar -->
+  <div class="bg-[#BBBBBB] py-1 shadow-md">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex items-center mt-2 gap-5 justify-between">
+        <!-- Search Bar -->
+        <div class="flex-1 w-full">
+          <div class="relative mb-2">
+            <input
+              type="text"
+              placeholder="Search products..."
+              class="w-full pl-10 pr-4 py-2 border bg-white border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
+              id="search-input"
+            />
+            <button
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-[#CE9704] transition-colors duration-200"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filters Button -->
+        <button
+          class="flex items-center gap-2 mb-2 bg-[#CE9704] px-4 py-3 rounded-lg border border-gray-300 hover:border-[#CE9704] transition-all duration-200"
+          id="filters-btn"
+        >
+          <svg
+            class="w-5 h-5 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Products -->
+  <div class="max-w-7xl mx-auto px-6 mt-20 mb-20">
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+      id="products-grid"
+    >
+      <!-- Los productos se cargarán aquí dinámicamente -->
+    </div>
+  </div>
+
+  <script>
+    // Estado del carrito
+    let cart: any[] = [];
+
+    // Cargar carrito desde localStorage
+    function loadCartFromStorage() {
+      const savedCart = localStorage.getItem('reborn-rentals-cart');
+      if (savedCart) {
+        cart = JSON.parse(savedCart);
+        console.log('Cart loaded from localStorage:', cart);
+        updateCartDisplay();
+      }
+    }
+
+    // Actualizar display del carrito
+    function updateCartDisplay() {
+      updateCartBadge();
+      updateCartContent();
+      updateWhenWhereButton();
+    }
+
+    // Simulación de API - Lista de productos
+    const products = [
+      {
+        id: "120-23DRX",
+        name: "Concrete Washout Pan",
+        price: 20,
+        image: "/Product1.png",
+        size: "Large",
+        dimensions: "7'x7'x27\"",
+        capacity: "18.25 ton, 587 gallons capacity",
+      },
+      {
+        id: "121-24DRY",
+        name: "Heavy Duty Excavator",
+        price: 150,
+        image: "/Product2.png",
+        size: "Medium",
+        dimensions: "12'x8'x15\"",
+        capacity: "25 ton, 800 gallons capacity",
+      },
+      {
+        id: "122-25DRZ",
+        name: "Industrial Mixer",
+        price: 85,
+        image: "/Product1.png",
+        size: "Small",
+        dimensions: "5'x5'x20\"",
+        capacity: "12 ton, 400 gallons capacity",
+      },
+      {
+        id: "123-26DSA",
+        name: "Construction Compactor",
+        price: 120,
+        image: "/Product2.png",
+        size: "Large",
+        dimensions: "8'x6'x30\"",
+        capacity: "22 ton, 700 gallons capacity",
+      },
+      {
+        id: "124-27DSB",
+        name: "Utility Trailer",
+        price: 45,
+        image: "/Product1.png",
+        size: "Medium",
+        dimensions: "6'x4'x18\"",
+        capacity: "15 ton, 500 gallons capacity",
+      },
+      {
+        id: "125-28DSC",
+        name: "Material Handler",
+        price: 95,
+        image: "/Product2.png",
+        size: "Large",
+        dimensions: "10'x8'x25\"",
+        capacity: "20 ton, 650 gallons capacity",
+      },
+      {
+        id: "126-29DSD",
+        name: "Concrete Pump",
+        price: 200,
+        image: "/Product1.png",
+        size: "Extra Large",
+        dimensions: "12'x10'x35\"",
+        capacity: "30 ton, 900 gallons capacity",
+      },
+      {
+        id: "127-30DSE",
+        name: "Crane Attachment",
+        price: 75,
+        image: "/Product2.png",
+        size: "Small",
+        dimensions: "4'x4'x15\"",
+        capacity: "10 ton, 300 gallons capacity",
+      },
+      {
+        id: "128-31DSF",
+        name: "Hydraulic System",
+        price: 110,
+        image: "/Product1.png",
+        size: "Medium",
+        dimensions: "7'x5'x22\"",
+        capacity: "18 ton, 600 gallons capacity",
+      },
+      {
+        id: "129-32DSG",
+        name: "Power Generator",
+        price: 65,
+        image: "/Product2.png",
+        size: "Small",
+        dimensions: "5'x3'x16\"",
+        capacity: "8 ton, 250 gallons capacity",
+      },
+    ];
+
+    // Función para crear un card de producto
+    function createProductCard(product: any) {
+      return `
+        <div
+          class="bg-white rounded-lg border border-gray-200 overflow-visible hover:shadow-2xl shadow-[#CE9704]/20 transition-shadow duration-300 cursor-move"
+          draggable="true"
+          data-product-id="${product.id}"
+          data-product-name="${product.name}"
+          data-product-price="${product.price}"
+        >
+          <div class="relative bg-white p-4">
+            <button
+              class="absolute top-2 left-2 bg-[#CE9704] p-2 rounded hover:bg-[#B8860B] transition-colors duration-200 group relative z-10"
+              onclick="addToCartFromButton('${product.id}')"
+              title="Click to add to your cart or drag and drop the item into the cart"
+            >
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="m1 1 4 4 13 1 2 8H6l-2-8z"></path>
+              </svg>
+              <!-- Tooltip -->
+              <div class="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                Click to add to your cart or drag and drop the item into the cart
+                <div class="absolute top-full left-4 border-4 border-transparent border-t-gray-900"></div>
+              </div>
+            </button>
+            <img
+              src="${product.image}"
+              alt="${product.name}"
+              class="w-full h-64 object-contain"
+            />
+          </div>
+          <div class="bg-[#4A4A4A] px-4 py-3 text-center">
+            <h3 class="text-white font-bold text-lg">${product.name}</h3>
+          </div>
+          <div class="border-t border-gray-500"></div>
+          <div class="bg-[#4A4A4A] px-4 py-3 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-white">ID: <span class="text-[#CE9704]">${product.id}</span></span>
+              <span class="text-white font-bold text-lg">${product.price}$/day*</span>
+            </div>
+            <div>
+              <span class="text-gray-300">Size: ${product.size}</span>
+              <div class="text-white text-sm">${product.dimensions}</div>
+            </div>
+            <div>
+              <span class="text-gray-300">Tonnage Capacity</span>
+              <div class="text-white text-sm">${product.capacity}</div>
+			</div>
+		</div>
+          <button 
+            class="w-full bg-[#CE9704] text-white font-bold py-2 px-4 rounded hover:bg-[#B8860B] transition-colors duration-200"
+            onclick="viewSpecification('${product.id}')"
+          >
+            SEE SPECIFICATION
+          </button>
+        </div>
+      `;
+    }
+
+    // Función para renderizar todos los productos
+    function renderProducts() {
+      const productsGrid = document.getElementById("products-grid");
+      if (productsGrid) {
+        productsGrid.innerHTML = products
+          .map((product) => createProductCard(product))
+          .join("");
+        // Configurar drag and drop después de renderizar
+        setupDragAndDrop();
+      }
+    }
+
+    // Simulación de API - Función para obtener productos
+    function getProducts() {
+      return new Promise((resolve) => {
+        // Simular delay de API
+        setTimeout(() => {
+          resolve(products);
+        }, 100);
+      });
+    }
+
+    // Simulación de API - Función para buscar productos
+    function searchProducts(query: string) {
+      return products.filter(
+        (product) =>
+          product.name.toLowerCase().includes(query.toLowerCase()) ||
+          product.id.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+
+    // Simulación de API - Función para filtrar por precio
+    function filterProductsByPrice(minPrice: number, maxPrice: number) {
+      return products.filter(
+        (product) => product.price >= minPrice && product.price <= maxPrice
+      );
+    }
+
+    // Función para actualizar la búsqueda
+    function handleSearch() {
+      const searchInput = document.getElementById(
+        "search-input"
+      ) as HTMLInputElement;
+      if (searchInput) {
+        const query = searchInput.value;
+        if (query.trim() === "") {
+          renderProducts();
+        } else {
+          const filteredProducts = searchProducts(query);
+          const productsGrid = document.getElementById("products-grid");
+          if (productsGrid) {
+            productsGrid.innerHTML = filteredProducts
+              .map((product) => createProductCard(product))
+              .join("");
+            // Configurar drag and drop después de filtrar
+            setupDragAndDrop();
+          }
+        }
+      }
+    }
+
+    // Función para actualizar el badge del carrito
+    function updateCartBadge() {
+      const cartBadge = document.getElementById("cart-badge");
+      if (cartBadge) {
+        cartBadge.textContent = cart.length.toString();
+        cartBadge.classList.toggle("hidden", cart.length === 0);
+      }
+    }
+
+    // Función para actualizar el botón "When, where?"
+    function updateWhenWhereButton() {
+      const whenWhereBtn = document.getElementById("when-where-btn") as any;
+      if (whenWhereBtn) {
+        if (cart.length > 0) {
+          // Habilitar botón cuando hay productos
+          whenWhereBtn.disabled = false;
+          whenWhereBtn.className =
+            "w-full bg-[#CE9704] text-white py-3 px-4 rounded-lg font-bold text-lg cursor-pointer hover:bg-[#B8860B] transition-all duration-300";
+        } else {
+          // Deshabilitar botón cuando está vacío
+          whenWhereBtn.disabled = true;
+          whenWhereBtn.className =
+            "w-full bg-gray-600 text-gray-400 py-3 px-4 rounded-lg font-bold text-lg cursor-not-allowed transition-all duration-300";
+        }
+      }
+    }
+
+    // Función para actualizar el contenido del carrito
+    function updateCartContent() {
+      const cartItems = document.querySelector(".cart-items");
+      const subtotalSection = document.getElementById("subtotal-section");
+
+      if (cartItems) {
+        if (cart.length === 0) {
+          cartItems.innerHTML = `
+            <div class="flex flex-col items-center justify-center h-full">
+              <p class="text-white font-semibold italic text-center">Your cart is empty.</p>
+              <p class="text-white text-sm text-center">Looks like you haven't made your choice yet.</p>
+              <p class="text-white text-sm text-center">Start by adding items to your cart.</p>
+            </div>
+          `;
+          if (subtotalSection) {
+            subtotalSection.style.display = "none";
+          }
+        } else {
+          cartItems.innerHTML = cart
+            .map(
+              (item: any, index: number) => `
+            <div class="bg-[#4A4A4A] rounded-lg border border-gray-600 mb-3 overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200">
+              <div class="flex items-center p-3">
+                <!-- Product Image -->
+                <div class="flex-shrink-0 mr-3">
+                  <div class="w-16 h-16 bg-white rounded-lg p-1 flex items-center justify-center shadow-sm">
+                    <img 
+                      src="${products.find((p) => p.id === item.id)?.image || "/Product1.png"}" 
+                      alt="${item.name}"
+                      class="w-full h-full object-contain"
+                    />
+                  </div>
+                </div>
+                
+                <!-- Product Info -->
+                <div class="flex-1 min-w-0">
+                  <!-- Header Row: Name + Remove -->
+                  <div class="flex justify-between items-start mb-2">
+                    <h4 class="text-white font-bold text-base uppercase leading-tight pr-2 truncate">${item.name}</h4>
+                    <button onclick="removeFromCart(${index})" class="text-gray-400 hover:text-red-400 p-1 transition-colors duration-200 flex-shrink-0">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <!-- Info Row: ID + Price -->
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-[#CE9704] font-semibold text-xs">ID: ${item.id}</span>
+                    <span class="text-white font-bold text-base">${item.price}$/day*</span>
+                  </div>
+                  
+                  <!-- Quantity Control -->
+                  <div class="flex items-center justify-end mb-2">
+                    <div class="flex items-center bg-gray-600 rounded-md">
+                      <button onclick="updateQuantity(${index}, -1)" class="bg-gray-600 text-white px-2 py-1 rounded-l-md text-xs hover:bg-gray-500 transition-colors duration-200">
+                        −
+                      </button>
+                      <span class="text-white mx-2 font-bold text-sm min-w-[16px] text-center">${item.quantity}</span>
+                      <button onclick="updateQuantity(${index}, 1)" class="bg-gray-600 text-white px-2 py-1 rounded-r-md text-xs hover:bg-gray-500 transition-colors duration-200">
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Compact Specifications -->
+                  <div class="bg-gray-800 p-2 rounded text-xs space-y-1">
+                    <div class="flex justify-between">
+                      <span class="text-gray-300">Size:</span>
+                      <span class="text-white">${products.find((p) => p.id === item.id)?.size || "N/A"}</span>
+                    </div>
+                    <div class="text-white font-mono text-xs">${products.find((p) => p.id === item.id)?.dimensions || "N/A"}</div>
+                    <div class="text-white text-xs">${products.find((p) => p.id === item.id)?.capacity || "N/A"}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `
+            )
+            .join("");
+
+          if (subtotalSection) {
+            subtotalSection.style.display = "block";
+          }
+        }
+      }
+
+      // Actualizar subtotal
+      updateSubtotal();
+    }
+
+    // Función para actualizar la cantidad de un producto
+    function updateQuantity(index: any, change: any) {
+      if (cart[index]) {
+        cart[index].quantity += change;
+        if (cart[index].quantity <= 0) {
+          cart.splice(index, 1);
+        } else {
+          // Asegurar que la cantidad no sea negativa
+          cart[index].quantity = Math.max(0, cart[index].quantity);
+        }
+        // Guardar en localStorage
+        localStorage.setItem('reborn-rentals-cart', JSON.stringify(cart));
+        updateCartContent();
+        updateCartBadge();
+        updateWhenWhereButton();
+      }
+    }
+
+    // Función para actualizar el subtotal
+    function updateSubtotal() {
+      const subtotalAmount = document.getElementById("subtotal-amount");
+      const totalItems = document.getElementById("total-items");
+
+      if (cart.length === 0) {
+        if (subtotalAmount) subtotalAmount.textContent = "$0";
+        if (totalItems) totalItems.textContent = "0";
+        return;
+      }
+
+      const total = cart.reduce(
+        (sum: any, item: any) => sum + item.price * item.quantity,
+        0
+      );
+      const totalQuantity = cart.reduce(
+        (sum: any, item: any) => sum + item.quantity,
+        0
+      );
+
+      if (subtotalAmount) subtotalAmount.textContent = `$${total.toFixed(2)}`;
+      if (totalItems) totalItems.textContent = totalQuantity.toString();
+    }
+
+    // Función para agregar producto al carrito
+    function addToCart(productId: any, productName: any, productPrice: any) {
+      const existingItem = cart.find((item: any) => item.id === productId);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({
+          id: productId,
+          name: productName,
+          price: productPrice,
+          quantity: 1,
+        });
+      }
+      // Guardar en localStorage
+      localStorage.setItem('reborn-rentals-cart', JSON.stringify(cart));
+      updateCartBadge();
+      updateCartContent();
+      updateWhenWhereButton();
+      console.log("Producto agregado al carrito:", {
+        id: productId,
+        name: productName,
+        price: productPrice,
+      });
+    }
+
+    // Función para remover producto del carrito
+    function removeFromCart(index: any) {
+      cart.splice(index, 1);
+      // Guardar en localStorage
+      localStorage.setItem('reborn-rentals-cart', JSON.stringify(cart));
+      updateCartBadge();
+      updateCartContent();
+      updateWhenWhereButton();
+    }
+
+    // Función para configurar drag and drop en las tarjetas
+    function setupDragAndDrop() {
+      const productCards = document.querySelectorAll('[draggable="true"]');
+      productCards.forEach((card: any) => {
+        card.addEventListener("dragstart", (e: any) => {
+          const dragEvent = e as DragEvent;
+          if (dragEvent.dataTransfer) {
+            dragEvent.dataTransfer.setData(
+              "text/plain",
+              JSON.stringify({
+                id: (card as any).dataset.productId,
+                name: (card as any).dataset.productName,
+                price: (card as any).dataset.productPrice,
+              })
+            );
+          }
+          (card as any).style.opacity = "0.5";
+        });
+
+        card.addEventListener("dragend", (e: any) => {
+          (card as any).style.opacity = "1";
+        });
+      });
+    }
+
+    // Event listeners para drag and drop
+    document.addEventListener("DOMContentLoaded", function () {
+      // Cargar carrito desde localStorage
+      loadCartFromStorage();
+      
+      // Hacer que el botón del carrito sea una zona de drop
+      const cartBtn = document.getElementById("cart-btn");
+      if (cartBtn) {
+        cartBtn.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          this.style.backgroundColor = "#B8860B";
+        });
+
+        cartBtn.addEventListener("dragleave", function (e) {
+          this.style.backgroundColor = "#CE9704";
+        });
+
+        cartBtn.addEventListener("drop", function (e) {
+          e.preventDefault();
+          this.style.backgroundColor = "#CE9704";
+
+          try {
+            const dropEvent = e as DragEvent;
+            if (dropEvent.dataTransfer) {
+              const productData = JSON.parse(
+                dropEvent.dataTransfer.getData("text/plain")
+              );
+              addToCart(productData.id, productData.name, productData.price);
+
+              // Mostrar notificación
+              showNotification(`${productData.name} added to cart`);
+            }
+          } catch (error) {
+            console.error("Error al procesar el drop:", error);
+          }
+        });
+      }
+
+      // Hacer que el sidebar del carrito también sea una zona de drop
+      const cartSidebar = document.getElementById("cart-sidebar");
+      if (cartSidebar) {
+        cartSidebar.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          this.style.backgroundColor = "#3A3A3A";
+        });
+
+        cartSidebar.addEventListener("dragleave", function (e) {
+          this.style.backgroundColor = "#2F2F2F";
+        });
+
+        cartSidebar.addEventListener("drop", function (e) {
+          e.preventDefault();
+          this.style.backgroundColor = "#2F2F2F";
+
+          try {
+            const dropEvent = e as DragEvent;
+            if (dropEvent.dataTransfer) {
+              const productData = JSON.parse(
+                dropEvent.dataTransfer.getData("text/plain")
+              );
+              addToCart(productData.id, productData.name, productData.price);
+
+              // Show notification
+              showNotification(`${productData.name} added to cart`);
+            }
+          } catch (error) {
+            console.error("Error processing the drop:", error);
+          }
+        });
+      }
+
+      // Inicializar el carrito y renderizar productos
+      updateCartBadge();
+      updateCartContent();
+      updateWhenWhereButton();
+      renderProducts();
+
+      // Event listener para la búsqueda
+      const searchInput = document.getElementById("search-input");
+      if (searchInput) {
+        searchInput.addEventListener("input", handleSearch);
+      }
+
+      // Event listener para el botón "Proceed to Payment"
+      const whenWhereBtn = document.getElementById("when-where-btn") as any;
+      if (whenWhereBtn) {
+        whenWhereBtn.addEventListener("click", (e: any) => {
+          const button = e.target as any;
+          if (!button.disabled) {
+            // Save cart data to localStorage before redirecting
+            localStorage.setItem('reborn-rentals-cart', JSON.stringify(cart));
+            
+            // Redirect to directions page
+            window.location.href = '/directions';
+          }
+        });
+      }
+    });
+
+    // Función para mostrar notificaciones
+    function showNotification(message: string) {
+      const toastContainer = document.getElementById("toast-container");
+      if (toastContainer) {
+        const toast = document.createElement("div");
+        toast.className =
+          "bg-[#CE9704] text-white px-4 py-2 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300";
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+
+        // Animar entrada
+        setTimeout(() => {
+          toast.classList.remove("translate-x-full");
+        }, 100);
+
+        // Remover después de 3 segundos
+        setTimeout(() => {
+          toast.classList.add("translate-x-full");
+          setTimeout(() => {
+            toast.remove();
+          }, 300);
+        }, 3000);
+      }
+    }
+
+    // Función para ver especificaciones del producto
+    function viewSpecification(productId: string) {
+      const product = products.find((p) => p.id === productId);
+      if (product) {
+        alert(
+          `Especificaciones de ${product.name}:\n\nID: ${product.id}\nPrecio: $${product.price}/día\nTamaño: ${product.size}\nDimensiones: ${product.dimensions}\nCapacidad: ${product.capacity}`
+        );
+      }
+    }
+
+    // Función para agregar producto al carrito desde el botón
+    function addToCartFromButton(productId: string) {
+      const product = products.find((p) => p.id === productId);
+      if (product) {
+        addToCart(product.id, product.name, product.price);
+        showNotification(`${product.name} added to cart`);
+      }
+    }
+
+    // Hacer funciones globales para uso en HTML
+    (window as any).addToCart = addToCart;
+    (window as any).removeFromCart = removeFromCart;
+    (window as any).updateQuantity = updateQuantity;
+    (window as any).viewSpecification = viewSpecification;
+    (window as any).addToCartFromButton = addToCartFromButton;
+  </script>
 </Layout>

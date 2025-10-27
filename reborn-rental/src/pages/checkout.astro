@@ -1,0 +1,435 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout>
+  <main class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-6">
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Checkout Summary</h1>
+        <p class="text-gray-600">Review your rental items and complete your order</p>
+      </div>
+
+      <!-- Checkout Content -->
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Items Section -->
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-xl font-bold text-gray-900 mb-4">Items: <span id="total-items">0</span></h2>
+          
+          <!-- Items List -->
+          <div id="checkout-items" class="space-y-4">
+            <!-- Items will be loaded here dynamically -->
+          </div>
+        </div>
+
+        <!-- Discount Code Section -->
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">Discount Code</h3>
+              <p class="text-sm text-gray-600">Enter a discount code if you have one</p>
+            </div>
+            <div class="flex items-center space-x-4">
+              <input 
+                type="text" 
+                id="discount-code" 
+                placeholder="Enter code"
+                class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
+              />
+              <button 
+                id="apply-discount"
+                class="bg-[#CE9704] text-white px-4 py-2 rounded-lg hover:bg-[#B8860B] transition-colors duration-200"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+          
+          <!-- Applied Discount -->
+          <div id="applied-discount" class="mt-4 hidden">
+            <div class="flex items-center justify-between bg-green-50 p-3 rounded-lg">
+              <div>
+                <span class="text-green-800 font-semibold" id="discount-name">BIGPANS101</span>
+                <span class="text-green-600 ml-2" id="discount-type">-10% OFF</span>
+              </div>
+              <span class="text-green-800 font-bold" id="discount-amount">-$0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sales Tax Section -->
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">Sales Tax</h3>
+              <p class="text-sm text-gray-600">Based on your location</p>
+            </div>
+            <div class="text-right">
+              <span class="text-[#CE9704] font-semibold" id="tax-rate">2% Tax</span>
+              <div class="text-lg font-bold text-gray-900" id="tax-amount">$0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Section -->
+        <div class="p-6 bg-gray-50">
+          <div class="flex items-center justify-between">
+            <h3 class="text-2xl font-bold text-gray-900">Total:</h3>
+            <div class="text-3xl font-bold text-gray-900" id="final-total">$0.00</div>
+          </div>
+        </div>
+
+        <!-- Payment Section -->
+        <div class="p-6">
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">Payment Information</h3>
+          
+          <!-- Payment Form -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Card Number -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+              <input 
+                type="text" 
+                placeholder="1234 5678 9012 3456"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
+              />
+            </div>
+            
+            <!-- Expiry Date -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+              <input 
+                type="text" 
+                placeholder="MM/YY"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
+              />
+            </div>
+            
+            <!-- CVV -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+              <input 
+                type="text" 
+                placeholder="123"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
+              />
+            </div>
+            
+            <!-- Cardholder Name -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
+              <input 
+                type="text" 
+                placeholder="John Doe"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
+              />
+            </div>
+          </div>
+          
+          <!-- Complete Order Button -->
+          <div class="mt-8">
+            <button 
+              id="complete-order"
+              class="w-full bg-[#CE9704] text-white py-4 px-6 rounded-lg font-bold text-lg hover:bg-[#B8860B] transition-colors duration-200"
+            >
+              Complete Order
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </main>
+
+  <script>
+    // Load cart data
+    let cart: any[] = [];
+    let rentalDays = 30; // Default rental period
+    let discountApplied = false;
+    let discountAmount = 0;
+    let discountPercentage = 0;
+
+    // Load cart from localStorage
+    function loadCartData() {
+      const savedCart = localStorage.getItem('reborn-rentals-cart');
+      if (savedCart) {
+        cart = JSON.parse(savedCart);
+        console.log('Cart loaded for checkout:', cart);
+        renderCheckoutItems();
+        calculateTotals();
+      }
+    }
+
+    // Load cart data from Layout (same as sidebar)
+    function loadCartFromStorage() {
+      const savedCart = localStorage.getItem('reborn-rentals-cart');
+      if (savedCart) {
+        cart = JSON.parse(savedCart);
+        console.log('Cart loaded from localStorage:', cart);
+        renderCheckoutItems();
+        calculateTotals();
+      }
+    }
+
+    // Load rental period from directions
+    function loadRentalPeriod() {
+      const savedFormData = localStorage.getItem('reborn-rentals-directions');
+      if (savedFormData) {
+        const formData = JSON.parse(savedFormData);
+        const startDate = new Date(formData.startDate);
+        const endDate = new Date(formData.endDate);
+        const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+        rentalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        console.log('Rental period:', rentalDays, 'days');
+      }
+    }
+
+    // Render checkout items (using same data as sidebar cart)
+    function renderCheckoutItems() {
+      const checkoutItems = document.getElementById('checkout-items');
+      const totalItems = document.getElementById('total-items');
+      
+      if (!checkoutItems) return;
+
+      if (cart.length === 0) {
+        checkoutItems.innerHTML = `
+          <div class="text-center py-8">
+            <p class="text-gray-500 text-lg">No items in cart</p>
+            <a href="/" class="text-[#CE9704] hover:underline">Continue Shopping</a>
+          </div>
+        `;
+        if (totalItems) totalItems.textContent = '0';
+        return;
+      }
+
+      // Render cart items using the actual cart data (no hardcoded products)
+      const itemsHTML = cart.map((item, index) => {
+        // Use the data directly from the cart item
+        const price = item.price || 0;
+        const itemTotal = price * item.quantity * rentalDays;
+        
+        return `
+          <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+            <!-- Product Image -->
+            <div class="flex-shrink-0">
+              <div class="w-16 h-16 bg-white rounded-lg p-2 flex items-center justify-center shadow-sm">
+                <img 
+                  src="${item.image || '/Product1.png'}" 
+                  alt="${item.name}"
+                  class="w-full h-full object-contain"
+                />
+              </div>
+            </div>
+            
+            <!-- Product Details -->
+            <div class="flex-1 min-w-0">
+              <h4 class="text-lg font-semibold text-gray-900 truncate">${item.name}</h4>
+              <p class="text-sm text-gray-600">${item.capacity || 'N/A'}</p>
+              <div class="flex items-center space-x-4 mt-2">
+                <span class="text-[#CE9704] font-semibold text-sm">ID: ${item.id}</span>
+                <span class="text-gray-500 text-sm">${item.quantity}pc</span>
+                <span class="text-gray-500 text-sm">${price}$ / Day</span>
+                <span class="text-[#CE9704] font-semibold text-sm">${rentalDays} Days*</span>
+              </div>
+            </div>
+            
+            <!-- Item Total -->
+            <div class="text-right">
+              <div class="text-xl font-bold text-gray-900">${itemTotal.toFixed(2)} $</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Add delivery and pickup fees (same as in the image)
+      const deliveryFee = 500;
+      const pickupFee = 500;
+      const roughTerrainFee = 200;
+
+      const feesHTML = `
+        <!-- Delivery Fee -->
+        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+          <div class="flex-shrink-0">
+            <div class="w-16 h-16 bg-[#CE9704] rounded-lg p-2 flex items-center justify-center shadow-sm">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-lg font-semibold text-gray-900">Delivery Fee Crane Truck</h4>
+            <p class="text-sm text-gray-600">Delivery Fee Crane Truck (Standard Fare)</p>
+            <div class="flex items-center space-x-4 mt-2">
+              <span class="text-[#CE9704] font-semibold text-sm">ID: YY12-901</span>
+              <span class="text-gray-500 text-sm">1pc</span>
+              <span class="text-gray-500 text-sm">FLAT RATE</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-xl font-bold text-gray-900">${deliveryFee.toFixed(2)} $</div>
+          </div>
+        </div>
+
+        <!-- Pickup Fee -->
+        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+          <div class="flex-shrink-0">
+            <div class="w-16 h-16 bg-[#CE9704] rounded-lg p-2 flex items-center justify-center shadow-sm">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-lg font-semibold text-gray-900">Pick-up Fee Crane Truck</h4>
+            <p class="text-sm text-gray-600">Pick-up Fee Crane Truck (Standard Fare)</p>
+            <div class="flex items-center space-x-4 mt-2">
+              <span class="text-[#CE9704] font-semibold text-sm">ID: YY12-901</span>
+              <span class="text-gray-500 text-sm">1pc</span>
+              <span class="text-gray-500 text-sm">FLAT RATE</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-xl font-bold text-gray-900">${pickupFee.toFixed(2)} $</div>
+          </div>
+        </div>
+
+        <!-- Rough Terrain Surcharge -->
+        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+          <div class="flex-shrink-0">
+            <div class="w-16 h-16 bg-[#CE9704] rounded-lg p-2 flex items-center justify-center shadow-sm">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-lg font-semibold text-gray-900">Rough Terrain Surcharge</h4>
+            <p class="text-sm text-gray-600">Additional fee for rough terrain delivery</p>
+            <div class="flex items-center space-x-4 mt-2">
+              <span class="text-[#CE9704] font-semibold text-sm">ID: YY12-337</span>
+              <span class="text-gray-500 text-sm">1pc</span>
+              <span class="text-gray-500 text-sm">FLAT RATE</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-xl font-bold text-gray-900">${roughTerrainFee.toFixed(2)} $</div>
+          </div>
+        </div>
+      `;
+
+      checkoutItems.innerHTML = itemsHTML + feesHTML;
+      
+      if (totalItems) {
+        totalItems.textContent = (cart.length + 3).toString(); // +3 for delivery, pickup, and rough terrain fees
+      }
+    }
+
+    // Calculate totals using actual cart data
+    function calculateTotals() {
+      // Calculate subtotal using the actual cart data
+      const subtotal = cart.reduce((sum, item) => {
+        const price = item.price || 0;
+        return sum + (price * item.quantity * rentalDays);
+      }, 0);
+
+      // Add fees
+      const deliveryFee = 500;
+      const pickupFee = 500;
+      const roughTerrainFee = 200;
+      const feesTotal = deliveryFee + pickupFee + roughTerrainFee;
+
+      // Calculate discount
+      let discount = 0;
+      if (discountApplied) {
+        if (discountPercentage > 0) {
+          discount = (subtotal + feesTotal) * (discountPercentage / 100);
+        } else {
+          discount = discountAmount;
+        }
+      }
+
+      // Calculate tax (2% on subtotal + fees - discount)
+      const taxableAmount = subtotal + feesTotal - discount;
+      const tax = taxableAmount * 0.02;
+
+      // Calculate final total
+      const finalTotal = subtotal + feesTotal - discount + tax;
+
+      // Update UI
+      const taxAmount = document.getElementById('tax-amount');
+      const finalTotalElement = document.getElementById('final-total');
+      
+      if (taxAmount) taxAmount.textContent = `$${tax.toFixed(2)}`;
+      if (finalTotalElement) finalTotalElement.textContent = `$${finalTotal.toFixed(2)}`;
+
+      // Update discount display
+      if (discountApplied) {
+        const appliedDiscount = document.getElementById('applied-discount');
+        const discountName = document.getElementById('discount-name');
+        const discountType = document.getElementById('discount-type');
+        const discountAmountElement = document.getElementById('discount-amount');
+        
+        if (appliedDiscount) appliedDiscount.classList.remove('hidden');
+        if (discountName) discountName.textContent = 'BIGPANS101';
+        if (discountType) discountType.textContent = discountPercentage > 0 ? `-${discountPercentage}% OFF` : '-10% OFF';
+        if (discountAmountElement) discountAmountElement.textContent = `-$${discount.toFixed(2)}`;
+      }
+    }
+
+    // Apply discount
+    function applyDiscount() {
+      const discountCode = (document.getElementById('discount-code') as HTMLInputElement)?.value;
+      
+      if (discountCode && discountCode.toUpperCase() === 'BIGPANS101') {
+        discountApplied = true;
+        discountPercentage = 10;
+        calculateTotals();
+        
+        // Show success message
+        alert('Discount applied successfully!');
+      } else if (discountCode) {
+        alert('Invalid discount code. Please try again.');
+      }
+    }
+
+    // Complete order
+    function completeOrder() {
+      // Validate payment form
+      const cardNumber = (document.querySelector('input[placeholder="1234 5678 9012 3456"]') as HTMLInputElement)?.value;
+      const expiryDate = (document.querySelector('input[placeholder="MM/YY"]') as HTMLInputElement)?.value;
+      const cvv = (document.querySelector('input[placeholder="123"]') as HTMLInputElement)?.value;
+      const cardholderName = (document.querySelector('input[placeholder="John Doe"]') as HTMLInputElement)?.value;
+
+      if (!cardNumber || !expiryDate || !cvv || !cardholderName) {
+        alert('Please fill in all payment fields.');
+        return;
+      }
+
+      // Simulate order processing
+      alert('Order completed successfully! Thank you for your business.');
+      
+      // Clear cart and redirect
+      localStorage.removeItem('reborn-rentals-cart');
+      localStorage.removeItem('reborn-rentals-directions');
+      window.location.href = '/';
+    }
+
+    // Initialize checkout
+    document.addEventListener('DOMContentLoaded', function() {
+      loadCartFromStorage();
+      loadRentalPeriod();
+      
+      // Apply discount button
+      const applyDiscountBtn = document.getElementById('apply-discount');
+      if (applyDiscountBtn) {
+        applyDiscountBtn.addEventListener('click', applyDiscount);
+      }
+      
+      // Complete order button
+      const completeOrderBtn = document.getElementById('complete-order');
+      if (completeOrderBtn) {
+        completeOrderBtn.addEventListener('click', completeOrder);
+      }
+    });
+  </script>
+</Layout>
