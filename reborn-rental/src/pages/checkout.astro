@@ -141,6 +141,177 @@ import Layout from "../layouts/Layout.astro";
     </div>
     </main>
 
+  <!-- Contact Info Modal -->
+  <div id="contact-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="bg-white rounded-lg max-w-md w-full shadow-2xl">
+      <!-- Header -->
+      <div class="p-6 border-b border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-900">Contact Information</h2>
+      </div>
+      
+      <!-- Content -->
+      <div class="p-6">
+        <p class="text-gray-600 text-sm mb-4">We need your contact information to send verification code</p>
+        
+        <!-- Phone Number -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+          <input 
+            type="tel" 
+            id="modal-phone"
+            placeholder="+1 (555) 000-0000"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
+          />
+        </div>
+        
+        <!-- Email -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+          <input 
+            type="email" 
+            id="modal-email"
+            placeholder="your.email@example.com"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
+          />
+        </div>
+      </div>
+      
+      <!-- Footer Buttons -->
+      <div class="p-6 pt-0 flex gap-3">
+        <button 
+          onclick="closeContactModal()" 
+          class="flex-1 bg-white border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200"
+        >
+          Cancel
+        </button>
+        <button 
+          onclick="sendVerificationCode()" 
+          class="flex-1 bg-[#CE9704] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#B8860B] transition-colors duration-200"
+        >
+          Send Code
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verification Code Modal -->
+  <div id="verification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="bg-white rounded-lg max-w-md w-full shadow-2xl">
+      <!-- Close Button -->
+      <div class="flex justify-end p-4">
+        <button onclick="closeVerificationModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Header -->
+      <div class="px-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">We need to verify you</h2>
+        <p class="text-gray-600 text-sm mb-6">Enter the code sent to <span id="verification-phone-display"></span></p>
+      </div>
+      
+      <!-- Verification Code Inputs -->
+      <div class="px-6 mb-6">
+        <div class="flex gap-2 justify-center">
+          <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" id="code-0" />
+          <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" id="code-1" />
+          <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" id="code-2" />
+          <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" id="code-3" />
+          <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" id="code-4" />
+          <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" id="code-5" />
+        </div>
+      </div>
+      
+      <!-- Session Timer -->
+      <div class="px-6 mb-6 text-center">
+        <p class="text-sm text-gray-600">For security reasons, your session will expire in <span id="session-timer" class="font-semibold text-[#CE9704]">20:00</span></p>
+      </div>
+      
+      <!-- Footer Buttons -->
+      <div class="px-6 pb-6 flex gap-3">
+        <button 
+          onclick="closeVerificationModal()" 
+          class="flex-1 bg-white border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200"
+        >
+          Cancel
+        </button>
+        <button 
+          onclick="verifyCode()" 
+          class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
+        >
+          Verify
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="bg-white rounded-lg max-w-md w-full shadow-2xl mx-auto mt-20">
+      <!-- Header -->
+      <div class="bg-green-500 text-white p-6 rounded-t-lg">
+        <div class="flex items-center justify-center mb-4">
+          <div class="bg-white rounded-full p-2">
+            <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+        </div>
+        <h2 class="text-2xl font-bold text-center">Request submitted</h2>
+      </div>
+      
+      <!-- Content -->
+      <div class="p-6">
+        <!-- Details section similar to image -->
+        <div class="mb-4">
+          <h3 class="text-green-600 font-bold text-lg mb-4">Request details</h3>
+          <div class="space-y-3">
+            <div>
+              <p class="text-green-600 font-semibold text-sm">Rental Period</p>
+              <p id="modal-rental-period" class="text-gray-800 text-sm"></p>
+            </div>
+            <div>
+              <p class="text-green-600 font-semibold text-sm">Delivery Address</p>
+              <p id="modal-delivery-address" class="text-gray-800 text-sm"></p>
+            </div>
+            <div>
+              <p class="text-green-600 font-semibold text-sm">Total Amount</p>
+              <p id="modal-total-amount" class="text-gray-800 text-sm"></p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Yellow Banner -->
+        <div class="bg-yellow-400 border border-yellow-500 rounded-lg p-4 mb-4">
+          <div class="flex items-center">
+            <svg class="w-6 h-6 text-yellow-800 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+            </svg>
+            <p class="text-yellow-900 text-xs font-semibold">Free same day and/or weekend deliveries so you don't miss your crews.</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Footer Buttons -->
+      <div class="p-6 pt-0 flex flex-col sm:flex-row gap-3">
+        <button 
+          onclick="window.location.href='/'" 
+          class="flex-1 bg-[#8B4513] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#A0522D] transition-colors duration-200"
+        >
+          Back to Search
+        </button>
+        <button 
+          onclick="closeSuccessModal()" 
+          class="flex-1 bg-green-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-200"
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Load cart data
     let cart: any[] = [];
@@ -165,7 +336,29 @@ import Layout from "../layouts/Layout.astro";
       const savedCart = localStorage.getItem('reborn-rentals-cart');
       if (savedCart) {
         cart = JSON.parse(savedCart);
+        // Initialize rentalDays for each item if not set
+        cart.forEach((item, index) => {
+          if (!item.rentalDays) {
+            cart[index].rentalDays = rentalDays;
+          }
+        });
         console.log('Cart loaded from localStorage:', cart);
+        renderCheckoutItems();
+        calculateTotals();
+      }
+    }
+    
+    // Update rental days for a specific item
+    function updateRentalDays(itemIndex: any, change: any) {
+      if (cart[itemIndex]) {
+        cart[itemIndex].rentalDays = (cart[itemIndex].rentalDays || rentalDays) + change;
+        // Ensure minimum of 1 day
+        if (cart[itemIndex].rentalDays < 1) {
+          cart[itemIndex].rentalDays = 1;
+        }
+        // Update cart in localStorage
+        localStorage.setItem('reborn-rentals-cart', JSON.stringify(cart));
+        // Re-render items and recalculate totals
         renderCheckoutItems();
         calculateTotals();
       }
@@ -206,7 +399,8 @@ import Layout from "../layouts/Layout.astro";
       const itemsHTML = cart.map((item, index) => {
         // Use the data directly from the cart item
         const price = item.price || 0;
-        const itemTotal = price * item.quantity * rentalDays;
+        const days = item.rentalDays || rentalDays; // Use item-specific days if available
+        const itemTotal = price * item.quantity * days;
         
         return `
           <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
@@ -229,7 +423,23 @@ import Layout from "../layouts/Layout.astro";
                 <span class="text-[#CE9704] font-semibold text-sm">ID: ${item.id}</span>
                 <span class="text-gray-500 text-sm">${item.quantity}pc</span>
                 <span class="text-gray-500 text-sm">${price}$ / Day</span>
-                <span class="text-[#CE9704] font-semibold text-sm">${rentalDays} Days*</span>
+                
+                <!-- Days Selector -->
+                <div class="flex items-center space-x-2">
+                  <button 
+                    onclick="updateRentalDays(${index}, -1)" 
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs font-medium transition-colors duration-200"
+                  >
+                    −
+                  </button>
+                  <span class="text-[#CE9704] font-semibold text-sm min-w-[30px] text-center">${days} Days</span>
+                  <button 
+                    onclick="updateRentalDays(${index}, 1)" 
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs font-medium transition-colors duration-200"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
             
@@ -241,86 +451,10 @@ import Layout from "../layouts/Layout.astro";
         `;
       }).join('');
 
-      // Add delivery and pickup fees (same as in the image)
-      const deliveryFee = 500;
-      const pickupFee = 500;
-      const roughTerrainFee = 200;
-
-      const feesHTML = `
-        <!-- Delivery Fee -->
-        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-          <div class="flex-shrink-0">
-            <div class="w-16 h-16 bg-[#CE9704] rounded-lg p-2 flex items-center justify-center shadow-sm">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-              </svg>
-            </div>
-          </div>
-          <div class="flex-1 min-w-0">
-            <h4 class="text-lg font-semibold text-gray-900">Delivery Fee Crane Truck</h4>
-            <p class="text-sm text-gray-600">Delivery Fee Crane Truck (Standard Fare)</p>
-            <div class="flex items-center space-x-4 mt-2">
-              <span class="text-[#CE9704] font-semibold text-sm">ID: YY12-901</span>
-              <span class="text-gray-500 text-sm">1pc</span>
-              <span class="text-gray-500 text-sm">FLAT RATE</span>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-xl font-bold text-gray-900">${deliveryFee.toFixed(2)} $</div>
-          </div>
-        </div>
-
-        <!-- Pickup Fee -->
-        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-          <div class="flex-shrink-0">
-            <div class="w-16 h-16 bg-[#CE9704] rounded-lg p-2 flex items-center justify-center shadow-sm">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-              </svg>
-            </div>
-          </div>
-          <div class="flex-1 min-w-0">
-            <h4 class="text-lg font-semibold text-gray-900">Pick-up Fee Crane Truck</h4>
-            <p class="text-sm text-gray-600">Pick-up Fee Crane Truck (Standard Fare)</p>
-            <div class="flex items-center space-x-4 mt-2">
-              <span class="text-[#CE9704] font-semibold text-sm">ID: YY12-901</span>
-              <span class="text-gray-500 text-sm">1pc</span>
-              <span class="text-gray-500 text-sm">FLAT RATE</span>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-xl font-bold text-gray-900">${pickupFee.toFixed(2)} $</div>
-          </div>
-        </div>
-
-        <!-- Rough Terrain Surcharge -->
-        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-          <div class="flex-shrink-0">
-            <div class="w-16 h-16 bg-[#CE9704] rounded-lg p-2 flex items-center justify-center shadow-sm">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-              </svg>
-            </div>
-          </div>
-          <div class="flex-1 min-w-0">
-            <h4 class="text-lg font-semibold text-gray-900">Rough Terrain Surcharge</h4>
-            <p class="text-sm text-gray-600">Additional fee for rough terrain delivery</p>
-            <div class="flex items-center space-x-4 mt-2">
-              <span class="text-[#CE9704] font-semibold text-sm">ID: YY12-337</span>
-              <span class="text-gray-500 text-sm">1pc</span>
-              <span class="text-gray-500 text-sm">FLAT RATE</span>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-xl font-bold text-gray-900">${roughTerrainFee.toFixed(2)} $</div>
-          </div>
-        </div>
-      `;
-
-      checkoutItems.innerHTML = itemsHTML + feesHTML;
+      checkoutItems.innerHTML = itemsHTML;
       
       if (totalItems) {
-        totalItems.textContent = (cart.length + 3).toString(); // +3 for delivery, pickup, and rough terrain fees
+        totalItems.textContent = cart.length.toString();
       }
     }
 
@@ -329,31 +463,26 @@ import Layout from "../layouts/Layout.astro";
       // Calculate subtotal using the actual cart data
       const subtotal = cart.reduce((sum, item) => {
         const price = item.price || 0;
-        return sum + (price * item.quantity * rentalDays);
+        const days = item.rentalDays || rentalDays; // Use item-specific days if available
+        return sum + (price * item.quantity * days);
       }, 0);
-
-      // Add fees
-      const deliveryFee = 500;
-      const pickupFee = 500;
-      const roughTerrainFee = 200;
-      const feesTotal = deliveryFee + pickupFee + roughTerrainFee;
 
       // Calculate discount
       let discount = 0;
       if (discountApplied) {
         if (discountPercentage > 0) {
-          discount = (subtotal + feesTotal) * (discountPercentage / 100);
+          discount = subtotal * (discountPercentage / 100);
         } else {
           discount = discountAmount;
         }
       }
 
-      // Calculate tax (2% on subtotal + fees - discount)
-      const taxableAmount = subtotal + feesTotal - discount;
+      // Calculate tax (2% on subtotal - discount)
+      const taxableAmount = subtotal - discount;
       const tax = taxableAmount * 0.02;
 
       // Calculate final total
-      const finalTotal = subtotal + feesTotal - discount + tax;
+      const finalTotal = subtotal - discount + tax;
 
       // Update UI
       const taxAmount = document.getElementById('tax-amount');
@@ -392,7 +521,7 @@ import Layout from "../layouts/Layout.astro";
       }
     }
 
-    // Complete order
+    // Complete order - Show contact modal first
     function completeOrder() {
       // Validate payment form
       const cardNumber = (document.querySelector('input[placeholder="1234 5678 9012 3456"]') as HTMLInputElement)?.value;
@@ -405,15 +534,181 @@ import Layout from "../layouts/Layout.astro";
         return;
       }
 
-      // Simulate order processing
-      alert('Order completed successfully! Thank you for your business.');
+      // Show contact modal first
+      const contactModal = document.getElementById('contact-modal');
+      if (contactModal) {
+        contactModal.style.display = 'flex';
+      }
+    }
+    
+    // Send verification code
+    function sendVerificationCode() {
+      const phone = (document.getElementById('modal-phone') as HTMLInputElement)?.value;
+      const email = (document.getElementById('modal-email') as HTMLInputElement)?.value;
+      
+      if (!phone || !email) {
+        alert('Please fill in all fields.');
+        return;
+      }
+      
+      // Close contact modal
+      const contactModal = document.getElementById('contact-modal');
+      if (contactModal) {
+        contactModal.style.display = 'none';
+      }
+      
+      // Show phone in verification modal
+      const phoneDisplay = document.getElementById('verification-phone-display');
+      if (phoneDisplay) {
+        phoneDisplay.textContent = phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) ***-$3');
+      }
+      
+      // Show verification modal
+      const verificationModal = document.getElementById('verification-modal');
+      if (verificationModal) {
+        verificationModal.style.display = 'flex';
+      }
+      
+      // Start session timer
+      startSessionTimer();
+      
+      // Auto-focus first input
+      setTimeout(() => {
+        const firstInput = document.getElementById('code-0') as HTMLInputElement;
+        firstInput?.focus();
+        
+        // Add auto-advance functionality
+        for (let i = 0; i < 6; i++) {
+          const input = document.getElementById(`code-${i}`) as HTMLInputElement;
+          if (input) {
+            input.addEventListener('input', function(e: any) {
+              const value = e.target.value;
+              if (value && i < 5) {
+                const nextInput = document.getElementById(`code-${i + 1}`) as HTMLInputElement;
+                nextInput?.focus();
+              }
+            });
+            
+            input.addEventListener('keydown', function(e: any) {
+              if (e.key === 'Backspace' && !e.target.value && i > 0) {
+                const prevInput = document.getElementById(`code-${i - 1}`) as HTMLInputElement;
+                prevInput?.focus();
+              }
+            });
+          }
+        }
+      }, 100);
+    }
+    
+    // Verify code
+    function verifyCode() {
+      let code = '';
+      for (let i = 0; i < 6; i++) {
+        const input = document.getElementById(`code-${i}`) as HTMLInputElement;
+        code += input?.value || '';
+      }
+      
+      if (code.length !== 6) {
+        alert('Please enter the 6-digit verification code.');
+        return;
+      }
+      
+      // Close verification modal
+      const verificationModal = document.getElementById('verification-modal');
+      if (verificationModal) {
+        verificationModal.style.display = 'none';
+      }
+      
+      // Get rental period info
+      const savedFormData = localStorage.getItem('reborn-rentals-directions');
+      let rentalPeriodInfo = 'N/A';
+      let deliveryAddress = 'N/A';
+      
+      if (savedFormData) {
+        const formData = JSON.parse(savedFormData);
+        const startDate = new Date(formData.startDate);
+        const endDate = new Date(formData.endDate);
+        const days = Math.ceil(Math.abs(endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        rentalPeriodInfo = `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()} (${days} days)`;
+        deliveryAddress = formData.jobsiteAddress || 'Not specified';
+      }
+      
+      // Get total amount
+      const finalTotalElement = document.getElementById('final-total');
+      const totalAmount = finalTotalElement?.textContent || '$0.00';
+      
+      // Populate success modal with data
+      document.getElementById('modal-rental-period')!.textContent = rentalPeriodInfo;
+      document.getElementById('modal-delivery-address')!.textContent = deliveryAddress;
+      document.getElementById('modal-total-amount')!.textContent = totalAmount;
+      
+      // Show success modal
+      const successModal = document.getElementById('success-modal');
+      if (successModal) {
+        successModal.style.display = 'flex';
+      }
+    }
+    
+    // Close contact modal
+    function closeContactModal() {
+      const modal = document.getElementById('contact-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+    
+    // Close verification modal
+    function closeVerificationModal() {
+      const modal = document.getElementById('verification-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+    
+    // Close success modal
+    function closeSuccessModal() {
+      const modal = document.getElementById('success-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
       
       // Clear cart and redirect
       localStorage.removeItem('reborn-rentals-cart');
       localStorage.removeItem('reborn-rentals-directions');
       window.location.href = '/';
     }
+    
+    // Start session timer (20 minutes)
+    function startSessionTimer() {
+      let timeLeft = 20 * 60; // 20 minutes in seconds
+      
+      const timer = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        
+        const timerElement = document.getElementById('session-timer');
+        if (timerElement) {
+          timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          alert('Session expired. Please try again.');
+          closeVerificationModal();
+        }
+      }, 1000);
+    }
 
+    // Make functions global
+    (window as any).updateRentalDays = updateRentalDays;
+    (window as any).closeSuccessModal = closeSuccessModal;
+    (window as any).sendVerificationCode = sendVerificationCode;
+    (window as any).verifyCode = verifyCode;
+    (window as any).closeContactModal = closeContactModal;
+    (window as any).closeVerificationModal = closeVerificationModal;
+    
     // Initialize checkout
     document.addEventListener('DOMContentLoaded', function() {
       loadCartFromStorage();
