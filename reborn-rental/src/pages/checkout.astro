@@ -23,38 +23,14 @@ import Layout from "../layouts/Layout.astro";
           </div>
         </div>
 
-        <!-- Discount Code Section -->
-        <div class="p-6 border-b border-gray-200">
-          <div class="flex items-center justify-between">
+        <!-- Applied Discount (hidden by default, shown when coupon is applied) -->
+        <div id="applied-discount" class="p-6 border-b border-gray-200 hidden">
+          <div class="flex items-center justify-between bg-green-50 p-3 rounded-lg">
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">Discount Code</h3>
-              <p class="text-sm text-gray-600">Enter a discount code if you have one</p>
+              <span class="text-green-800 font-semibold" id="discount-name">BIGPANS101</span>
+              <span class="text-green-600 ml-2" id="discount-type">-20% OFF</span>
             </div>
-            <div class="flex items-center space-x-4">
-              <input 
-                type="text" 
-                id="discount-code" 
-                placeholder="Enter code"
-                class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
-              />
-              <button 
-                id="apply-discount"
-                class="bg-[#CE9704] text-white px-4 py-2 rounded-lg hover:bg-[#B8860B] transition-colors duration-200"
-              >
-                Apply
-              </button>
-            </div>
-          </div>
-          
-          <!-- Applied Discount -->
-          <div id="applied-discount" class="mt-4 hidden">
-            <div class="flex items-center justify-between bg-green-50 p-3 rounded-lg">
-              <div>
-                <span class="text-green-800 font-semibold" id="discount-name">BIGPANS101</span>
-                <span class="text-green-600 ml-2" id="discount-type">-10% OFF</span>
-              </div>
-              <span class="text-green-800 font-bold" id="discount-amount">-$0.00</span>
-            </div>
+            <span class="text-green-800 font-bold" id="discount-amount">-$0.00</span>
           </div>
         </div>
 
@@ -79,126 +55,38 @@ import Layout from "../layouts/Layout.astro";
             <div class="text-3xl font-bold text-gray-900" id="final-total">$0.00</div>
           </div>
         </div>
-
-        <!-- Payment Section -->
-        <div class="p-6">
-          <h3 class="text-xl font-semibold text-gray-900 mb-4">Payment Information</h3>
-          
-          <!-- Payment Form -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Card Number -->
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
-              <input 
-                type="text" 
-                placeholder="1234 5678 9012 3456"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
-              />
-            </div>
-            
-            <!-- Expiry Date -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
-              <input 
-                type="text" 
-                placeholder="MM/YY"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
-              />
-            </div>
-            
-            <!-- CVV -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
-              <input 
-                type="text" 
-                placeholder="123"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
-              />
-            </div>
-            
-            <!-- Cardholder Name -->
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
-              <input 
-                type="text" 
-                placeholder="John Doe"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
-              />
-            </div>
-          </div>
-          
-          <!-- Complete Order Button -->
-          <div class="mt-8">
-            <button 
-              id="complete-order"
-              class="w-full bg-[#CE9704] text-white py-4 px-6 rounded-lg font-bold text-lg hover:bg-[#B8860B] transition-colors duration-200"
-            >
-              Complete Order
-            </button>
-          </div>
-        </div>
       </div>
     </div>
     </main>
 
-  <!-- Contact Info Modal -->
-  <div id="contact-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
-    <div class="bg-white rounded-lg max-w-md w-full shadow-2xl">
-      <!-- Header -->
-      <div class="p-6 border-b border-gray-200">
-        <h2 class="text-xl font-semibold text-gray-900">Contact Information</h2>
-      </div>
-      
-      <!-- Content -->
-      <div class="p-6">
-        <p class="text-gray-600 text-sm mb-4">We need your contact information to send verification code</p>
-        
-        <!-- Phone Number -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-          <input 
-            type="tel" 
-            id="modal-phone"
-            placeholder="+1 (555) 000-0000"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
-          />
-        </div>
-        
-        <!-- Email -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-          <input 
-            type="email" 
-            id="modal-email"
-            placeholder="your.email@example.com"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
-          />
-        </div>
-      </div>
-      
-      <!-- Footer Buttons -->
-      <div class="p-6 pt-0 flex gap-3">
-        <button 
-          onclick="closeContactModal()" 
-          class="flex-1 bg-white border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200"
-        >
-          Cancel
-        </button>
-        <button 
-          onclick="sendVerificationCode()" 
-          class="flex-1 bg-[#CE9704] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#B8860B] transition-colors duration-200"
-        >
-          Send Code
-        </button>
-      </div>
+  <!-- Verification Code Modal with Instructions and Timer -->
+  <div id="verification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex flex-col items-center justify-center p-4" style="display: none;">
+    <!-- Instructions above modal -->
+    <div id="verification-instructions" class="text-center text-gray-600 text-sm mb-4 w-full max-w-md">
+      <p>To proceed with the payment, please enter the verification code sent to your phone number <span id="instructions-phone" class="font-semibold"></span></p>
     </div>
-  </div>
-
-  <!-- Verification Code Modal -->
-  <div id="verification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
-    <div class="bg-white rounded-lg max-w-md w-full shadow-2xl">
-      <!-- Close Button -->
-      <div class="flex justify-end p-4">
+    
+    <!-- Modal Container -->
+    <div class="bg-white rounded-lg max-w-md w-full shadow-2xl relative mb-4">
+      <!-- Header with Payment Method Icons and Close Button -->
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <!-- Generic Card Icon -->
+          <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+          </div>
+          <!-- Mastercard Logo -->
+          <div class="w-8 h-8 rounded bg-red-500 flex items-center justify-center relative overflow-hidden">
+            <div class="absolute left-0 w-4 h-8 bg-orange-500 rounded-l-full"></div>
+            <div class="absolute right-0 w-4 h-8 bg-red-500 rounded-r-full"></div>
+          </div>
+          <!-- American Express Logo -->
+          <div class="w-8 h-6 bg-blue-600 rounded flex items-center justify-center">
+            <span class="text-white text-xs font-bold">AMEX</span>
+          </div>
+        </div>
         <button onclick="closeVerificationModal()" class="text-gray-400 hover:text-gray-600">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -206,34 +94,33 @@ import Layout from "../layouts/Layout.astro";
         </button>
       </div>
       
-      <!-- Header -->
-      <div class="px-6">
+      <!-- Title -->
+      <div class="px-6 pt-6">
         <h2 class="text-xl font-semibold text-gray-900 mb-2">We need to verify you</h2>
-        <p class="text-gray-600 text-sm mb-6">Enter the code sent to <span id="verification-phone-display"></span></p>
+        <p class="text-gray-600 text-sm mb-6">Enter the code Mastercard sent to <span id="verification-phone-display" class="font-medium"></span></p>
       </div>
       
-      <!-- Verification Code Inputs -->
-      <div class="px-6 mb-6">
-        <div class="flex gap-2 justify-center">
-          <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" id="code-0" />
-          <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" id="code-1" />
-          <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" id="code-2" />
-          <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" id="code-3" />
-          <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" id="code-4" />
-          <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" id="code-5" />
+      <!-- Verification Code Inputs (5 digits) -->
+      <div class="px-6 mb-4">
+        <div class="flex gap-3 justify-center">
+          <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-0" />
+          <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-1" />
+          <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-2" />
+          <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-3" />
+          <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-4" />
         </div>
       </div>
       
-      <!-- Session Timer -->
-      <div class="px-6 mb-6 text-center">
-        <p class="text-sm text-gray-600">For security reasons, your session will expire in <span id="session-timer" class="font-semibold text-[#CE9704]">20:00</span></p>
+      <!-- Continue another way link -->
+      <div class="px-6 mb-6">
+        <a href="#" class="text-sm text-blue-600 hover:text-blue-800 underline">Continue another way</a>
       </div>
       
       <!-- Footer Buttons -->
       <div class="px-6 pb-6 flex gap-3">
         <button 
           onclick="closeVerificationModal()" 
-          class="flex-1 bg-white border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200"
+          class="flex-1 bg-white border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200"
         >
           Cancel
         </button>
@@ -245,69 +132,162 @@ import Layout from "../layouts/Layout.astro";
         </button>
       </div>
     </div>
+    
+    <!-- Session Timer (outside modal, below it) -->
+    <div class="text-center text-gray-600 text-sm w-full max-w-md">
+      <p>For security reasons, your session will expire in <span id="session-timer" class="font-semibold text-[#CE9704]">20:00</span></p>
+    </div>
   </div>
 
   <!-- Success Modal -->
-  <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
-    <div class="bg-white rounded-lg max-w-md w-full shadow-2xl mx-auto mt-20">
-      <!-- Header -->
-      <div class="bg-green-500 text-white p-6 rounded-t-lg">
-        <div class="flex items-center justify-center mb-4">
-          <div class="bg-white rounded-full p-2">
-            <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+  <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="bg-[#333333] rounded-lg max-w-lg w-full relative shadow-2xl p-8">
+      <!-- Close Button -->
+      <div class="absolute top-4 right-4 z-10">
+        <button onclick="closeSuccessModal()" class="text-white hover:text-gray-300 p-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Logo -->
+      <div class="flex justify-center mb-8">
+        <img src="/Logo.png" alt="Reborn Rental" class="h-16 w-auto object-contain" />
+      </div>
+      
+      <!-- Success Message -->
+      <div class="text-center mb-6">
+        <h1 class="text-5xl md:text-6xl font-bold text-white mb-4">
+          Success<span class="text-[#CE9704]">!!!</span>
+        </h1>
+        <p class="text-xl md:text-2xl font-bold text-white mb-8">
+          Your Reservation is in place! you're all set!
+        </p>
+      </div>
+      
+      <!-- Details Message -->
+      <div class="text-center text-white mb-8 space-y-3">
+        <p class="text-base">We'll email you your reservation confirmation and receipt.</p>
+        <p class="text-base">Thank you for choosing RebornRental as your Rental Partner.</p>
+      </div>
+      
+      <!-- Social Media Section -->
+      <div class="text-center mb-8">
+        <p class="text-white mb-4">FOLLOW US ON</p>
+        <div class="flex justify-center gap-4">
+          <!-- Facebook -->
+          <a href="https://www.facebook.com/rebornrentals/" target="_blank" rel="noopener noreferrer" class="w-12 h-12 bg-black border-2 border-white rounded flex items-center justify-center hover:bg-gray-800 transition-colors">
+            <span class="text-white font-bold text-xl">f</span>
+          </a>
+          <!-- Instagram -->
+          <a href="https://www.instagram.com/reborn_rentals/" target="_blank" rel="noopener noreferrer" class="w-12 h-12 bg-black border-2 border-white rounded flex items-center justify-center hover:bg-gray-800 transition-colors">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
             </svg>
-          </div>
+          </a>
+          <!-- LinkedIn -->
+          <a href="https://www.linkedin.com/company/reborn-rental/" target="_blank" rel="noopener noreferrer" class="w-12 h-12 bg-black border-2 border-white rounded flex items-center justify-center hover:bg-gray-800 transition-colors">
+            <span class="text-white font-bold text-sm">in</span>
+          </a>
         </div>
-        <h2 class="text-2xl font-bold text-center">Request submitted</h2>
+      </div>
+      
+      <!-- Go to Homepage Button -->
+      <div class="w-full">
+        <button 
+          onclick="goToHomepage()" 
+          class="w-full bg-[#CE9704] text-white py-4 px-6 rounded-lg font-bold text-lg hover:bg-[#B8860B] transition-colors duration-200"
+        >
+          Go to Homepage
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Confirmation Modal -->
+  <div id="checkout-confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="bg-white rounded-lg max-w-md w-full shadow-2xl">
+      <!-- Header -->
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold text-gray-900">Confirm Checkout</h2>
+          <button onclick="closeCheckoutConfirmationModal()" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
       
       <!-- Content -->
       <div class="p-6">
-        <!-- Details section similar to image -->
-        <div class="mb-4">
-          <h3 class="text-green-600 font-bold text-lg mb-4">Request details</h3>
-          <div class="space-y-3">
-            <div>
-              <p class="text-green-600 font-semibold text-sm">Rental Period</p>
-              <p id="modal-rental-period" class="text-gray-800 text-sm"></p>
-            </div>
-            <div>
-              <p class="text-green-600 font-semibold text-sm">Delivery Address</p>
-              <p id="modal-delivery-address" class="text-gray-800 text-sm"></p>
-            </div>
-            <div>
-              <p class="text-green-600 font-semibold text-sm">Total Amount</p>
-              <p id="modal-total-amount" class="text-gray-800 text-sm"></p>
-            </div>
-          </div>
-        </div>
+        <p class="text-gray-600 text-sm mb-6">Are you ready to complete your order? This will process your rental request.</p>
         
-        <!-- Yellow Banner -->
-        <div class="bg-yellow-400 border border-yellow-500 rounded-lg p-4 mb-4">
-          <div class="flex items-center">
-            <svg class="w-6 h-6 text-yellow-800 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-            </svg>
-            <p class="text-yellow-900 text-xs font-semibold">Free same day and/or weekend deliveries so you don't miss your crews.</p>
+        <!-- Order Summary -->
+        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+          <h3 class="font-semibold text-gray-900 mb-3">Order Summary</h3>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Subtotal:</span>
+              <span class="text-gray-900 font-medium" id="modal-subtotal">$0.00</span>
+            </div>
+            <div id="modal-discount-row" class="hidden">
+              <div class="flex justify-between">
+                <span class="text-green-600">Discount:</span>
+                <span class="text-green-600 font-medium" id="modal-discount">-$0.00</span>
+              </div>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Tax:</span>
+              <span class="text-gray-900 font-medium" id="modal-tax">$0.00</span>
+            </div>
+            <div class="border-t border-gray-300 pt-2 mt-2">
+              <div class="flex justify-between">
+                <span class="font-semibold text-gray-900">Total:</span>
+                <span class="font-bold text-lg text-gray-900" id="modal-total">$0.00</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       
       <!-- Footer Buttons -->
-      <div class="p-6 pt-0 flex flex-col sm:flex-row gap-3">
+      <div class="p-6 pt-0 flex gap-3">
         <button 
-          onclick="window.location.href='/'" 
-          class="flex-1 bg-[#8B4513] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#A0522D] transition-colors duration-200"
+          onclick="closeCheckoutConfirmationModal()" 
+          class="flex-1 bg-white border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200"
         >
-          Back to Search
+          Cancel
         </button>
         <button 
-          onclick="closeSuccessModal()" 
-          class="flex-1 bg-green-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-200"
+          onclick="confirmCheckout()" 
+          class="flex-1 bg-[#CE9704] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#B8860B] transition-colors duration-200"
         >
-          Continue
+          Confirm Order
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Method Modal -->
+  <div id="payment-method-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="bg-white rounded-lg max-w-md w-full shadow-2xl">
+      <!-- Header -->
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold text-gray-900" id="payment-modal-title">Payment Method Details</h2>
+          <button onclick="closePaymentMethodModal()" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Content -->
+      <div class="p-6" id="payment-method-form-container">
+        <!-- Form content will be inserted here dynamically -->
       </div>
     </div>
   </div>
@@ -500,8 +480,33 @@ import Layout from "../layouts/Layout.astro";
         
         if (appliedDiscount) appliedDiscount.classList.remove('hidden');
         if (discountName) discountName.textContent = 'BIGPANS101';
-        if (discountType) discountType.textContent = discountPercentage > 0 ? `-${discountPercentage}% OFF` : '-10% OFF';
+        if (discountType) discountType.textContent = discountPercentage > 0 ? `-${discountPercentage}% OFF` : '-20% OFF';
         if (discountAmountElement) discountAmountElement.textContent = `-$${discount.toFixed(2)}`;
+      }
+    }
+
+    // Function to show toast notification
+    function showNotification(message: string) {
+      const toastContainer = document.getElementById("toast-container");
+      if (toastContainer) {
+        const toast = document.createElement("div");
+        toast.className =
+          "bg-[#CE9704] text-white px-4 py-2 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300";
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+
+        // Animar entrada
+        setTimeout(() => {
+          toast.classList.remove("translate-x-full");
+        }, 100);
+
+        // Remover después de 3 segundos
+        setTimeout(() => {
+          toast.classList.add("translate-x-full");
+          setTimeout(() => {
+            toast.remove();
+          }, 300);
+        }, 3000);
       }
     }
 
@@ -511,57 +516,96 @@ import Layout from "../layouts/Layout.astro";
       
       if (discountCode && discountCode.toUpperCase() === 'BIGPANS101') {
         discountApplied = true;
-        discountPercentage = 10;
+        discountPercentage = 20;
         calculateTotals();
         
-        // Show success message
-        alert('Discount applied successfully!');
+        // Show toast notification
+        showNotification('Coupon code applied');
       } else if (discountCode) {
         alert('Invalid discount code. Please try again.');
       }
     }
 
-    // Complete order - Show contact modal first
-    function completeOrder() {
-      // Validate payment form
-      const cardNumber = (document.querySelector('input[placeholder="1234 5678 9012 3456"]') as HTMLInputElement)?.value;
-      const expiryDate = (document.querySelector('input[placeholder="MM/YY"]') as HTMLInputElement)?.value;
-      const cvv = (document.querySelector('input[placeholder="123"]') as HTMLInputElement)?.value;
-      const cardholderName = (document.querySelector('input[placeholder="John Doe"]') as HTMLInputElement)?.value;
+    // Function to open checkout confirmation modal
+    function openCheckoutConfirmationModal() {
+      const modal = document.getElementById('checkout-confirmation-modal');
+      if (!modal) return;
 
-      if (!cardNumber || !expiryDate || !cvv || !cardholderName) {
-        alert('Please fill in all payment fields.');
-        return;
+      // Calculate totals to show in modal
+      const subtotal = cart.reduce((sum, item) => {
+        const price = item.price || 0;
+        const days = item.rentalDays || rentalDays;
+        return sum + (price * item.quantity * days);
+      }, 0);
+
+      let discount = 0;
+      if (discountApplied && discountPercentage > 0) {
+        discount = subtotal * (discountPercentage / 100);
       }
 
-      // Show contact modal first
-      const contactModal = document.getElementById('contact-modal');
-      if (contactModal) {
-        contactModal.style.display = 'flex';
+      const taxableAmount = subtotal - discount;
+      const tax = taxableAmount * 0.02;
+      const finalTotal = subtotal - discount + tax;
+
+      // Update modal content
+      const modalSubtotal = document.getElementById('modal-subtotal');
+      const modalDiscount = document.getElementById('modal-discount');
+      const modalDiscountRow = document.getElementById('modal-discount-row');
+      const modalTax = document.getElementById('modal-tax');
+      const modalTotal = document.getElementById('modal-total');
+
+      if (modalSubtotal) modalSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+      if (modalTax) modalTax.textContent = `$${tax.toFixed(2)}`;
+      if (modalTotal) modalTotal.textContent = `$${finalTotal.toFixed(2)}`;
+
+      if (discountApplied && discount > 0) {
+        if (modalDiscount) modalDiscount.textContent = `-$${discount.toFixed(2)}`;
+        if (modalDiscountRow) modalDiscountRow.classList.remove('hidden');
+      } else {
+        if (modalDiscountRow) modalDiscountRow.classList.add('hidden');
+      }
+
+      modal.style.display = 'flex';
+    }
+
+    // Function to close checkout confirmation modal
+    function closeCheckoutConfirmationModal() {
+      const modal = document.getElementById('checkout-confirmation-modal');
+      if (modal) {
+        modal.style.display = 'none';
       }
     }
-    
-    // Send verification code
-    function sendVerificationCode() {
-      const phone = (document.getElementById('modal-phone') as HTMLInputElement)?.value;
-      const email = (document.getElementById('modal-email') as HTMLInputElement)?.value;
+
+    // Function to confirm checkout and proceed
+    function confirmCheckout() {
+      closeCheckoutConfirmationModal();
+      openVerificationModal();
+    }
+
+    // Function to open verification modal directly
+    function openVerificationModal() {
+      // Get phone from billing details
+      const billingDetails = localStorage.getItem('billing-details');
+      let phone = '';
       
-      if (!phone || !email) {
-        alert('Please fill in all fields.');
-        return;
+      if (billingDetails) {
+        try {
+          const billing = JSON.parse(billingDetails);
+          phone = billing.phone || '';
+        } catch (e) {
+          console.error('Error parsing billing details:', e);
+        }
       }
       
-      // Close contact modal
-      const contactModal = document.getElementById('contact-modal');
-      if (contactModal) {
-        contactModal.style.display = 'none';
-      }
+      // Format phone number for display
+      const formattedPhone = phone ? phone.replace(/(\d{3})(\d{3})(\d{4})/, '+1 (*) ***-$3') : '+1 (*) *-012';
       
-      // Show phone in verification modal
+      // Update phone display
       const phoneDisplay = document.getElementById('verification-phone-display');
-      if (phoneDisplay) {
-        phoneDisplay.textContent = phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) ***-$3');
-      }
+      const instructionsPhone = document.getElementById('instructions-phone');
+      
+      if (phoneDisplay) phoneDisplay.textContent = formattedPhone;
+      if (instructionsPhone) instructionsPhone.textContent = formattedPhone;
       
       // Show verification modal
       const verificationModal = document.getElementById('verification-modal');
@@ -577,13 +621,13 @@ import Layout from "../layouts/Layout.astro";
         const firstInput = document.getElementById('code-0') as HTMLInputElement;
         firstInput?.focus();
         
-        // Add auto-advance functionality
-        for (let i = 0; i < 6; i++) {
+        // Add auto-advance functionality for 5 inputs
+        for (let i = 0; i < 5; i++) {
           const input = document.getElementById(`code-${i}`) as HTMLInputElement;
           if (input) {
             input.addEventListener('input', function(e: any) {
               const value = e.target.value;
-              if (value && i < 5) {
+              if (value && i < 4) {
                 const nextInput = document.getElementById(`code-${i + 1}`) as HTMLInputElement;
                 nextInput?.focus();
               }
@@ -603,45 +647,18 @@ import Layout from "../layouts/Layout.astro";
     // Verify code
     function verifyCode() {
       let code = '';
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 5; i++) {
         const input = document.getElementById(`code-${i}`) as HTMLInputElement;
         code += input?.value || '';
       }
       
-      if (code.length !== 6) {
-        alert('Please enter the 6-digit verification code.');
+      if (code.length !== 5) {
+        alert('Please enter the 5-digit verification code.');
         return;
       }
       
-      // Close verification modal
-      const verificationModal = document.getElementById('verification-modal');
-      if (verificationModal) {
-        verificationModal.style.display = 'none';
-      }
-      
-      // Get rental period info
-      const savedFormData = localStorage.getItem('reborn-rentals-directions');
-      let rentalPeriodInfo = 'N/A';
-      let deliveryAddress = 'N/A';
-      
-      if (savedFormData) {
-        const formData = JSON.parse(savedFormData);
-        const startDate = new Date(formData.startDate);
-        const endDate = new Date(formData.endDate);
-        const days = Math.ceil(Math.abs(endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-        
-        rentalPeriodInfo = `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()} (${days} days)`;
-        deliveryAddress = formData.jobsiteAddress || 'Not specified';
-      }
-      
-      // Get total amount
-      const finalTotalElement = document.getElementById('final-total');
-      const totalAmount = finalTotalElement?.textContent || '$0.00';
-      
-      // Populate success modal with data
-      document.getElementById('modal-rental-period')!.textContent = rentalPeriodInfo;
-      document.getElementById('modal-delivery-address')!.textContent = deliveryAddress;
-      document.getElementById('modal-total-amount')!.textContent = totalAmount;
+      // Close verification modal first
+      closeVerificationModal();
       
       // Show success modal
       const successModal = document.getElementById('success-modal');
@@ -650,19 +667,16 @@ import Layout from "../layouts/Layout.astro";
       }
     }
     
-    // Close contact modal
-    function closeContactModal() {
-      const modal = document.getElementById('contact-modal');
-      if (modal) {
-        modal.style.display = 'none';
-      }
-    }
-    
     // Close verification modal
     function closeVerificationModal() {
       const modal = document.getElementById('verification-modal');
+      const instructions = document.getElementById('verification-instructions');
+      
       if (modal) {
         modal.style.display = 'none';
+      }
+      if (instructions) {
+        instructions.style.display = 'none';
       }
     }
     
@@ -672,10 +686,17 @@ import Layout from "../layouts/Layout.astro";
       if (modal) {
         modal.style.display = 'none';
       }
-      
+    }
+    
+    // Go to homepage function
+    function goToHomepage() {
       // Clear cart and redirect
       localStorage.removeItem('reborn-rentals-cart');
       localStorage.removeItem('reborn-rentals-directions');
+      localStorage.removeItem('foreman-details');
+      localStorage.removeItem('billing-details');
+      localStorage.removeItem('payment-method');
+      localStorage.removeItem('payment-method-details');
       window.location.href = '/';
     }
     
@@ -704,27 +725,1312 @@ import Layout from "../layouts/Layout.astro";
     // Make functions global
     (window as any).updateRentalDays = updateRentalDays;
     (window as any).closeSuccessModal = closeSuccessModal;
-    (window as any).sendVerificationCode = sendVerificationCode;
+    (window as any).goToHomepage = goToHomepage;
     (window as any).verifyCode = verifyCode;
-    (window as any).closeContactModal = closeContactModal;
     (window as any).closeVerificationModal = closeVerificationModal;
+    (window as any).openVerificationModal = openVerificationModal;
+    // Function to close payment method modal (global)
+    function closePaymentMethodModal() {
+      const modal = document.getElementById('payment-method-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
     
+    // Make functions global
+    (window as any).closePaymentMethodModal = closePaymentMethodModal;
+
     // Initialize checkout
     document.addEventListener('DOMContentLoaded', function() {
       loadCartFromStorage();
       loadRentalPeriod();
       
-      // Apply discount button
-      const applyDiscountBtn = document.getElementById('apply-discount');
-      if (applyDiscountBtn) {
-        applyDiscountBtn.addEventListener('click', applyDiscount);
+      // Automatically open the cart sidebar
+      const cartSidebar = document.getElementById('cart-sidebar');
+      if (cartSidebar) {
+        cartSidebar.classList.remove('translate-x-full');
+        cartSidebar.classList.add('translate-x-0');
+        
+        // Show step indicator
+        const stepIndicatorContainer = document.getElementById('step-indicator-container');
+        if (stepIndicatorContainer) {
+          stepIndicatorContainer.style.display = 'block';
+        }
       }
       
-      // Complete order button
-      const completeOrderBtn = document.getElementById('complete-order');
-      if (completeOrderBtn) {
-        completeOrderBtn.addEventListener('click', completeOrder);
+      // Replace sidebar content with checkout payment details
+      const sidebarContent = cartSidebar?.querySelector('.p-8');
+      
+      if (sidebarContent) {
+        sidebarContent.innerHTML = `
+          <div class="text-white">
+            <!-- Title: Payment Details -->
+            <h3 class="text-2xl font-bold text-[#CE9704] mb-6">Payment Details</h3>
+            
+            <!-- Apply Coupon Code -->
+            <div class="mb-6">
+              <label class="block text-white text-sm mb-3">Apply Coupon Code</label>
+              <div class="flex gap-3">
+                <input 
+                  type="text" 
+                  id="sidebar-coupon-code"
+                  placeholder="Enter coupon code"
+                  class="flex-1 px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+                <button 
+                  id="sidebar-apply-coupon"
+                  class="bg-[#000000] text-white px-4 py-1.5 rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors duration-200"
+                >
+                  Apply Coupon
+                </button>
+              </div>
+            </div>
+            
+            <!-- Divider -->
+            <div class="border-t border-gray-500 my-6"></div>
+            
+            <!-- Foreman Details / Receiving person -->
+            <div id="foreman-details-container">
+              <label class="block text-white text-sm mb-4">Foreman Details / Receiving person</label>
+              
+              <!-- First Name -->
+              <div class="mb-3">
+                <label class="block text-white text-xs mb-1.5">First Name</label>
+                <input 
+                  type="text" 
+                  id="foreman-first-name"
+                  placeholder="Enter first name"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              
+              <!-- Last Name -->
+              <div class="mb-3">
+                <label class="block text-white text-xs mb-1.5">Last Name</label>
+                <input 
+                  type="text" 
+                  id="foreman-last-name"
+                  placeholder="Enter last name"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              
+              <!-- Phone Number -->
+              <div class="mb-3">
+                <label class="block text-white text-xs mb-1.5">Phone Number</label>
+                <input 
+                  type="tel" 
+                  id="foreman-phone"
+                  placeholder="Enter phone number"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              
+              <!-- Email -->
+              <div class="mb-4">
+                <label class="block text-white text-xs mb-1.5">Email</label>
+                <input 
+                  type="email" 
+                  id="foreman-email"
+                  placeholder="Enter email"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              
+              <!-- Continue Button -->
+              <button 
+                id="foreman-continue-btn"
+                class="w-full bg-[#000000] text-white py-2 rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors duration-200"
+              >
+                Continue
+              </button>
+            </div>
+            
+            <!-- Divider -->
+            <div class="border-t border-gray-500 my-6"></div>
+            
+            <!-- Billing Details -->
+            <div id="billing-details-container">
+              <div class="flex items-center justify-between mb-4">
+                <label class="block text-white text-sm">Billing Details</label>
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              
+              <!-- First Name and Last Name -->
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <input 
+                    type="text" 
+                    id="billing-first-name"
+                    placeholder="First Name*"
+                    class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                  />
+                </div>
+                <div>
+                  <input 
+                    type="text" 
+                    id="billing-last-name"
+                    placeholder="Last Name*"
+                    class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                  />
+                </div>
+              </div>
+              
+              <!-- Email and Phone Number -->
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <input 
+                    type="email" 
+                    id="billing-email"
+                    placeholder="Email*"
+                    class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                  />
+                </div>
+                <div>
+                  <input 
+                    type="tel" 
+                    id="billing-phone"
+                    placeholder="Phone number*"
+                    class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                  />
+                </div>
+              </div>
+              
+              <!-- Address Line 1 -->
+              <div class="mb-3">
+                <input 
+                  type="text" 
+                  id="billing-address-line-1"
+                  placeholder="Address line 1"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              
+              <!-- Address Line 2 -->
+              <div class="mb-3">
+                <input 
+                  type="text" 
+                  id="billing-address-line-2"
+                  placeholder="Address line 2"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              
+              <!-- City -->
+              <div class="mb-3">
+                <input 
+                  type="text" 
+                  id="billing-city"
+                  placeholder="City"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              
+              <!-- State / Province -->
+              <div class="mb-3">
+                <input 
+                  type="text" 
+                  id="billing-state"
+                  placeholder="State / Province"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              
+              <!-- Zip / Postal Code -->
+              <div class="mb-3">
+                <input 
+                  type="text" 
+                  id="billing-zip"
+                  placeholder="Zip / Postal Code"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              
+              <!-- Country -->
+              <div class="mb-4">
+                <input 
+                  type="text" 
+                  id="billing-country"
+                  placeholder="Country"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              
+              <!-- Checkbox -->
+              <div class="flex items-center mb-4">
+                <input 
+                  type="checkbox" 
+                  id="billing-is-company"
+                  class="w-4 h-4 bg-white border-gray-300 rounded text-[#CE9704] focus:ring-[#CE9704]"
+                />
+                <label for="billing-is-company" class="ml-2 text-white text-sm">Billed is assigned to a company.</label>
+              </div>
+              
+              <!-- Company Fields (hidden by default) -->
+              <div id="company-fields" class="hidden mb-4">
+                <div class="mb-3">
+                  <input 
+                    type="text" 
+                    id="billing-company-name"
+                    placeholder="Company Name"
+                    class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                  />
+                </div>
+                <div class="mb-4">
+                  <input 
+                    type="text" 
+                    id="billing-job-title"
+                    placeholder="Job Title"
+                    class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                  />
+                </div>
+              </div>
+              
+              <!-- Continue Button -->
+              <button 
+                id="billing-continue-btn"
+                class="w-full bg-[#000000] text-white py-2 rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors duration-200"
+              >
+                Continue
+              </button>
+            </div>
+            
+            <!-- Divider -->
+            <div class="border-t border-gray-500 my-6"></div>
+            
+            <!-- Payment Method -->
+            <div id="payment-method-container">
+              <label class="block text-white text-sm mb-4">Payment Method</label>
+              
+              <div class="space-y-3">
+                <!-- Credit/Debit Card -->
+                <div class="flex items-center">
+                  <input 
+                    type="radio" 
+                    id="payment-credit-debit"
+                    name="payment-method"
+                    value="credit-debit"
+                    class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
+                  />
+                  <label for="payment-credit-debit" class="ml-3 text-white text-sm">Credit/Debit Card</label>
+                </div>
+                
+                <!-- Direct Debit/ACH Wire Transfer -->
+                <div class="flex items-center">
+                  <input 
+                    type="radio" 
+                    id="payment-direct-debit"
+                    name="payment-method"
+                    value="direct-debit"
+                    class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
+                  />
+                  <label for="payment-direct-debit" class="ml-3 text-white text-sm">Direct Debit/ ACH Wire Transfer</label>
+                </div>
+                
+                <!-- Google Pay -->
+                <div class="flex items-center">
+                  <input 
+                    type="radio" 
+                    id="payment-google-pay"
+                    name="payment-method"
+                    value="google-pay"
+                    class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
+                  />
+                  <label for="payment-google-pay" class="ml-3 text-white text-sm">Google Pay</label>
+                </div>
+                
+                <!-- Apple Pay -->
+                <div class="flex items-center">
+                  <input 
+                    type="radio" 
+                    id="payment-apple-pay"
+                    name="payment-method"
+                    value="apple-pay"
+                    class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
+                  />
+                  <label for="payment-apple-pay" class="ml-3 text-white text-sm">Apple Pay</label>
+                </div>
+                
+                <!-- Klarna -->
+                <div class="flex items-center">
+                  <input 
+                    type="radio" 
+                    id="payment-klarna"
+                    name="payment-method"
+                    value="klarna"
+                    class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
+                  />
+                  <label for="payment-klarna" class="ml-3 text-white text-sm">Klarna</label>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Divider -->
+            <div class="border-t border-gray-500 my-6"></div>
+            
+            <!-- Terms and Conditions -->
+            <div class="mb-6">
+              <div class="flex items-center mb-4">
+                <input 
+                  type="checkbox" 
+                  id="terms-checkbox"
+                  class="w-4 h-4 bg-white border-gray-300 rounded text-[#CE9704] focus:ring-[#CE9704]"
+                />
+                <label for="terms-checkbox" class="ml-3 text-white text-sm">
+                  By checking out you agree to <a href="/Terms&Conditions" class="text-[#CE9704] hover:underline">Terms and Conditions</a>
+                </label>
+              </div>
+              
+              <!-- Checkout Button -->
+              <button 
+                id="sidebar-checkout-btn"
+                class="w-full bg-[#CE9704] text-white py-3 px-6 rounded-lg font-bold text-lg hover:bg-[#B8860B] transition-colors duration-200"
+              >
+                Checkout
+              </button>
+            </div>
+            
+            </div>
+          </div>
+        `;
+        
+        // Function to display foreman details instead of form
+        function displayForemanDetails(foremanDetails: any) {
+          const foremanSection = document.getElementById('foreman-details-container');
+          if (!foremanSection) return;
+          
+          foremanSection.innerHTML = `
+            <label class="block text-white text-sm mb-4">Foreman Details / Receiving person</label>
+            
+            <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-4">
+              <div class="space-y-3">
+                <div>
+                  <p class="text-black text-xs opacity-75 mb-1">Full Name</p>
+                  <p class="text-black font-semibold text-sm">${foremanDetails.firstName || ''} ${foremanDetails.lastName || ''}</p>
+                </div>
+                
+                <div class="border-t border-white border-opacity-20 pt-3">
+                  <p class="text-black text-xs opacity-75 mb-1">Phone Number</p>
+                  <p class="text-black font-semibold text-sm">${foremanDetails.phone || ''}</p>
+                </div>
+                
+                <div class="border-t border-white border-opacity-20 pt-3">
+                    <p class="text-black text-xs opacity-75 mb-1">Email</p>
+                  <p class="text-black font-semibold text-sm">${foremanDetails.email || ''}</p>
+                </div>
+              </div>
+            </div>
+            
+            <button 
+              id="edit-foreman-btn"
+              class="w-full bg-[#CE9704] text-white py-2 rounded-lg font-medium text-sm hover:bg-[#B8860B] transition-colors duration-200"
+            >
+              Edit Details
+            </button>
+          `;
+          
+          // Add edit button listener
+          const editBtn = document.getElementById('edit-foreman-btn');
+          if (editBtn) {
+            editBtn.addEventListener('click', function() {
+              renderForemanForm();
+            });
+          }
+        }
+        
+        // Function to render foreman form
+        function renderForemanForm() {
+          const foremanSection = document.getElementById('foreman-details-container');
+          if (!foremanSection) return;
+          
+          const savedDetails = localStorage.getItem('foreman-details');
+          const foremanDetails = savedDetails ? JSON.parse(savedDetails) : {};
+          
+          foremanSection.innerHTML = `
+            <label class="block text-white text-sm mb-4">Foreman Details / Receiving person</label>
+            
+            <!-- First Name -->
+            <div class="mb-3">
+              <label class="block text-white text-xs mb-1.5">First Name</label>
+              <input 
+                type="text" 
+                id="foreman-first-name"
+                placeholder="Enter first name"
+                value="${foremanDetails.firstName || ''}"
+                class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+              />
+            </div>
+            
+            <!-- Last Name -->
+            <div class="mb-3">
+              <label class="block text-white text-xs mb-1.5">Last Name</label>
+              <input 
+                type="text" 
+                id="foreman-last-name"
+                placeholder="Enter last name"
+                value="${foremanDetails.lastName || ''}"
+                class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+              />
+            </div>
+            
+            <!-- Phone Number -->
+            <div class="mb-3">
+              <label class="block text-white text-xs mb-1.5">Phone Number</label>
+              <input 
+                type="tel" 
+                id="foreman-phone"
+                placeholder="Enter phone number"
+                value="${foremanDetails.phone || ''}"
+                class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+              />
+            </div>
+            
+            <!-- Email -->
+            <div class="mb-4">
+              <label class="block text-white text-xs mb-1.5">Email</label>
+              <input 
+                type="email" 
+                id="foreman-email"
+                placeholder="Enter email"
+                value="${foremanDetails.email || ''}"
+                class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+              />
+            </div>
+            
+            <!-- Continue Button -->
+            <button 
+              id="foreman-continue-btn"
+              class="w-full bg-[#000000] text-white py-2 rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors duration-200"
+            >
+              Continue
+            </button>
+          `;
+          
+          // Re-attach continue button listener
+          const foremanContinueBtn = document.getElementById('foreman-continue-btn');
+          if (foremanContinueBtn) {
+            foremanContinueBtn.addEventListener('click', handleForemanContinue);
+          }
+        }
+        
+        // Function to handle continue button click
+        function handleForemanContinue() {
+          // Validate foreman details
+          const firstName = (document.getElementById('foreman-first-name') as HTMLInputElement)?.value;
+          const lastName = (document.getElementById('foreman-last-name') as HTMLInputElement)?.value;
+          const phone = (document.getElementById('foreman-phone') as HTMLInputElement)?.value;
+          const email = (document.getElementById('foreman-email') as HTMLInputElement)?.value;
+          
+          if (!firstName || !lastName || !phone || !email) {
+            alert('Please fill in all foreman details.');
+            return;
+          }
+          
+          // Store foreman details
+          const foremanDetails = { firstName, lastName, phone, email };
+          localStorage.setItem('foreman-details', JSON.stringify(foremanDetails));
+          
+          // Display details instead of form
+          displayForemanDetails(foremanDetails);
+        }
+        
+        // Function to display billing details instead of form
+        function displayBillingDetails(billingDetails: any) {
+          const billingSection = document.getElementById('billing-details-container');
+          if (!billingSection) return;
+          
+          const isCompany = billingDetails.isCompany ? 'Yes' : 'No';
+          
+          billingSection.innerHTML = `
+            <div class="flex items-center justify-between mb-4">
+              <label class="block text-white text-sm">Billing Details</label>
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+            
+            <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-4">
+              <div class="space-y-3">
+                <div>
+                  <p class="text-black text-xs opacity-75 mb-1">Full Name</p>
+                  <p class="text-black font-semibold text-sm">${billingDetails.firstName || ''} ${billingDetails.lastName || ''}</p>
+                </div>
+                
+                <div class="border-t border-white border-opacity-20 pt-3">
+                  <p class="text-black text-xs opacity-75 mb-1">Contact</p>
+                  <p class="text-black font-semibold text-sm">${billingDetails.email || ''}</p>
+                  <p class="text-black font-semibold text-sm">${billingDetails.phone || ''}</p>
+                </div>
+                
+                ${billingDetails.addressLine1 ? `
+                <div class="border-t border-white border-opacity-20 pt-3">
+                  <p class="text-black text-xs opacity-75 mb-1">Address</p>
+                  <p class="text-black font-semibold text-sm">${billingDetails.addressLine1 || ''}</p>
+                  ${billingDetails.addressLine2 ? `<p class="text-black font-semibold text-sm">${billingDetails.addressLine2}</p>` : ''}
+                  <p class="text-black font-semibold text-sm">${billingDetails.city || ''}${billingDetails.state ? ', ' + billingDetails.state : ''} ${billingDetails.zip || ''}</p>
+                  <p class="text-black font-semibold text-sm">${billingDetails.country || ''}</p>
+                </div>
+                ` : ''}
+                
+                <div class="border-t border-white border-opacity-20 pt-3">
+                  <p class="text-black text-xs opacity-75 mb-1">Assigned to Company</p>
+                  <p class="text-black font-semibold text-sm">${isCompany}</p>
+                  ${isCompany === 'Yes' && billingDetails.companyName ? `
+                    <p class="text-black font-semibold text-sm mt-1">${billingDetails.companyName}</p>
+                    ${billingDetails.jobTitle ? `<p class="text-black font-semibold text-sm">${billingDetails.jobTitle}</p>` : ''}
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+            
+            <button 
+              id="edit-billing-btn"
+              class="w-full bg-[#CE9704] text-white py-2 rounded-lg font-medium text-sm hover:bg-[#B8860B] transition-colors duration-200"
+            >
+              Edit Details
+            </button>
+          `;
+          
+          // Add edit button listener
+          const editBtn = document.getElementById('edit-billing-btn');
+          if (editBtn) {
+            editBtn.addEventListener('click', function() {
+              renderBillingForm();
+            });
+          }
+        }
+        
+        // Function to render billing form
+        function renderBillingForm() {
+          const billingSection = document.getElementById('billing-details-container');
+          if (!billingSection) return;
+          
+          const savedDetails = localStorage.getItem('billing-details');
+          const billingDetails = savedDetails ? JSON.parse(savedDetails) : {};
+          const isCompanyChecked = billingDetails.isCompany ? 'checked' : '';
+          
+          billingSection.innerHTML = `
+            <div class="flex items-center justify-between mb-4">
+              <label class="block text-white text-sm">Billing Details</label>
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+            
+            <!-- First Name and Last Name -->
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <input 
+                  type="text" 
+                  id="billing-first-name"
+                  placeholder="First Name*"
+                  value="${billingDetails.firstName || ''}"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              <div>
+                <input 
+                  type="text" 
+                  id="billing-last-name"
+                  placeholder="Last Name*"
+                  value="${billingDetails.lastName || ''}"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+            </div>
+            
+            <!-- Email and Phone Number -->
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <input 
+                  type="email" 
+                  id="billing-email"
+                  placeholder="Email*"
+                  value="${billingDetails.email || ''}"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              <div>
+                <input 
+                  type="tel" 
+                  id="billing-phone"
+                  placeholder="Phone number*"
+                  value="${billingDetails.phone || ''}"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+            </div>
+            
+            <!-- Address Line 1 -->
+            <div class="mb-3">
+              <input 
+                type="text" 
+                id="billing-address-line-1"
+                placeholder="Address line 1"
+                value="${billingDetails.addressLine1 || ''}"
+                class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+              />
+            </div>
+            
+            <!-- Address Line 2 -->
+            <div class="mb-3">
+              <input 
+                type="text" 
+                id="billing-address-line-2"
+                placeholder="Address line 2"
+                value="${billingDetails.addressLine2 || ''}"
+                class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+              />
+            </div>
+            
+            <!-- City -->
+            <div class="mb-3">
+              <input 
+                type="text" 
+                id="billing-city"
+                placeholder="City"
+                value="${billingDetails.city || ''}"
+                class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+              />
+            </div>
+            
+            <!-- State / Province -->
+            <div class="mb-3">
+              <input 
+                type="text" 
+                id="billing-state"
+                placeholder="State / Province"
+                value="${billingDetails.state || ''}"
+                class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+              />
+            </div>
+            
+            <!-- Zip / Postal Code -->
+            <div class="mb-3">
+              <input 
+                type="text" 
+                id="billing-zip"
+                placeholder="Zip / Postal Code"
+                value="${billingDetails.zip || ''}"
+                class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+              />
+            </div>
+            
+            <!-- Country -->
+            <div class="mb-4">
+              <input 
+                type="text" 
+                id="billing-country"
+                placeholder="Country"
+                value="${billingDetails.country || ''}"
+                class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+              />
+            </div>
+            
+            <!-- Checkbox -->
+            <div class="flex items-center mb-4">
+              <input 
+                type="checkbox" 
+                id="billing-is-company"
+                ${isCompanyChecked}
+                class="w-4 h-4 bg-white border-gray-300 rounded text-[#CE9704] focus:ring-[#CE9704]"
+              />
+              <label for="billing-is-company" class="ml-2 text-white text-sm">Billed is assigned to a company.</label>
+            </div>
+            
+            <!-- Company Fields -->
+            <div id="company-fields" class="${billingDetails.isCompany ? '' : 'hidden'} mb-4">
+              <div class="mb-3">
+                <input 
+                  type="text" 
+                  id="billing-company-name"
+                  placeholder="Company Name"
+                  value="${billingDetails.companyName || ''}"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+              <div class="mb-4">
+                <input 
+                  type="text" 
+                  id="billing-job-title"
+                  placeholder="Job Title"
+                  value="${billingDetails.jobTitle || ''}"
+                  class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                />
+              </div>
+            </div>
+            
+            <!-- Continue Button -->
+            <button 
+              id="billing-continue-btn"
+              class="w-full bg-[#000000] text-white py-2 rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors duration-200"
+            >
+              Continue
+            </button>
+          `;
+          
+          // Re-attach continue button listener
+          const billingContinueBtn = document.getElementById('billing-continue-btn');
+          if (billingContinueBtn) {
+            billingContinueBtn.addEventListener('click', handleBillingContinue);
+          }
+          
+          // Add event listener to company checkbox
+          const companyCheckbox = document.getElementById('billing-is-company');
+          if (companyCheckbox) {
+            companyCheckbox.addEventListener('change', toggleCompanyFields);
+          }
+        }
+        
+        // Function to handle billing continue button click
+        function handleBillingContinue() {
+          // Validate required billing details
+          const firstName = (document.getElementById('billing-first-name') as HTMLInputElement)?.value;
+          const lastName = (document.getElementById('billing-last-name') as HTMLInputElement)?.value;
+          const email = (document.getElementById('billing-email') as HTMLInputElement)?.value;
+          const phone = (document.getElementById('billing-phone') as HTMLInputElement)?.value;
+          const isCompany = (document.getElementById('billing-is-company') as HTMLInputElement)?.checked || false;
+          const companyName = (document.getElementById('billing-company-name') as HTMLInputElement)?.value || '';
+          const jobTitle = (document.getElementById('billing-job-title') as HTMLInputElement)?.value || '';
+          
+          if (!firstName || !lastName || !email || !phone) {
+            alert('Please fill in all required billing details (marked with *).');
+            return;
+          }
+          
+          // If company is checked, validate company fields
+          if (isCompany && (!companyName || !jobTitle)) {
+            alert('Please fill in Company Name and Job Title when billing is assigned to a company.');
+            return;
+          }
+          
+          // Get all billing details
+          const billingDetails = {
+            firstName,
+            lastName,
+            email,
+            phone,
+            addressLine1: (document.getElementById('billing-address-line-1') as HTMLInputElement)?.value || '',
+            addressLine2: (document.getElementById('billing-address-line-2') as HTMLInputElement)?.value || '',
+            city: (document.getElementById('billing-city') as HTMLInputElement)?.value || '',
+            state: (document.getElementById('billing-state') as HTMLInputElement)?.value || '',
+            zip: (document.getElementById('billing-zip') as HTMLInputElement)?.value || '',
+            country: (document.getElementById('billing-country') as HTMLInputElement)?.value || '',
+            isCompany,
+            companyName,
+            jobTitle
+          };
+          
+          // Store billing details
+          localStorage.setItem('billing-details', JSON.stringify(billingDetails));
+          
+          // Display details instead of form
+          displayBillingDetails(billingDetails);
+        }
+        
+        // Function to toggle company fields visibility
+        function toggleCompanyFields() {
+          const checkbox = document.getElementById('billing-is-company') as HTMLInputElement;
+          const companyFields = document.getElementById('company-fields');
+          
+          if (checkbox && companyFields) {
+            if (checkbox.checked) {
+              companyFields.classList.remove('hidden');
+            } else {
+              companyFields.classList.add('hidden');
+            }
+          }
+        }
+        
+        // Function to open payment method modal
+        function openPaymentMethodModal(method: string) {
+          const modal = document.getElementById('payment-method-modal');
+          const formContainer = document.getElementById('payment-method-form-container');
+          const modalTitle = document.getElementById('payment-modal-title');
+          
+          if (!modal || !formContainer || !modalTitle) return;
+          
+          let formHTML = '';
+          let title = '';
+          
+          switch(method) {
+            case 'credit-debit':
+              title = 'Credit/Debit Card Details';
+              formHTML = `
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+                    <input 
+                      type="text" 
+                      id="payment-card-number"
+                      placeholder="1234 5678 9012 3456"
+                      maxlength="19"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                    />
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                      <input 
+                        type="text" 
+                        id="payment-expiry"
+                        placeholder="MM/YY"
+                        maxlength="5"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                      <input 
+                        type="text" 
+                        id="payment-cvv"
+                        placeholder="123"
+                        maxlength="4"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
+                    <input 
+                      type="text" 
+                      id="payment-cardholder"
+                      placeholder="John Doe"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                    />
+                  </div>
+                  <div class="flex gap-3 pt-4">
+                    <button 
+                      onclick="closePaymentMethodModal()" 
+                      class="flex-1 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onclick="if (window.savePaymentDetailsLocal) window.savePaymentDetailsLocal('credit-debit')" 
+                      class="flex-1 bg-[#CE9704] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#B8860B] transition-colors"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              `;
+              break;
+            case 'direct-debit':
+              title = 'Direct Debit / ACH Wire Transfer';
+              formHTML = `
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
+                    <input 
+                      type="text" 
+                      id="payment-bank-name"
+                      placeholder="Enter bank name"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
+                    <input 
+                      type="text" 
+                      id="payment-account-number"
+                      placeholder="Enter account number"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Routing Number</label>
+                    <input 
+                      type="text" 
+                      id="payment-routing-number"
+                      placeholder="Enter routing number"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                    />
+                  </div>
+                  <div class="flex gap-3 pt-4">
+                    <button 
+                      onclick="closePaymentMethodModal()" 
+                      class="flex-1 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onclick="if (window.savePaymentDetailsLocal) window.savePaymentDetailsLocal('direct-debit')" 
+                      class="flex-1 bg-[#CE9704] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#B8860B] transition-colors"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              `;
+              break;
+            case 'google-pay':
+            case 'apple-pay':
+            case 'klarna':
+              title = method === 'google-pay' ? 'Google Pay' : method === 'apple-pay' ? 'Apple Pay' : 'Klarna';
+              formHTML = `
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input 
+                      type="email" 
+                      id="payment-email"
+                      placeholder="your.email@example.com"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <input 
+                      type="tel" 
+                      id="payment-phone"
+                      placeholder="+1 (555) 000-0000"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"
+                    />
+                  </div>
+                  <div class="flex gap-3 pt-4">
+                    <button 
+                      onclick="closePaymentMethodModal()" 
+                      class="flex-1 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onclick="window.savePaymentDetailsLocal('${method}')" 
+                      class="flex-1 bg-[#CE9704] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#B8860B] transition-colors"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              `;
+              break;
+          }
+          
+          modalTitle.textContent = title;
+          formContainer.innerHTML = formHTML;
+          modal.style.display = 'flex';
+        }
+        
+        // Function to save payment details (must be accessible globally)
+        (window as any).savePaymentDetailsLocal = function(method: string) {
+          let paymentDetails: any = { method };
+          
+          switch(method) {
+            case 'credit-debit':
+              const cardNumber = (document.getElementById('payment-card-number') as HTMLInputElement)?.value;
+              const expiry = (document.getElementById('payment-expiry') as HTMLInputElement)?.value;
+              const cvv = (document.getElementById('payment-cvv') as HTMLInputElement)?.value;
+              const cardholder = (document.getElementById('payment-cardholder') as HTMLInputElement)?.value;
+              
+              if (!cardNumber || !expiry || !cvv || !cardholder) {
+                alert('Please fill in all card details.');
+                return;
+              }
+              
+              paymentDetails = {
+                method,
+                cardNumber: cardNumber.replace(/\s/g, ''),
+                expiry,
+                cvv,
+                cardholder,
+                maskedCard: '**** **** **** ' + cardNumber.slice(-4).replace(/\s/g, '')
+              };
+              break;
+            case 'direct-debit':
+              const bankName = (document.getElementById('payment-bank-name') as HTMLInputElement)?.value;
+              const accountNumber = (document.getElementById('payment-account-number') as HTMLInputElement)?.value;
+              const routingNumber = (document.getElementById('payment-routing-number') as HTMLInputElement)?.value;
+              
+              if (!bankName || !accountNumber || !routingNumber) {
+                alert('Please fill in all bank details.');
+                return;
+              }
+              
+              paymentDetails = {
+                method,
+                bankName,
+                accountNumber: accountNumber.slice(-4),
+                routingNumber
+              };
+              break;
+            case 'google-pay':
+            case 'apple-pay':
+            case 'klarna':
+              const email = (document.getElementById('payment-email') as HTMLInputElement)?.value;
+              const phone = (document.getElementById('payment-phone') as HTMLInputElement)?.value;
+              
+              if (!email || !phone) {
+                alert('Please fill in all fields.');
+                return;
+              }
+              
+              paymentDetails = {
+                method,
+                email,
+                phone
+              };
+              break;
+          }
+          
+          localStorage.setItem('payment-method-details', JSON.stringify(paymentDetails));
+          localStorage.setItem('payment-method', method);
+          closePaymentMethodModal();
+          displayPaymentMethodDetails(paymentDetails);
+        };
+        
+        // Keep local reference for internal use
+        const savePaymentDetails = (window as any).savePaymentDetailsLocal;
+        
+        // Function to display payment method details
+        function displayPaymentMethodDetails(paymentDetails: any) {
+          const paymentContainer = document.getElementById('payment-method-container');
+          if (!paymentContainer) return;
+          
+          let detailsHTML = '';
+          const methodLabels: any = {
+            'credit-debit': 'Credit/Debit Card',
+            'direct-debit': 'Direct Debit/ ACH Wire Transfer',
+            'google-pay': 'Google Pay',
+            'apple-pay': 'Apple Pay',
+            'klarna': 'Klarna'
+          };
+          
+          let infoHTML = '';
+          switch(paymentDetails.method) {
+            case 'credit-debit':
+              infoHTML = `
+                <p class="text-black font-semibold text-sm">${paymentDetails.maskedCard || '**** **** **** ****'}</p>
+                <p class="text-black font-semibold text-sm">${paymentDetails.cardholder || ''}</p>
+                <p class="text-black font-semibold text-sm">Expires: ${paymentDetails.expiry || ''}</p>
+              `;
+              break;
+            case 'direct-debit':
+              infoHTML = `
+                <p class="text-black font-semibold text-sm">${paymentDetails.bankName || ''}</p>
+                <p class="text-black font-semibold text-sm">Account: ****${paymentDetails.accountNumber || ''}</p>
+                <p class="text-black font-semibold text-sm">Routing: ${paymentDetails.routingNumber || ''}</p>
+              `;
+              break;
+            case 'google-pay':
+            case 'apple-pay':
+            case 'klarna':
+              infoHTML = `
+                <p class="text-black font-semibold text-sm">${paymentDetails.email || ''}</p>
+                <p class="text-black font-semibold text-sm">${paymentDetails.phone || ''}</p>
+              `;
+              break;
+          }
+          
+          detailsHTML = `
+            <label class="block text-white text-sm mb-4">Payment Method</label>
+            <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-4">
+              <div class="space-y-3">
+                <div>
+                  <p class="text-black text-xs opacity-75 mb-1">Method</p>
+                  <p class="text-black font-semibold text-sm">${methodLabels[paymentDetails.method] || paymentDetails.method}</p>
+                </div>
+                <div class="border-t border-white border-opacity-20 pt-3">
+                  <p class="text-black text-xs opacity-75 mb-1">Details</p>
+                  ${infoHTML}
+                </div>
+              </div>
+            </div>
+            <button 
+              id="edit-payment-btn"
+              class="w-full bg-[#CE9704] text-white py-2 rounded-lg font-medium text-sm hover:bg-[#B8860B] transition-colors duration-200"
+            >
+              Edit Details
+            </button>
+          `;
+          
+          paymentContainer.innerHTML = detailsHTML;
+          
+          // Add edit button listener
+          const editBtn = document.getElementById('edit-payment-btn');
+          if (editBtn) {
+            editBtn.addEventListener('click', function() {
+              openPaymentMethodModal(paymentDetails.method);
+            });
+          }
+        }
+        
+        // Add event listener for apply coupon button in sidebar
+        const sidebarApplyCouponBtn = document.getElementById('sidebar-apply-coupon');
+        if (sidebarApplyCouponBtn) {
+          sidebarApplyCouponBtn.addEventListener('click', function() {
+            const sidebarCouponCode = document.getElementById('sidebar-coupon-code') as HTMLInputElement;
+            if (sidebarCouponCode) {
+              const code = sidebarCouponCode.value;
+              // Apply discount logic with 20% discount
+              if (code && code.toUpperCase() === 'BIGPANS101') {
+                discountApplied = true;
+                discountPercentage = 20;
+                calculateTotals();
+                showNotification('Coupon code applied');
+              } else if (code) {
+                alert('Invalid discount code. Please try again.');
+              }
+            }
+          });
+        }
+        
+        // Check if foreman details already exist and display them
+        const savedForemanDetails = localStorage.getItem('foreman-details');
+        if (savedForemanDetails) {
+          try {
+            const foremanDetails = JSON.parse(savedForemanDetails);
+            // Delay to ensure DOM is ready
+            setTimeout(() => {
+              displayForemanDetails(foremanDetails);
+            }, 100);
+          } catch (e) {
+            console.error('Error parsing foreman details:', e);
+          }
+        }
+        
+        // Check if billing details already exist and display them
+        const savedBillingDetails = localStorage.getItem('billing-details');
+        if (savedBillingDetails) {
+          try {
+            const billingDetails = JSON.parse(savedBillingDetails);
+            // Delay to ensure DOM is ready
+            setTimeout(() => {
+              displayBillingDetails(billingDetails);
+            }, 150);
+          } catch (e) {
+            console.error('Error parsing billing details:', e);
+          }
+        }
+        
+        // Add event listener for foreman continue button in sidebar
+        const foremanContinueBtn = document.getElementById('foreman-continue-btn');
+        if (foremanContinueBtn) {
+          foremanContinueBtn.addEventListener('click', handleForemanContinue);
+        }
+        
+        // Add event listener for billing continue button in sidebar
+        const billingContinueBtn = document.getElementById('billing-continue-btn');
+        if (billingContinueBtn) {
+          billingContinueBtn.addEventListener('click', handleBillingContinue);
+        }
+        
+        // Add event listener for company checkbox in initial form
+        const companyCheckboxInitial = document.getElementById('billing-is-company');
+        if (companyCheckboxInitial) {
+          companyCheckboxInitial.addEventListener('change', toggleCompanyFields);
+        }
+        
+        // Load saved payment method and set event listeners
+        const savedPaymentMethod = localStorage.getItem('payment-method');
+        const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
+        
+        // Set saved payment method if exists
+        if (savedPaymentMethod && paymentMethodRadios.length > 0) {
+          paymentMethodRadios.forEach((radio: any) => {
+            if (radio.value === savedPaymentMethod) {
+              radio.checked = true;
+            }
+          });
+        }
+        
+        // Add event listeners to payment method radio buttons
+        paymentMethodRadios.forEach((radio: any) => {
+          radio.addEventListener('change', (e: Event) => {
+            const target = e.target as HTMLInputElement;
+            if (target.checked) {
+              localStorage.setItem('payment-method', target.value);
+              openPaymentMethodModal(target.value);
+            }
+          });
+        });
+        
+        // Check if payment method details exist and display them
+        const savedPaymentDetails = localStorage.getItem('payment-method-details');
+        if (savedPaymentDetails) {
+          try {
+            const paymentDetails = JSON.parse(savedPaymentDetails);
+            setTimeout(() => {
+              displayPaymentMethodDetails(paymentDetails);
+            }, 200);
+          } catch (e) {
+            console.error('Error parsing payment details:', e);
+          }
+        }
+        
+        // Make openPaymentMethodModal globally accessible
+        (window as any).openPaymentMethodModal = openPaymentMethodModal;
+        
+        // Add event listener for checkout button
+        const sidebarCheckoutBtn = document.getElementById('sidebar-checkout-btn');
+        if (sidebarCheckoutBtn) {
+          sidebarCheckoutBtn.addEventListener('click', function() {
+            // Validate terms checkbox
+            const termsCheckbox = document.getElementById('terms-checkbox') as HTMLInputElement;
+            if (!termsCheckbox || !termsCheckbox.checked) {
+              alert('Please agree to the Terms and Conditions to continue.');
+              return;
+            }
+            
+            // Check if all required data is filled
+            const foremanDetails = localStorage.getItem('foreman-details');
+            const billingDetails = localStorage.getItem('billing-details');
+            const paymentMethodDetails = localStorage.getItem('payment-method-details');
+            
+            if (!foremanDetails) {
+              alert('Please complete Foreman Details first.');
+              return;
+            }
+            
+            if (!billingDetails) {
+              alert('Please complete Billing Details first.');
+              return;
+            }
+            
+            if (!paymentMethodDetails) {
+              alert('Please complete Payment Method details first.');
+              return;
+            }
+            
+            // All validations passed, show verification modal directly
+            openVerificationModal();
+          });
+        }
+        
       }
     });
   </script>
+
+  <style>
+    /* Custom styles for checkout page */
+    @media (min-width: 640px) {
+      #cart-sidebar {
+        background: #8B4513 !important;
+      }
+      
+      #step-indicator-container {
+        background: #A0522D !important;
+      }
+      
+      /* Change text colors in sidebar for checkout */
+      #cart-sidebar h3,
+      #cart-sidebar .text-white,
+      #cart-sidebar .text-gray-300,
+      #cart-sidebar .text-gray-600 {
+        color: #CE9704 !important;
+      }
+      
+      #cart-sidebar .text-[#CE9704] {
+        color: #FFD700 !important;
+      }
+      
+      /* Change border colors */
+      #cart-sidebar .border-gray-300,
+      #cart-sidebar .border-gray-600 {
+        border-color: #CE9704 !important;
+      }
+    }
+  </style>
 </Layout>

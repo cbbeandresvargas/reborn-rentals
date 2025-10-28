@@ -62,7 +62,7 @@ import Layout from "../layouts/Layout.astro";
         
         <!-- Address Search Input -->
         <div class="relative">
-          <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
@@ -72,6 +72,7 @@ import Layout from "../layouts/Layout.astro";
             placeholder="Start typing and select from suggestions..."
             class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
             id="jobsite-address"
+            autocomplete="off"
           />
         </div>
       </div>
@@ -98,13 +99,26 @@ import Layout from "../layouts/Layout.astro";
           </p>
           
           <!-- Map Container -->
-          <div class="relative">
-            <div id="delivery-map" class="w-full h-96 rounded-lg overflow-hidden border border-gray-300 shadow-lg">
-              <!-- Map will be loaded here -->
+          <div class="relative" style="z-index: 0;">
+            <div id="delivery-map" class="w-full h-96 rounded-lg overflow-hidden border border-gray-300 shadow-lg" style="position: relative; z-index: 0;">
+              <!-- Interactive map will be loaded here -->
+            </div>
+            
+            <!-- Google Maps iframe (hidden by default, shown for self-pickup and no-address) -->
+            <div id="google-maps-static" class="w-full h-96 rounded-lg overflow-hidden border border-gray-300 shadow-lg hidden">
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3077.576787884259!2d-119.80605779999999!3d39.5240405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x809940b3fe48bd53%3A0x4e3afeee9f24c1bc!2s401%20Ryland%20St%20Suite%20200-A%2C%20Reno%2C%20NV%2089502%2C%20EE.%20UU.!5e0!3m2!1ses-419!2sbo!4v1761325010616!5m2!1ses-419!2sbo" 
+                width="100%" 
+                height="100%" 
+                style="border:0;" 
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
             </div>
             
             <!-- Map Controls -->
-            <div class="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-2 space-y-2 z-50">
+            <div class="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-2 space-y-2">
               <button 
                 id="center-map-btn" 
                 class="bg-[#CE9704] text-white px-3 py-2 rounded text-sm font-medium hover:bg-[#B8860B] transition-colors duration-200 block w-full"
@@ -122,7 +136,7 @@ import Layout from "../layouts/Layout.astro";
             </div>
             
             <!-- Selected Location Info -->
-            <div id="selected-location-info" class="absolute bottom-4 left-4 right-4 bg-white rounded-lg shadow-lg p-4 z-50">
+            <div id="selected-location-info" class="absolute bottom-4 left-4 right-4 bg-white rounded-lg shadow-lg p-4">
               <div class="flex justify-between items-start">
                 <div class="flex-1">
                   <h4 class="font-semibold text-gray-800 text-sm">Selected Location:</h4>
@@ -458,9 +472,125 @@ import Layout from "../layouts/Layout.astro";
       }
     }
 
+    // Initialize Google Places Autocomplete
+    function initGooglePlacesAutocomplete() {
+      // Load Google Places API
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDummyKey&libraries=places&callback=initAutocomplete`;
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+
+    // Initialize autocomplete (called by Google API)
+    (window as any).initAutocomplete = function() {
+      const addressInput = document.getElementById('jobsite-address') as HTMLInputElement;
+      if (!addressInput || typeof (window as any).google === 'undefined') return;
+
+      const autocomplete = new (window as any).google.maps.places.Autocomplete(addressInput, {
+        types: ['address'],
+        fields: ['formatted_address', 'geometry', 'name']
+      });
+
+      autocomplete.addListener('place_changed', function() {
+        const place = autocomplete.getPlace();
+        if (place.geometry) {
+          const location = {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng()
+          };
+          
+          // Update map with selected location
+          if (typeof (window as any).selectLocation === 'function') {
+            (window as any).selectLocation(location);
+          }
+        }
+      });
+    };
+
+    // Fallback: Try to use Nominatim (OpenStreetMap) for autocomplete if Google is not available
+    function initNominatimAutocomplete() {
+      const addressInput = document.getElementById('jobsite-address') as HTMLInputElement;
+      if (!addressInput) return;
+
+      let timeoutId: any;
+      const suggestionsDiv = document.createElement('div');
+      suggestionsDiv.id = 'address-suggestions';
+      suggestionsDiv.className = 'absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto';
+      suggestionsDiv.style.display = 'none';
+      addressInput.parentElement?.appendChild(suggestionsDiv);
+
+      addressInput.addEventListener('input', function() {
+        clearTimeout(timeoutId);
+        const query = addressInput.value.trim();
+
+        if (query.length < 3) {
+          suggestionsDiv.style.display = 'none';
+          return;
+        }
+
+        timeoutId = setTimeout(() => {
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&countrycodes=us`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.length === 0) {
+                suggestionsDiv.style.display = 'none';
+                return;
+              }
+
+              suggestionsDiv.innerHTML = data.map((item: any) => `
+                <div class="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200 last:border-b-0" onclick="selectAddressSuggestion('${item.display_name.replace(/'/g, "\\'")}', ${item.lat}, ${item.lon})">
+                  <div class="text-sm text-gray-900">${item.display_name}</div>
+                </div>
+              `).join('');
+              suggestionsDiv.style.display = 'block';
+            })
+            .catch(error => {
+              console.error('Error fetching suggestions:', error);
+              suggestionsDiv.style.display = 'none';
+            });
+        }, 300);
+      });
+
+      // Hide suggestions when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!addressInput.contains(e.target as Node) && !suggestionsDiv.contains(e.target as Node)) {
+          suggestionsDiv.style.display = 'none';
+        }
+      });
+    }
+
+    // Select address suggestion
+    (window as any).selectAddressSuggestion = function(address: string, lat: number, lng: number) {
+      const addressInput = document.getElementById('jobsite-address') as HTMLInputElement;
+      const suggestionsDiv = document.getElementById('address-suggestions');
+      
+      if (addressInput) {
+        addressInput.value = address;
+      }
+      if (suggestionsDiv) {
+        suggestionsDiv.style.display = 'none';
+      }
+      
+      // Update map with selected location - wait for selectLocation to be defined
+      setTimeout(() => {
+        if (typeof (window as any).selectLocation === 'function') {
+          (window as any).selectLocation({ lat, lng });
+        }
+      }, 100);
+    };
+
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
       loadCartData();
+      
+      // Initialize address autocomplete (try Google first, fallback to Nominatim)
+      try {
+        initGooglePlacesAutocomplete();
+      } catch (e) {
+        console.log('Google Places not available, using Nominatim');
+        initNominatimAutocomplete();
+      }
       
       // Update cart badge if it exists
       const cartBadge = document.getElementById('cart-badge');
@@ -511,7 +641,10 @@ import Layout from "../layouts/Layout.astro";
             if (noAddressCheckbox) {
               noAddressCheckbox.checked = false;
             }
+            toggleMapForPickup(true);
             toggleSelfPickupDetails();
+          } else {
+            toggleMapForPickup(false);
           }
         });
       }
@@ -527,13 +660,35 @@ import Layout from "../layouts/Layout.astro";
             const details = document.getElementById('self-pickup-details');
             const jobsiteAddress = document.getElementById('jobsite-address') as HTMLInputElement;
             
+            toggleMapForPickup(true);
             details?.classList.add('hidden');
             jobsiteAddress.placeholder = 'Optional: Additional delivery instructions...';
           } else {
+            toggleMapForPickup(false);
             const jobsiteAddress = document.getElementById('jobsite-address') as HTMLInputElement;
             jobsiteAddress.placeholder = 'Start typing and select from suggestions...';
           }
         });
+      }
+      
+      // Function to toggle between interactive map and Google Maps
+      function toggleMapForPickup(showGoogleMaps: boolean) {
+        const interactiveMap = document.getElementById('delivery-map');
+        const googleMaps = document.getElementById('google-maps-static');
+        const mapControls = document.querySelector('.absolute.top-4.right-4');
+        const locationInfo = document.getElementById('selected-location-info');
+        
+        if (showGoogleMaps) {
+          if (interactiveMap) interactiveMap.classList.add('hidden');
+          if (googleMaps) googleMaps.classList.remove('hidden');
+          if (mapControls) (mapControls as HTMLElement).style.display = 'none';
+          if (locationInfo) locationInfo.style.display = 'none';
+        } else {
+          if (interactiveMap) interactiveMap.classList.remove('hidden');
+          if (googleMaps) googleMaps.classList.add('hidden');
+          if (mapControls) (mapControls as HTMLElement).style.display = 'block';
+          if (locationInfo) locationInfo.style.display = 'block';
+        }
       }
 
       // Load saved form data if exists
@@ -735,26 +890,8 @@ import Layout from "../layouts/Layout.astro";
           });
         }
 
-        // Use location button
-        const useLocationBtn = document.getElementById('use-location-btn');
-        if (useLocationBtn) {
-          useLocationBtn.addEventListener('click', function() {
-            const selectedAddress = document.getElementById('selected-address');
-            if (selectedAddress && selectedAddress.textContent) {
-              const addressInput = document.getElementById('jobsite-address') as HTMLInputElement;
-              addressInput.value = selectedAddress.textContent;
-              
-              // Reset the location info text
-              const locationInfo = document.getElementById('selected-location-info');
-              if (locationInfo) {
-                const selectedAddressElement = document.getElementById('selected-address');
-                const distanceInfo = document.getElementById('distance-info');
-                if (selectedAddressElement) selectedAddressElement.textContent = 'Click on the map to select a delivery location';
-                if (distanceInfo) distanceInfo.textContent = '';
-              }
-            }
-          });
-        }
+        // Use location button - automatically update input when location is selected
+        // (Removed separate button click handler, now updates automatically)
         
       } catch (error) {
         console.error('Error creating map:', error);
@@ -767,6 +904,8 @@ import Layout from "../layouts/Layout.astro";
 
     // Select location on map
     function selectLocation(location: any) {
+      // Make function globally accessible
+      (window as any).selectLocation = selectLocation;
       const L = (window as any).L;
       
       // Remove previous marker
@@ -815,8 +954,14 @@ import Layout from "../layouts/Layout.astro";
           
           // Update UI
           const selectedAddress = document.getElementById('selected-address');
+          const addressInput = document.getElementById('jobsite-address') as HTMLInputElement;
           
           if (selectedAddress) selectedAddress.textContent = address;
+          
+          // Automatically update the input field with the selected address
+          if (addressInput) {
+            addressInput.value = address;
+          }
           
           // Calculate distance and show route
           calculateRoute(location, address);
