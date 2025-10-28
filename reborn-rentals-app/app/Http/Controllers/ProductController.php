@@ -35,7 +35,7 @@ class ProductController extends Controller
         $products = $query->latest()->paginate(12);
         $categories = Category::all();
 
-        return view('products.index', compact('products', 'categories'));
+        return view('products', compact('products', 'categories'));
     }
 
     public function show($id)
@@ -49,7 +49,7 @@ class ProductController extends Controller
             ->limit(4)
             ->get();
 
-        return view('products.show', compact('product', 'relatedProducts'));
+        return view('product', compact('product', 'relatedProducts'));
     }
 }
 

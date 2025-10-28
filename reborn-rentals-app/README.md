@@ -1,61 +1,137 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Reborn Rentals - Laravel MVC Application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplicación web completa de alquiler de maquinaria construida con Laravel 12, Tailwind CSS y arquitectura MVC.
 
-## About Laravel
+## 🚀 Características
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- ✅ **Backend Completo**: Modelos, Controladores, Rutas
+- ✅ **Frontend Integrado**: Vistas Blade con Tailwind CSS via CDN
+- ✅ **Carrito de Compras**: Sistema de sesiones
+- ✅ **Autenticación**: Login/Registro con sesiones Laravel
+- ✅ **Checkout Completo**: Proceso de pedidos con validación
+- ✅ **Gestión de Órdenes**: Visualización de pedidos del usuario
+- ✅ **Base de Datos**: SQLite con migraciones completas
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📋 Requisitos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP >= 8.2
+- Composer
+- SQLite
 
-## Learning Laravel
+## 🛠️ Instalación
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. **Configurar el entorno:**
+```bash
+# Ya está configurado para SQLite
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+2. **Instalar dependencias:**
+```bash
+composer install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. **Ejecutar migraciones y seeders:**
+```bash
+php artisan migrate --seed
+```
 
-## Laravel Sponsors
+4. **Iniciar el servidor:**
+```bash
+php -S localhost:8000 -t public
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 👤 Usuarios de Prueba
 
-### Premium Partners
+- **Admin**: 
+  - Email: `admin@rebornrentals.com`
+  - Password: `password`
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- **Usuario Normal**:
+  - Email: `john@example.com`
+  - Password: `password`
 
-## Contributing
+## 📁 Estructura del Proyecto
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```
+app/
+├── Http/Controllers/
+│   ├── Auth/          # Login y Registro
+│   ├── CartController.php      # Gestión de carrito
+│   ├── CheckoutController.php  # Proceso de checkout
+│   ├── HomeController.php      # Página principal
+│   ├── OrderController.php     # Gestión de órdenes
+│   └── ProductController.php   # Productos
+├── Models/            # Todos los modelos con relaciones
+└── ...
 
-## Code of Conduct
+resources/views/
+├── layouts/
+│   └── app.blade.php           # Layout principal
+├── auth/
+│   ├── login.blade.php
+│   └── register.blade.php
+├── checkout/
+│   └── index.blade.php
+├── orders/
+│   ├── index.blade.php
+│   └── show.blade.php
+├── products/
+│   ├── index.blade.php
+│   └── show.blade.php
+└── home.blade.php
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+routes/
+└── web.php            # Todas las rutas web
+```
 
-## Security Vulnerabilities
+## 🎨 Diseño
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Tailwind CSS**: Via CDN (sin npm)
+- **Colores principales**:
+  - Primario: `#CE9704` (Dorado)
+  - Fondo oscuro: `#4A4A4A`
+  - Fondo carrito: `#2F2F2F`
+  - Gris claro: `#BBBBBB`
 
-## License
+## 🛒 Funcionalidades
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Carrito de Compras
+- Agregar productos
+- Actualizar cantidad
+- Eliminar productos
+- Vista en sidebar
+- Persistencia con sesiones
+
+### Checkout
+- Selección de fechas
+- Dirección de entrega
+- Códigos de descuento
+- Métodos de pago
+- Cálculo automático de impuestos
+
+### Órdenes
+- Listado de pedidos
+- Detalle de pedido
+- Historial completo
+
+## 🔐 Autenticación
+
+- Sistema de sesiones nativo de Laravel
+- Login/Registro
+- Middleware de autenticación
+- Protección de rutas
+
+## 📝 Notas
+
+- El carrito usa sesiones de Laravel (no localStorage)
+- Los productos están en la base de datos
+- Las imágenes se encuentran en `public/`
+- Tailwind CSS se carga via CDN para evitar problemas de compilación
+
+## 🚀 Próximos Pasos
+
+1. Agregar panel de administración
+2. Mejorar sistema de notificaciones
+3. Agregar pagos reales (Stripe/PayPal)
+4. Sistema de email
+5. Mejorar responsividad móvil

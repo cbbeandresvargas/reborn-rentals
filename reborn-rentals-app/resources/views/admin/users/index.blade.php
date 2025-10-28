@@ -1,0 +1,76 @@
+@extends('layouts.app')
+
+@section('title', 'Users - Admin Panel')
+
+@section('content')
+<div class="ml-0 md:ml-64">
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+        <div class="px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800">Users</h1>
+            <a href="{{ route('admin.users.create') }}" class="bg-[#CE9704] text-white px-4 py-2 rounded-lg hover:bg-[#B8860B] transition-colors">
+                + Add User
+            </a>
+        </div>
+    </header>
+    
+    <main class="p-6">
+        @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            {{ session('success') }}
+        </div>
+        @endif
+
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @forelse($users as $user)
+                    <tr>
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-gray-900">{{ $user->name }} {{ $user->last_name }}</div>
+                            <div class="text-sm text-gray-500">{{ $user->username ?? 'N/A' }}</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">{{ $user->email }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded-full {{ $user->role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800' }}">
+                                {{ ucfirst($user->role) }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">{{ $user->created_at->format('M d, Y') }}</td>
+                        <td class="px-6 py-4 text-sm font-medium">
+                            <a href="{{ route('admin.users.edit', $user) }}" class="text-[#CE9704] hover:text-[#B8860B] mr-3">Edit</a>
+                            @if($user->id !== auth()->id())
+                            <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
+                            </form>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">No users found</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            {{ $users->links() }}
+        </div>
+    </main>
+</div>
+
+@include('admin.sidebar')
+@endsection
+

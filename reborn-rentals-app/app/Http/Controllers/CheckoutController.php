@@ -16,30 +16,30 @@ use Carbon\Carbon;
 
 class CheckoutController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
 
     public function index()
     {
         $cart = Session::get('cart', []);
         
         if (empty($cart)) {
-            return redirect()->route('cart.show')
+            return redirect()->route('home')
                 ->with('error', 'Tu carrito está vacío');
         }
 
         // Obtener productos del carrito
         $productIds = array_keys($cart);
-        $products = Product::whereIn('id', $productIds)->get();
+        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
         
+        // Calcular total
         $total = 0;
-        foreach ($products as $product) {
-            $total += $product->price * $cart[$product->id];
+        foreach ($cart as $productId => $quantity) {
+            if ($products->has($productId)) {
+                $product = $products->get($productId);
+                $total += $product->price * $quantity;
+            }
         }
 
-        return view('checkout.index', compact('products', 'cart', 'total'));
+        return view('checkout', compact('products', 'cart', 'total'));
     }
 
     public function store(Request $request)
@@ -47,7 +47,7 @@ class CheckoutController extends Controller
         $cart = Session::get('cart', []);
         
         if (empty($cart)) {
-            return redirect()->route('cart.show')
+            return redirect()->route('home')
                 ->with('error', 'Tu carrito está vacío');
         }
 

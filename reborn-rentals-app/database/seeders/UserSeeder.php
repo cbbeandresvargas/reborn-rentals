@@ -15,21 +15,23 @@ class UserSeeder extends Seeder
             'name' => 'Admin',
             'last_name' => 'User',
             'email' => 'admin@rebornrentals.com',
-            'password' => Hash::make('password'),
-            'is_admin' => true,
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
             'phone_number' => '+1 555-000-0000',
             'address' => '401 Ryland St. Ste 200 A, Reno, NV 89502',
+            'username' => 'admin',
         ]);
 
-        // Usuario de prueba
+        // Usuario cliente regular
         User::create([
             'name' => 'John',
             'last_name' => 'Doe',
-            'email' => 'john@example.com',
-            'password' => Hash::make('password'),
-            'is_admin' => false,
+            'email' => 'cliente@example.com',
+            'password' => Hash::make('cliente123'),
+            'role' => 'user',
             'phone_number' => '+1 555-123-4567',
             'address' => '123 Main St, Reno, NV 89501',
+            'username' => 'cliente',
         ]);
     }
 }

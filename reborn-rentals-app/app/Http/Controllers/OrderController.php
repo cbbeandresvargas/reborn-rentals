@@ -8,10 +8,6 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
 
     public function index()
     {
@@ -20,7 +16,7 @@ class OrderController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('orders.index', compact('orders'));
+        return view('orders', compact('orders'));
     }
 
     public function show($id)
@@ -29,7 +25,7 @@ class OrderController extends Controller
             ->with(['items.product', 'cupon', 'job'])
             ->findOrFail($id);
 
-        return view('orders.show', compact('order'));
+        return view('order', compact('order'));
     }
 }
 

@@ -26,7 +26,7 @@ class User extends Authenticatable
         'email',
         'username',
         'password',
-        'is_admin',
+        'role',
     ];
 
     /**
@@ -49,12 +49,32 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_admin' => 'boolean',
         ];
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if user is regular user
+     */
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
     }
 
     public function paymentInfos()
     {
         return $this->hasMany(PaymentInfo::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 }

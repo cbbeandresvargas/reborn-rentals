@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
@@ -31,14 +32,16 @@ class CartController extends Controller
 
     public function update(Request $request, $id)
     {
-        $quantity = $request->input('quantity');
-        
+        $change = $request->input('quantity', 0); // Puede ser +1 o -1
         $cart = Session::get('cart', []);
         
-        if ($quantity <= 0) {
-            unset($cart[$id]);
-        } else {
-            $cart[$id] = $quantity;
+        if (isset($cart[$id])) {
+            $newQuantity = $cart[$id] + $change;
+            if ($newQuantity <= 0) {
+                unset($cart[$id]);
+            } else {
+                $cart[$id] = $newQuantity;
+            }
         }
 
         Session::put('cart', $cart);
@@ -74,11 +77,32 @@ class CartController extends Controller
         ]);
     }
 
-    public function show()
+    public function show(Request $request)
     {
         $cart = Session::get('cart', []);
         
-        return view('cart.show', compact('cart'));
+        // Si es petición AJAX o JSON, devolver JSON
+        if ($request->wantsJson() || $request->expectsJson() || $request->ajax() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+            $productIds = array_keys($cart);
+            $products = Product::whereIn('id', $productIds)->get();
+            
+            $total = 0;
+            foreach ($products as $product) {
+                if (isset($cart[$product->id])) {
+                    $total += $product->price * $cart[$product->id];
+                }
+            }
+            
+            return response()->json([
+                'cart' => $cart,
+                'cart_count' => count($cart),
+                'products' => $products->toArray(),
+                'total' => $total
+            ]);
+        }
+        
+        // El carrito se muestra en el sidebar, redirigir a home
+        return redirect()->route('home')->with('cart', $cart);
     }
 }
 
