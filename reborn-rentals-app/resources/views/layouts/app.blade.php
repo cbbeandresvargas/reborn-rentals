@@ -192,16 +192,15 @@
                 
                 <!-- Terms and Conditions -->
                 <div class="text-gray-300 text-xs space-y-1">
-                    <p class="font-medium">*Minimum Order is 30 days.</p>
                     <p class="font-medium">*Additional charges for delivery, rough terrain and express orders may apply.</p>
                 </div>
             </div>
             
             <!-- Proceed Button -->
             <div class="mt-auto pt-4">
-                <a href="{{ route('checkout') }}" class="block w-full bg-gray-600 text-gray-400 py-3 px-4 rounded-lg font-bold text-lg text-center cursor-not-allowed transition-all duration-300" id="proceed-btn" style="pointer-events: none;">
+                <button type="button" class="block w-full bg-gray-600 text-gray-400 py-3 px-4 rounded-lg font-bold text-lg text-center cursor-not-allowed transition-all duration-300" id="when-where-btn" disabled>
                     Proceed to Payment
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -302,6 +301,22 @@
                     document.body.style.overflow = '';
                 }
             });
+            
+            // Proceed to Payment button - redirect to directions page
+            // Only add this listener if we're NOT on the directions page
+            // (directions page has its own listener that validates the form first)
+            if (!window.location.pathname.includes('/directions')) {
+                const whenWhereBtn = document.getElementById('when-where-btn');
+                if (whenWhereBtn) {
+                    whenWhereBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (!this.disabled) {
+                            // Redirect to directions page
+                            window.location.href = '{{ route("directions") }}';
+                        }
+                    });
+                }
+            }
         });
 
         // CSRF Token for AJAX

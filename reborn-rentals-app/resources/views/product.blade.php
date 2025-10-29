@@ -9,7 +9,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Product Image -->
         <div class="bg-white rounded-lg border border-gray-200 p-6">
-            <img src="{{ $product->image_url ? asset($product->image_url) : asset('Product1.png') }}" 
+            <img src="{{ $product->image_url ? asset('storage/' . $product->image_url) : asset('Product1.png') }}" 
                  alt="{{ $product->name }}" 
                  class="w-full h-auto object-contain rounded-lg" />
         </div>
@@ -61,7 +61,7 @@
             @foreach($relatedProducts as $related)
             <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                 <a href="{{ route('products.show', $related->id) }}">
-                    <img src="{{ $related->image_url ? asset($related->image_url) : asset('Product1.png') }}" 
+                    <img src="{{ $related->image_url ? asset('storage/' . $related->image_url) : asset('Product1.png') }}" 
                          alt="{{ $related->name }}" 
                          class="w-full h-48 object-contain p-4" />
                 </a>

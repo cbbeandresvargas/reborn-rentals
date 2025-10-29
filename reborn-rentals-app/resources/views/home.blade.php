@@ -57,7 +57,7 @@
                         <path d="m1 1 4 4 13 1 2 8H6l-2-8z"></path>
                     </svg>
                 </button>
-                <img src="{{ $product->image_url ? asset($product->image_url) : asset('Product1.png') }}" alt="{{ $product->name }}" class="w-full h-64 object-contain" />
+                <img src="{{ $product->image_url ? asset('storage/' . $product->image_url) : asset('Product1.png') }}" alt="{{ $product->name }}" class="w-full h-64 object-contain" />
             </div>
             <div class="bg-[#4A4A4A] px-4 py-3 text-center">
                 <h3 class="text-white font-bold text-lg">{{ $product->name }}</h3>

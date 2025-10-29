@@ -27,7 +27,7 @@
                 @foreach($order->items as $item)
                 <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div class="flex items-center space-x-4">
-                        <img src="{{ $item->product->image_url ? asset($item->product->image_url) : asset('Product1.png') }}" 
+                        <img src="{{ $item->product->image_url ? asset('storage/' . $item->product->image_url) : asset('Product1.png') }}" 
                              alt="{{ $item->product->name }}" 
                              class="w-16 h-16 object-contain bg-white rounded p-2" />
                         <div>

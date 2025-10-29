@@ -190,7 +190,7 @@ function updateCartDisplay() {
 function renderCart(cart, products, total) {
     const cartItems = document.querySelector('.cart-items');
     const subtotalSection = document.getElementById('subtotal-section');
-    const proceedBtn = document.getElementById('proceed-btn');
+    const proceedBtn = document.getElementById('when-where-btn');
     
     if (!cartItems) return;
     
@@ -212,9 +212,10 @@ function renderCart(cart, products, total) {
         `;
         if (subtotalSection) subtotalSection.classList.add('hidden');
         if (proceedBtn) {
+            proceedBtn.disabled = true;
             proceedBtn.classList.add('cursor-not-allowed');
             proceedBtn.style.pointerEvents = 'none';
-            proceedBtn.classList.remove('bg-[#CE9704]', 'text-white');
+            proceedBtn.classList.remove('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B]');
             proceedBtn.classList.add('bg-gray-600', 'text-gray-400');
         }
     } else {
@@ -233,7 +234,7 @@ function renderCart(cart, products, total) {
                     <div class="flex items-center p-3">
                         <div class="flex-shrink-0 mr-3">
                             <div class="w-16 h-16 bg-white rounded-lg p-1 flex items-center justify-center">
-                                <img src="${(product.image_url ? '/' + product.image_url : '/Product1.png')}" alt="${product.name}" class="w-full h-full object-contain" />
+                                <img src="${(product.image_url ? '/storage/' + product.image_url : '/Product1.png')}" alt="${product.name}" class="w-full h-full object-contain" />
                             </div>
                         </div>
                         <div class="flex-1 min-w-0">
@@ -274,6 +275,7 @@ function renderCart(cart, products, total) {
         }
         
         if (proceedBtn) {
+            proceedBtn.disabled = false;
             proceedBtn.classList.remove('cursor-not-allowed', 'bg-gray-600', 'text-gray-400');
             proceedBtn.classList.add('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B]');
             proceedBtn.style.pointerEvents = 'auto';
