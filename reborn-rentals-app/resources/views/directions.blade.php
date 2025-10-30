@@ -103,9 +103,15 @@
                     </p>
                     
                     <!-- Map Container -->
-                    <div class="relative" style="z-index: 0;">
-                        <div id="delivery-map" class="w-full h-96 rounded-lg overflow-hidden border border-gray-300 shadow-lg" style="position: relative; z-index: 0;">
-                            <!-- Interactive map will be loaded here -->
+                    <div class="relative" style="z-index: 1;">
+                        <div id="delivery-map" class="w-full h-96 rounded-lg overflow-hidden border border-gray-300 shadow-lg">
+                            <iframe 
+                                src="/map.html"
+                                title="Delivery Map"
+                                id="delivery-map-iframe"
+                                style="border:0; width:100%; height:100%; min-height: 400px;"
+                                loading="lazy"
+                            ></iframe>
                         </div>
                         
                         <!-- Google Maps iframe (hidden by default, shown for self-pickup and no-address) -->
@@ -233,18 +239,29 @@
 </div>
 
 @push('styles')
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #delivery-map {
+        min-height: 400px !important;
+        height: 100%;
+    }
+    .leaflet-container {
+        height: 100%;
+        width: 100%;
+    }
+</style>
 @endpush
 
 @push('scripts')
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+    console.log('=== DIRECTIONS PAGE LOADED ===');
+    const USE_IFRAME_MAP = true;
 let map;
 let selectedMarker;
 let officeMarker;
 let routeLayer;
+
+// Expose map globally for invalidateSize calls
+window.map = null;
 
 // Reborn Rentals Office coordinates
 const officeLocation = {
@@ -274,6 +291,9 @@ function initMap() {
         // Create map with OpenStreetMap tiles
         map = L.map('delivery-map').setView([officeLocation.lat, officeLocation.lng], 12);
         
+        // Expose map globally
+        window.map = map;
+        
         // Add OpenStreetMap tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -281,6 +301,13 @@ function initMap() {
         }).addTo(map);
         
         console.log('Map created successfully');
+        
+        // Ensure map is properly sized
+        setTimeout(() => {
+            if (map) {
+                map.invalidateSize();
+            }
+        }, 500);
 
         // Add office marker
         const officeIcon = L.divIcon({
@@ -562,41 +589,56 @@ function toggleSelfPickup() {
     const locationInfo = document.getElementById('selected-location-info');
     
     if (selfPickup.checked || noAddress.checked) {
-        if (details) details.classList.remove('hidden');
+        // Auto-fill company address when self-pickup or no-address is selected
         if (jobsiteAddress) {
+            jobsiteAddress.value = '401 Ryland St Suite 200-A, Reno, NV 89502, USA';
             jobsiteAddress.required = false;
             jobsiteAddress.placeholder = 'Optional: Additional delivery instructions...';
         }
         
-        // Show Google Maps, hide interactive map
-        if (interactiveMap) interactiveMap.classList.add('hidden');
-        if (googleMaps) googleMaps.classList.remove('hidden');
+        // Hide details and Google Maps
+        if (details) details.classList.add('hidden');
+        if (googleMaps) googleMaps.classList.add('hidden');
+        
+        // Keep interactive map but hide controls and location info
+        if (interactiveMap) interactiveMap.classList.remove('hidden');
         if (mapControls) mapControls.style.display = 'none';
         if (locationInfo) locationInfo.style.display = 'none';
     } else {
-        if (details) details.classList.add('hidden');
+        // Clear address input when unchecked
         if (jobsiteAddress) {
+            jobsiteAddress.value = '';
             jobsiteAddress.required = true;
             jobsiteAddress.placeholder = 'Start typing and select from suggestions...';
         }
         
-        // Show interactive map, hide Google Maps
-        if (interactiveMap) interactiveMap.classList.remove('hidden');
+        // Hide details and Google Maps
+        if (details) details.classList.add('hidden');
         if (googleMaps) googleMaps.classList.add('hidden');
+        
+        // Show interactive map with controls
+        if (interactiveMap) interactiveMap.classList.remove('hidden');
         if (mapControls) mapControls.style.display = 'block';
         if (locationInfo) locationInfo.style.display = 'block';
     }
 }
 
 // Make checkboxes work like radio buttons (only one selected at a time)
-document.addEventListener('DOMContentLoaded', function() {
+function initDirectionsPage() {
     // Open cart sidebar automatically when on directions page
+    // Wait longer to ensure map initializes first
     setTimeout(() => {
         const cartSidebar = document.getElementById('cart-sidebar');
         
         if (cartSidebar) {
             cartSidebar.classList.remove('translate-x-full');
             cartSidebar.classList.add('translate-x-0');
+            
+            // Show step indicator
+            const stepIndicatorContainer = document.getElementById('step-indicator-container');
+            if (stepIndicatorContainer) {
+                stepIndicatorContainer.style.display = 'block';
+            }
             
             // Adjust main content margin
             const mainContent = document.getElementById('main-content');
@@ -608,8 +650,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     mainContent.style.marginRight = '320px';
                 }
             }
+            
+            // Recalculate map size when sidebar opens
+            setTimeout(() => {
+                if (typeof window.map !== 'undefined' && window.map) {
+                    window.map.invalidateSize();
+                }
+            }, 300);
         }
-    }, 100);
+    }, 2000); // Wait 2 seconds for map to initialize
     
     const selfPickup = document.getElementById('self-pickup');
     const noAddress = document.getElementById('no-address');
@@ -639,87 +688,44 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize autocomplete (using Nominatim)
     initNominatimAutocomplete();
     
-    // Load map when Leaflet is ready - Wait for script and DOM
-    let attempts = 0;
-    const maxAttempts = 100; // 10 seconds max
-    
-    // Wait for Leaflet to load
-    function waitForLeaflet() {
-        attempts++;
-        const mapElement = document.getElementById('delivery-map');
-        
-        // Check if map container exists
-        if (!mapElement) {
-            if (attempts < maxAttempts) {
-                setTimeout(waitForLeaflet, 100);
-            }
-            return;
-        }
-        
-        // Check if Leaflet is loaded and ready (has map function)
-        if (typeof window.L !== 'undefined' && typeof window.L.map === 'function') {
-            console.log('Leaflet loaded, initializing map...');
-            // Small delay to ensure DOM is fully ready
-            setTimeout(() => {
-                try {
-                    initMap();
-                } catch (error) {
-                    console.error('Error initializing map:', error);
-                    if (mapElement) {
-                        mapElement.innerHTML = '<div class="flex items-center justify-center h-full bg-gray-100 text-gray-600">Error loading map. Please refresh the page.</div>';
-                    }
+    // Cargar mapa: si usamos iframe, no inicializamos Leaflet aquí
+    if (!USE_IFRAME_MAP) {
+        setTimeout(() => {
+            try {
+                initMap();
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                const mapElement = document.getElementById('delivery-map');
+                if (mapElement) {
+                    mapElement.innerHTML = '<div class="flex items-center justify-center h-full bg-gray-100 text-gray-600">Error loading map. Please refresh the page.</div>';
                 }
-            }, 100);
-        } else if (attempts < maxAttempts) {
-            console.log(`Waiting for Leaflet to load... (attempt ${attempts}/${maxAttempts})`);
-            setTimeout(waitForLeaflet, 100);
-        } else {
-            console.error('Leaflet failed to load after 10 seconds');
-            if (mapElement) {
-                mapElement.innerHTML = '<div class="flex items-center justify-center h-full bg-gray-100 text-gray-600">Map failed to load. Please check your internet connection and refresh the page.</div>';
             }
-        }
-    }
-    
-    // Start checking for Leaflet after DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(waitForLeaflet, 300);
-        });
+        }, 500);
     } else {
-        setTimeout(waitForLeaflet, 300);
+        // Ocultar controles del mapa de Leaflet cuando se usa iframe
+        const mapControls = document.querySelector('.absolute.top-4.right-4');
+        if (mapControls) mapControls.style.display = 'none';
+        // Handshake con iframe
+        const iframe = document.getElementById('delivery-map-iframe');
+        if (iframe) {
+            iframe.addEventListener('load', function() {
+                try {
+                    console.log('Iframe loaded, sending map:parentPing');
+                    iframe.contentWindow && iframe.contentWindow.postMessage({ type: 'map:parentPing' }, '*');
+                } catch (e) {
+                    console.warn('No se pudo enviar postMessage al iframe:', e);
+                }
+            });
+        }
     }
     
     // Update when-where button based on cart
     function updateWhenWhereButton() {
         const whenWhereBtn = document.getElementById('when-where-btn');
         if (whenWhereBtn) {
-            // Check cart via AJAX
-            fetch('/cart', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const hasItems = data.cart && Object.keys(data.cart).length > 0;
-                if (hasItems) {
-                    whenWhereBtn.disabled = false;
-                    whenWhereBtn.classList.remove('bg-gray-600', 'text-gray-400', 'cursor-not-allowed');
-                    whenWhereBtn.classList.add('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B']);
-                } else {
-                    whenWhereBtn.disabled = true;
-                    whenWhereBtn.classList.remove('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B');
-                    whenWhereBtn.classList.add('bg-gray-600', 'text-gray-400', 'cursor-not-allowed');
-                }
-            })
-            .catch(() => {
-                whenWhereBtn.disabled = true;
-                whenWhereBtn.classList.remove('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B');
-                whenWhereBtn.classList.add('bg-gray-600', 'text-gray-400', 'cursor-not-allowed');
-            });
+            whenWhereBtn.disabled = false;
+            whenWhereBtn.classList.remove('bg-gray-600', 'text-gray-400', 'cursor-not-allowed');
+            whenWhereBtn.classList.add('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B]');
         }
     }
     
@@ -751,7 +757,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDirectionsPage);
+} else {
+    initDirectionsPage();
+}
 
 // Initialize Nominatim autocomplete
 function initNominatimAutocomplete() {
@@ -783,12 +795,29 @@ function initNominatimAutocomplete() {
                         return;
                     }
 
-                    suggestionsDiv.innerHTML = data.map(item => `
-                        <div class="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200 last:border-b-0" onclick="selectAddressSuggestion('${item.display_name.replace(/'/g, "\\'")}', ${item.lat}, ${item.lon})">
-                            <div class="text-sm text-gray-900">${item.display_name}</div>
-                        </div>
-                    `).join('');
+                    suggestionsDiv.innerHTML = data.map(item => {
+                        return `
+                            <div class="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200 last:border-b-0 address-suggestion" 
+                                 data-lat="${item.lat}" 
+                                 data-lon="${item.lon}" 
+                                 data-name="${item.display_name.replace(/"/g, '&quot;')}">
+                                <div class="text-sm text-gray-900">${item.display_name}</div>
+                            </div>
+                        `;
+                    }).join('');
                     suggestionsDiv.style.display = 'block';
+                    
+                    // Add click listeners to suggestions
+                    suggestionsDiv.querySelectorAll('.address-suggestion').forEach(el => {
+                        el.addEventListener('click', function() {
+                            const lat = parseFloat(this.dataset.lat);
+                            const lon = parseFloat(this.dataset.lon);
+                            const name = this.dataset.name;
+                            if (typeof selectAddressSuggestion === 'function') {
+                                selectAddressSuggestion(name, lat, lon);
+                            }
+                        });
+                    });
                 })
                 .catch(error => {
                     console.error('Error fetching suggestions:', error);
@@ -825,6 +854,54 @@ window.selectAddressSuggestion = function(address, lat, lng) {
     }, 100);
 };
 
+// Escuchar selección desde el iframe del mapa
+window.addEventListener('message', function(event) {
+    const data = event.data || {};
+    try { console.log('Map iframe message:', data); } catch (e) {}
+    if (data.type === 'map:locationSelected') {
+        const { address, lat, lng, distanceKm, durationMin } = data;
+        const selectedAddress = document.getElementById('selected-address');
+        const distanceInfo = document.getElementById('distance-info');
+        const addressInput = document.getElementById('jobsite-address');
+        const fallback = (lat && lng) ? `Lat: ${Number(lat).toFixed(4)}, Lng: ${Number(lng).toFixed(4)}` : '';
+        if (selectedAddress) selectedAddress.textContent = address || fallback || 'Location selected';
+        if (addressInput) addressInput.value = address || fallback || '';
+        if (distanceInfo) {
+            if (distanceKm && durationMin != null) {
+                distanceInfo.textContent = `Distance: ${distanceKm} km • Duration: ${durationMin} min`;
+            } else if (distanceKm) {
+                distanceInfo.textContent = `Straight line distance: ${parseFloat(distanceKm).toFixed(1)} km (approximate)`;
+            } else {
+                distanceInfo.textContent = '';
+            }
+        }
+        // Asegurar que el panel sea visible
+        const locationInfo = document.getElementById('selected-location-info');
+        if (locationInfo) locationInfo.style.display = 'block';
+    } else if (data.type === 'map:cleared') {
+        const selectedAddress = document.getElementById('selected-address');
+        const distanceInfo = document.getElementById('distance-info');
+        const addressInput = document.getElementById('jobsite-address');
+        if (selectedAddress) selectedAddress.textContent = 'Click on the map to select a delivery location';
+        if (distanceInfo) distanceInfo.textContent = '';
+        if (addressInput) addressInput.value = '';
+    } else if (data.type === 'map:ready') {
+        // El iframe está listo, enviar ping para sincronizar
+        const iframe = document.getElementById('delivery-map-iframe');
+        if (iframe && iframe.contentWindow) {
+            try {
+                console.log('Received map:ready, sending map:parentPing');
+                iframe.contentWindow.postMessage({ type: 'map:parentPing' }, '*');
+            } catch (e) {
+                console.warn('No se pudo enviar map:parentPing tras map:ready:', e);
+            }
+        }
+    } else if (data.type === 'map:pong') {
+        // Confirmación del handshake
+        try { console.log('Handshake OK (map:pong)'); } catch (e) {}
+    }
+});
+
 // Form validation
 function validateForm() {
     const startDate = document.getElementById('start-date');
@@ -832,36 +909,62 @@ function validateForm() {
     const jobsiteAddress = document.getElementById('jobsite-address');
     const selfPickup = document.getElementById('self-pickup');
     const noAddress = document.getElementById('no-address');
-    
+    const selectedAddressEl = document.getElementById('selected-address');
+
+    // Copiar dirección del panel si el input está vacío
+    if (jobsiteAddress && selectedAddressEl && !jobsiteAddress.value.trim()) {
+        const txt = selectedAddressEl.textContent || '';
+        if (txt && txt !== 'Click on the map to select a delivery location') {
+            jobsiteAddress.value = txt;
+        }
+    }
+
+    // Autocompletar fechas si faltan: hoy y mañana
+    if (startDate && !startDate.value) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        startDate.value = `${yyyy}-${mm}-${dd}`;
+    }
+    if (endDate && !endDate.value) {
+        const t = new Date();
+        t.setDate(t.getDate() + 1);
+        const yyyy = t.getFullYear();
+        const mm = String(t.getMonth() + 1).padStart(2, '0');
+        const dd = String(t.getDate()).padStart(2, '0');
+        endDate.value = `${yyyy}-${mm}-${dd}`;
+    }
+
     if (!startDate.value || !endDate.value) {
         alert('Please select both start and end dates.');
         return false;
     }
-    
+
     if (new Date(startDate.value) >= new Date(endDate.value)) {
         alert('End date must be after start date.');
         return false;
     }
-    
-    // Only require address if not self-pickup and not no-address
+
+    // Solo exigir dirección si no es self-pickup ni no-address
     if (!selfPickup.checked && !noAddress.checked && !jobsiteAddress.value.trim()) {
         alert('Please enter a jobsite address or select a pickup option.');
         return false;
     }
-    
+
     return true;
 }
 
 // Save form data
 function saveFormData() {
+    const checked = document.querySelector('input[name="pickup-option"]:checked');
+    const pickupOption = checked ? checked.value : null;
+    
     const formData = {
         startDate: document.getElementById('start-date').value,
         endDate: document.getElementById('end-date').value,
         jobsiteAddress: document.getElementById('jobsite-address').value,
-        pickupOption: (() => {
-            const checked = document.querySelector('input[name="pickup-option"]:checked');
-            return checked ? checked.value : null;
-        })(),
+        pickupOption: pickupOption,
         selfPickupChecked: document.getElementById('self-pickup').checked,
         noAddressChecked: document.getElementById('no-address').checked
     };

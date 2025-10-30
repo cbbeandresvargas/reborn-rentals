@@ -9,6 +9,9 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Leaflet CSS - Load globally for directions page -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    
     <!-- Custom Tailwind Config -->
     <script>
         tailwind.config = {
@@ -158,7 +161,24 @@
     </div>
 
     <!-- Cart Sidebar (Right) -->
-    <div id="cart-sidebar" class="fixed top-0 right-0 h-screen text-white w-full sm:w-80 lg:w-96 max-w-[90vw] bg-[#2F2F2F] shadow-2xl translate-x-full transition-transform duration-300 ease-in-out z-30 overflow-y-auto scrollbar-hide">
+    <div id="cart-sidebar-container" class="fixed top-0 right-0 h-screen z-30 overflow-visible">
+        <div id="cart-sidebar" class="text-white w-full sm:w-80 lg:w-96 max-w-[90vw] bg-[#2F2F2F] shadow-2xl translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto scrollbar-hide h-full relative overflow-visible">
+            <!-- Step Indicator on left edge (protruding) -->
+            <div id="step-indicator-container" class="absolute -left-[42px] top-[170px] w-[42px] h-[236px] bg-[#2F2F2F] flex flex-col items-center justify-center gap-[21px]" style="border-radius: 26px 0px 0px 26px; display: none;">
+                <!-- Step 1 -->
+                <div class="w-8 h-12 text-[#CE9704] font-black text-base leading-[48px] text-center flex items-center justify-center" id="step-indicator-1">
+                    1
+                </div>
+                <!-- Step 2 -->
+                <div class="w-8 h-12 text-white font-black text-base leading-[48px] text-center flex items-center justify-center" id="step-indicator-2">
+                    2
+                </div>
+                <!-- Step 3 -->
+                <div class="w-8 h-12 text-white font-black text-base leading-[48px] text-center flex items-center justify-center" id="step-indicator-3">
+                    3
+                </div>
+            </div>
+        
         <div class="p-8 min-h-full flex flex-col">
             <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-300">
                 <h3 class="m-0 text-[#CE9704] text-2xl">YOUR CART</h3>
@@ -202,6 +222,7 @@
                     Proceed to Payment
                 </button>
             </div>
+        </div>
         </div>
     </div>
 
@@ -254,6 +275,18 @@
                 cartBtn.addEventListener('click', function() {
                     cartSidebar.classList.remove('translate-x-full');
                     cartSidebar.classList.add('translate-x-0');
+                    
+                    // Show step indicator
+                    const stepIndicatorContainer = document.getElementById('step-indicator-container');
+                    if (stepIndicatorContainer) {
+                        stepIndicatorContainer.style.display = 'block';
+                    }
+                    
+                    const mainContent = document.getElementById('main-content');
+                    if (mainContent) {
+                        // Añadir padding derecho para dejar espacio al sidebar (sm: w-80, lg: w-96)
+                        mainContent.classList.add('pr-80', 'lg:pr-96');
+                    }
                 });
             }
 
@@ -273,6 +306,17 @@
                 closeCartBtn.addEventListener('click', function() {
                     cartSidebar.classList.remove('translate-x-0');
                     cartSidebar.classList.add('translate-x-full');
+                    
+                    // Hide step indicator
+                    const stepIndicatorContainer = document.getElementById('step-indicator-container');
+                    if (stepIndicatorContainer) {
+                        stepIndicatorContainer.style.display = 'none';
+                    }
+                    
+                    const mainContent = document.getElementById('main-content');
+                    if (mainContent) {
+                        mainContent.classList.remove('pr-80', 'lg:pr-96');
+                    }
                 });
             }
 
@@ -327,10 +371,60 @@
                 }
             }
         };
+        
+        // Update step indicator based on current page
+        function updateStepIndicator() {
+            const currentPath = window.location.pathname;
+            
+            const step1 = document.getElementById('step-indicator-1');
+            const step2 = document.getElementById('step-indicator-2');
+            const step3 = document.getElementById('step-indicator-3');
+            
+            // Remove all active states
+            if (step1) {
+                step1.classList.remove('text-[#CE9704]');
+                step1.classList.add('text-white');
+            }
+            if (step2) {
+                step2.classList.remove('text-[#CE9704]');
+                step2.classList.add('text-white');
+            }
+            if (step3) {
+                step3.classList.remove('text-[#CE9704]');
+                step3.classList.add('text-white');
+            }
+            
+            // Set active step based on current page
+            if (currentPath === '/' || currentPath.includes('home')) {
+                if (step1) {
+                    step1.classList.remove('text-white');
+                    step1.classList.add('text-[#CE9704]');
+                }
+            } else if (currentPath.includes('directions')) {
+                if (step2) {
+                    step2.classList.remove('text-white');
+                    step2.classList.add('text-[#CE9704]');
+                }
+            } else if (currentPath.includes('checkout')) {
+                if (step3) {
+                    step3.classList.remove('text-white');
+                    step3.classList.add('text-[#CE9704]');
+                }
+            }
+        }
+        
+        // Initialize step indicator on page load
+        updateStepIndicator();
     </script>
     
     <!-- Cart JS -->
     <script src="{{ asset('js/cart.js') }}"></script>
+    
+    <!-- Leaflet JS - Load globally for directions page -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        console.log('=== LEAFlet LOADED ===', typeof window.L !== 'undefined' ? 'YES' : 'NO');
+    </script>
     
     @stack('scripts')
 </body>
