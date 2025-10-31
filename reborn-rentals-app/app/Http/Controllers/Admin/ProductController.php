@@ -13,7 +13,8 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('category')->latest()->paginate(15);
-        return view('admin.products.index', compact('products'));
+        $categories = Category::all();
+        return view('admin.products.index', compact('products', 'categories'));
     }
 
     public function create()
@@ -42,13 +43,14 @@ class ProductController extends Controller
         Product::create($validated);
 
         return redirect()->route('admin.products.index')
-            ->with('success', 'Producto creado exitosamente');
+            ->with('success', 'Product created successfully');
     }
 
     public function show(Product $product)
     {
         $product->load('category', 'orderItems.order');
-        return view('admin.products.show', compact('product'));
+        $categories = Category::all();
+        return view('admin.products.show', compact('product', 'categories'));
     }
 
     public function edit(Product $product)
@@ -69,7 +71,7 @@ class ProductController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Eliminar imagen antigua
+            // Delete old image
             if ($product->image_url) {
                 Storage::disk('public')->delete($product->image_url);
             }
@@ -81,7 +83,7 @@ class ProductController extends Controller
         $product->update($validated);
 
         return redirect()->route('admin.products.index')
-            ->with('success', 'Producto actualizado exitosamente');
+            ->with('success', 'Product updated successfully');
     }
 
     public function destroy(Product $product)
@@ -93,6 +95,6 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->route('admin.products.index')
-            ->with('success', 'Producto eliminado exitosamente');
+            ->with('success', 'Product deleted successfully');
     }
 }

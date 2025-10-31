@@ -787,7 +787,9 @@ function initNominatimAutocomplete() {
         }
 
         timeoutId = setTimeout(() => {
-            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&countrycodes=us`)
+            // Search only in Colorado, USA - append "Colorado" to the query
+            const coloradoQuery = query.includes(', CO') || query.includes('Colorado') ? query : `${query}, Colorado`;
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(coloradoQuery)}&limit=5&countrycodes=us`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.length === 0) {
@@ -795,7 +797,13 @@ function initNominatimAutocomplete() {
                         return;
                     }
 
-                    suggestionsDiv.innerHTML = data.map(item => {
+                    // Filter results to ensure they're in Colorado
+                    const coloradoResults = data.filter(item => {
+                        const addr = item.display_name.toLowerCase();
+                        return addr.includes('colorado') || addr.includes(', co');
+                    });
+
+                    suggestionsDiv.innerHTML = coloradoResults.map(item => {
                         return `
                             <div class="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200 last:border-b-0 address-suggestion" 
                                  data-lat="${item.lat}" 
@@ -805,7 +813,7 @@ function initNominatimAutocomplete() {
                             </div>
                         `;
                     }).join('');
-                    suggestionsDiv.style.display = 'block';
+                    suggestionsDiv.style.display = coloradoResults.length > 0 ? 'block' : 'none';
                     
                     // Add click listeners to suggestions
                     suggestionsDiv.querySelectorAll('.address-suggestion').forEach(el => {
@@ -846,8 +854,25 @@ window.selectAddressSuggestion = function(address, lat, lng) {
         suggestionsDiv.style.display = 'none';
     }
     
-    // Update map with selected location
+    // Update map with selected location (both iframe and Leaflet modes)
     setTimeout(() => {
+        // Try iframe mode first
+        const iframe = document.getElementById('delivery-map-iframe');
+        if (iframe && iframe.contentWindow) {
+            try {
+                console.log('Sending location to iframe:', { lat, lng, address });
+                iframe.contentWindow.postMessage({
+                    type: 'map:selectLocation',
+                    lat: lat,
+                    lng: lng,
+                    address: address
+                }, '*');
+            } catch (e) {
+                console.warn('Error sending to iframe:', e);
+            }
+        }
+        
+        // Also try Leaflet mode if available
         if (typeof window.selectLocation === 'function') {
             window.selectLocation({ lat, lng });
         }

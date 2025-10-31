@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Cupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Carbon\Carbon;
 
 class CartController extends Controller
 {
@@ -84,7 +86,7 @@ class CartController extends Controller
         // Si es petición AJAX o JSON, devolver JSON
         if ($request->wantsJson() || $request->expectsJson() || $request->ajax() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             $productIds = array_keys($cart);
-            $products = Product::whereIn('id', $productIds)->get();
+            $products = Product::with('category')->whereIn('id', $productIds)->get();
             
             $total = 0;
             foreach ($products as $product) {
@@ -103,6 +105,102 @@ class CartController extends Controller
         
         // El carrito se muestra en el sidebar, redirigir a home
         return redirect()->route('home')->with('cart', $cart);
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        $code = $request->input('code');
+        $cartTotal = $request->input('cart_total', 0);
+
+        if (!$code) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Coupon code is required'
+            ], 400);
+        }
+
+        // Buscar el cupón
+        $coupon = Cupon::where('code', strtoupper(trim($code)))->first();
+
+        if (!$coupon) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Coupon is not valid'
+            ], 404);
+        }
+
+        // Verificar si está activo
+        if (!$coupon->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Coupon is not valid'
+            ], 400);
+        }
+
+        // Verificar fecha de inicio
+        if ($coupon->starts_at && Carbon::now()->lt($coupon->starts_at)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Coupon is not valid'
+            ], 400);
+        }
+
+        // Verificar fecha de expiración
+        if ($coupon->expires_at && Carbon::now()->gt($coupon->expires_at)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Coupon is not valid'
+            ], 400);
+        }
+
+        // Verificar orden mínima
+        if ($coupon->min_order_total && $cartTotal < $coupon->min_order_total) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Minimum order total of $' . number_format($coupon->min_order_total, 2) . ' required'
+            ], 400);
+        }
+
+        // Calcular descuento
+        $discount = 0;
+        if ($coupon->discount_type === 'percentage') {
+            $discount = ($cartTotal * $coupon->discount_value) / 100;
+        } else {
+            $discount = min($coupon->discount_value, $cartTotal); // No puede ser más que el total
+        }
+
+        $newTotal = max(0, $cartTotal - $discount);
+
+        // Guardar el cupón en la sesión
+        Session::put('applied_coupon', [
+            'id' => $coupon->id,
+            'code' => $coupon->code,
+            'discount_type' => $coupon->discount_type,
+            'discount_value' => $coupon->discount_value,
+            'discount_amount' => $discount
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Coupon applied successfully',
+            'coupon' => [
+                'code' => $coupon->code,
+                'discount_type' => $coupon->discount_type,
+                'discount_value' => $coupon->discount_value,
+                'discount_amount' => round($discount, 2),
+                'new_total' => round($newTotal, 2)
+            ]
+        ]);
+    }
+
+    public function removeCoupon()
+    {
+        Session::forget('applied_coupon');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Coupon removed successfully'
+        ]);
     }
 }
 

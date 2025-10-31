@@ -39,7 +39,7 @@ class UserController extends Controller
         User::create($validated);
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'Usuario creado exitosamente');
+            ->with('success', 'User created successfully');
     }
 
     public function show(User $user)
@@ -75,20 +75,20 @@ class UserController extends Controller
         $user->update($validated);
 
         return redirect()->route('admin.users.show', $user)
-            ->with('success', 'Usuario actualizado exitosamente');
+            ->with('success', 'User updated successfully');
     }
 
     public function destroy(User $user)
     {
-        // No permitir eliminar tu propio usuario
+        // Prevent deleting your own user
         if ($user->id === Auth::id()) {
             return redirect()->route('admin.users.index')
-                ->with('error', 'No puedes eliminar tu propio usuario');
+                ->with('error', 'You cannot delete your own user');
         }
 
         $user->delete();
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'Usuario eliminado exitosamente');
+            ->with('success', 'User deleted successfully');
     }
 }

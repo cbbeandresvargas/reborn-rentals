@@ -180,7 +180,7 @@
             </div>
         
         <div class="p-8 min-h-full flex flex-col">
-            <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-300">
+            <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-300" id="cart-header">
                 <h3 class="m-0 text-[#CE9704] text-2xl">YOUR CART</h3>
                 <button class="bg-none border-none cursor-pointer p-2 rounded transition-colors duration-300 ease-in-out hover:bg-gray-200" id="close-cart">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -217,7 +217,7 @@
             </div>
             
             <!-- Proceed Button -->
-            <div class="mt-auto pt-4">
+            <div class="mt-auto pt-4" id="proceed-button-container">
                 <button type="button" class="block w-full bg-gray-600 text-gray-400 py-3 px-4 rounded-lg font-bold text-lg text-center cursor-not-allowed transition-all duration-300" id="when-where-btn" disabled>
                     Proceed to Payment
                 </button>
@@ -228,6 +228,179 @@
 
     <!-- Overlay -->
     <div id="sidebar-overlay" class="fixed top-0 left-0 w-full h-full bg-black/50 z-40 opacity-0 invisible transition-all duration-300 ease-in-out"></div>
+
+    <!-- Payment Method Modal -->
+    <div id="payment-method-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-white rounded-lg max-w-md w-full shadow-2xl">
+            <!-- Header -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-semibold text-gray-900" id="payment-modal-title">Payment Method Details</h2>
+                    <button onclick="closePaymentMethodModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-6" id="payment-method-form-container">
+                <!-- Form content will be inserted here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Verification Code Modal -->
+    <div id="verification-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex flex-col items-center justify-center p-4" style="display: none;">
+        <!-- Instructions above modal -->
+        <div id="verification-instructions" class="text-center text-white text-sm mb-4 w-full max-w-md">
+            <p>To proceed with the payment, please enter the verification code sent to your email <span id="instructions-email" class="font-semibold"></span></p>
+        </div>
+        
+        <!-- Modal Container -->
+        <div class="bg-white rounded-lg max-w-md w-full shadow-2xl relative mb-4">
+            <!-- Header with Payment Method Icons and Close Button -->
+            <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <!-- Generic Card Icon -->
+                    <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                    </div>
+                    <!-- Mastercard Logo -->
+                    <div class="w-8 h-8 rounded bg-red-500 flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute left-0 w-4 h-8 bg-orange-500 rounded-l-full"></div>
+                        <div class="absolute right-0 w-4 h-8 bg-red-500 rounded-r-full"></div>
+                    </div>
+                    <!-- American Express Logo -->
+                    <div class="w-8 h-6 bg-blue-600 rounded flex items-center justify-center">
+                        <span class="text-white text-xs font-bold">AMEX</span>
+                    </div>
+                </div>
+                <button onclick="closeVerificationModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Title -->
+            <div class="px-6 pt-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">We need to verify you</h2>
+                <p class="text-gray-600 text-sm mb-6">Enter the code Mastercard sent to <span id="verification-email-display" class="font-medium"></span></p>
+            </div>
+            
+            <!-- Verification Code Inputs (5 digits) -->
+            <div class="px-6 mb-4">
+                <div class="flex gap-3 justify-center">
+                    <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-0" />
+                    <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-1" />
+                    <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-2" />
+                    <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-3" />
+                    <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-4" />
+                </div>
+            </div>
+            
+            <!-- Resend Code -->
+            <div class="px-6 mb-4">
+                <button type="button" id="resend-code-btn" onclick="sendVerificationCode()" class="text-sm text-blue-600 hover:text-blue-800 underline">Resend Code</button>
+            </div>
+            
+            <!-- Footer Buttons -->
+            <div class="px-6 pb-6 flex gap-3">
+                <button type="button" onclick="closeVerificationModal()" class="flex-1 bg-white border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200">Cancel</button>
+                <button type="button" onclick="verifyCode()" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200">Verify</button>
+            </div>
+        </div>
+        
+        <!-- Session Timer (outside modal, below it) -->
+        <div class="text-center text-white text-sm w-full max-w-md">
+            <p>For security reasons, your session will expire in <span id="session-timer" class="font-semibold text-[#CE9704]">20:00</span></p>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity duration-300" style="display: none; opacity: 0;">
+        <div class=" from-[#333333] to-[#2a2a2a] rounded-2xl max-w-lg w-full relative shadow-2xl border-2 border-[#CE9704] transform transition-all duration-300 scale-95" style="opacity: 0; transform: scale(0.95) translateY(20px);" id="success-modal-content">
+            <!-- Decorative Top Border -->
+            <div class="absolute top-0 left-0 right-0 h-1  from-[#CE9704] via-[#FFD700] to-[#CE9704] rounded-t-2xl"></div>
+            
+            <!-- Close Button -->
+            <div class="absolute top-5 right-5 z-10">
+                <button onclick="closeSuccessModal()" class="text-white hover:text-[#CE9704] p-2 rounded-full hover:bg-white/10 transition-all duration-200 transform hover:scale-110">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Content Container -->
+            <div class="p-10 md:p-12">
+                <!-- Success Icon with Animation -->
+                <div class="flex justify-center mb-6">
+                    <div class="w-20 h-20 bg-[#CE9704] rounded-full flex items-center justify-center shadow-lg transform transition-all duration-500 hover:scale-110">
+                        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Logo -->
+                <div class="flex justify-center mb-8">
+                    <img src="{{ asset('Logo.png') }}" alt="Reborn Rental" class="h-20 w-auto object-contain drop-shadow-lg" />
+                </div>
+                
+                <!-- Success Message -->
+                <div class="text-center mb-8">
+                    <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-3 drop-shadow-lg">
+                        Success<span class="text-[#CE9704] animate-pulse">!!!</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl font-bold text-white mb-6 leading-tight">
+                        Your Reservation is in place!<br />you're all set!
+                    </p>
+                </div>
+                
+                <!-- Divider -->
+                <div class="w-24 h-0.5  from-transparent via-[#CE9704] to-transparent mx-auto mb-8"></div>
+                
+                <!-- Details Message -->
+                <div class="text-center text-gray-300 mb-8 space-y-3 leading-relaxed">
+                    <p class="text-base md:text-lg">We'll email you your reservation confirmation and receipt.</p>
+                    <p class="text-base md:text-lg font-medium text-white">Thank you for choosing RebornRental as your Rental Partner.</p>
+                </div>
+                
+                <!-- Social Media Section -->
+                <div class="text-center mb-8">
+                    <p class="text-white font-semibold mb-5 tracking-wider text-sm uppercase">Follow Us On</p>
+                    <div class="flex justify-center gap-5">
+                        <!-- Facebook -->
+                        <a href="https://www.facebook.com/rebornrentals/" target="_blank" rel="noopener noreferrer" class="w-14 h-14 bg-black border-2 border-[#CE9704] rounded-full flex items-center justify-center hover:bg-[#CE9704] hover:border-white transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:shadow-[#CE9704]/50">
+                            <span class="text-white font-bold text-xl">f</span>
+                        </a>
+                        <!-- Instagram -->
+                        <a href="https://www.instagram.com/reborn_rentals/" target="_blank" rel="noopener noreferrer" class="w-14 h-14 bg-black border-2 border-[#CE9704] rounded-full flex items-center justify-center hover:bg-[#CE9704] hover:border-white transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:shadow-[#CE9704]/50">
+                            <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                        <!-- LinkedIn -->
+                        <a href="https://www.linkedin.com/company/reborn-rental/" target="_blank" rel="noopener noreferrer" class="w-14 h-14 bg-black border-2 border-[#CE9704] rounded-full flex items-center justify-center hover:bg-[#CE9704] hover:border-white transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:shadow-[#CE9704]/50">
+                            <span class="text-white font-bold text-base">in</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Go to Homepage Button -->
+                <div class="w-full mt-10">
+                    <button onclick="goToHomepage()" class="w-full  from-[#CE9704] to-[#B8860B] text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:shadow-[#CE9704]/50 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+                        Go to Homepage
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <main class="min-h-[calc(100vh-72px)] md:min-h-[calc(100vh-96px)] transition-all duration-300 ease-in-out" id="main-content">
@@ -427,6 +600,13 @@
     </script>
     
     @stack('scripts')
+    
+    @auth
+    <script>
+        // Make authenticated user email available to JavaScript
+        window.authenticatedUserEmail = @json(Auth::user()->email);
+    </script>
+    @endauth
 </body>
 </html>
 

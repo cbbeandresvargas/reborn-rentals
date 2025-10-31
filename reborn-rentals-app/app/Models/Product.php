@@ -42,6 +42,22 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    // Accessor para obtener la URL completa de la imagen
+    public function getImageUrlAttribute($value)
+    {
+        if (!$value) {
+            return null;
+        }
+        
+        // Si ya empieza con "/", es una ruta relativa desde la raíz pública
+        if (str_starts_with($value, '/')) {
+            return $value;
+        }
+        
+        // Si no, es una ruta desde storage
+        return 'storage/' . $value;
+    }
+
     // Scopes para limpiar el controlador index()
     public function scopeSearch($q, ?string $term)
     {

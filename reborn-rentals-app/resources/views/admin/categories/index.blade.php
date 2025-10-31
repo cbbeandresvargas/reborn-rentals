@@ -62,7 +62,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             @forelse($categories as $category)
-                            <tr>
+                            <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location.href='{{ route('admin.categories.show', $category) }}'">
                                 <td class="px-6 py-4">
                                     <div class="font-medium text-gray-900">{{ $category->name }}</div>
                                     @if($category->description)
@@ -70,14 +70,8 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $category->products_count ?? 0 }}</td>
-                                <td class="px-6 py-4 text-sm font-medium">
-                                    <button onclick="editCategory({{ $category->id }}, '{{ $category->name }}', '{{ addslashes($category->description ?? '') }}')" 
-                                        class="text-[#CE9704] hover:text-[#B8860B] mr-3">Edit</button>
-                                    <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="inline" onsubmit="return confirm('¿Estás seguro de eliminar esta categoría?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
-                                    </form>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-500">
+                                    Click to view details →
                                 </td>
                             </tr>
                             @empty
@@ -97,44 +91,6 @@
     </main>
 </div>
 
-<!-- Modal para editar -->
-<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
-        <h2 class="text-xl font-bold mb-4">Edit Category</h2>
-        <form id="editForm" method="POST">
-            @csrf
-            @method('PUT')
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
-                <input type="text" name="name" id="editName" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704]">
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                <textarea name="description" id="editDescription" rows="3"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704]"></textarea>
-            </div>
-            <div class="flex gap-3">
-                <button type="submit" class="bg-[#CE9704] text-white px-4 py-2 rounded-lg hover:bg-[#B8860B] transition-colors">
-                    Update
-                </button>
-                <button type="button" onclick="document.getElementById('editModal').classList.add('hidden')" 
-                    class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
-                    Cancel
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-function editCategory(id, name, description) {
-    document.getElementById('editForm').action = '/admin/categories/' + id;
-    document.getElementById('editName').value = name;
-    document.getElementById('editDescription').value = description;
-    document.getElementById('editModal').classList.remove('hidden');
-}
-</script>
 
 @include('admin.sidebar')
 @endsection

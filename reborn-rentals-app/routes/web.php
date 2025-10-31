@@ -40,11 +40,15 @@ Route::put('/cart/{id}', [CartController::class, 'update'])->name('cart.update')
 Route::delete('/cart/{id}', [CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 Route::get('/cart', [CartController::class, 'show'])->name('cart.show')->middleware('web');
+Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.applyCoupon');
+Route::delete('/cart/remove-coupon', [CartController::class, 'removeCoupon'])->name('cart.removeCoupon');
 
 // Checkout (requiere autenticación)
 Route::middleware('auth')->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::post('/checkout/send-verification-code', [CheckoutController::class, 'sendVerificationCode'])->name('checkout.send-verification-code');
+    Route::post('/checkout/verify-code', [CheckoutController::class, 'verifyCode'])->name('checkout.verify-code');
     
     // Órdenes
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
@@ -83,8 +87,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('users', AdminUserController::class);
     
     // Categories CRUD
-    Route::resource('categories', AdminCategoryController::class)->except(['create', 'show', 'edit']);
+    Route::resource('categories', AdminCategoryController::class)->except(['create', 'edit']);
     
     // Coupons CRUD
-    Route::resource('coupons', AdminCouponController::class)->except(['show']);
+    Route::resource('coupons', AdminCouponController::class);
 });

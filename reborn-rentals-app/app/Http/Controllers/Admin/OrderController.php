@@ -10,8 +10,8 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::with(['user', 'cupon', 'items.product'])
-            ->latest()
+        $orders = Order::with(['user', 'cupon', 'items.product', 'job'])
+            ->orderBy('ordered_at', 'desc')
             ->paginate(15);
         
         return view('admin.orders.index', compact('orders'));
@@ -35,7 +35,7 @@ class OrderController extends Controller
         $order->update($validated);
 
         return redirect()->route('admin.orders.show', $order)
-            ->with('success', 'Orden actualizada exitosamente');
+            ->with('success', 'Order updated successfully');
     }
 
     public function destroy(Order $order)
@@ -43,6 +43,6 @@ class OrderController extends Controller
         $order->delete();
 
         return redirect()->route('admin.orders.index')
-            ->with('success', 'Orden eliminada exitosamente');
+            ->with('success', 'Order deleted successfully');
     }
 }

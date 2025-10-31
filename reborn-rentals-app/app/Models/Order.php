@@ -21,6 +21,9 @@ class Order extends Model
         'job_id',
         'user_id',
         'cupon_id',
+        'foreman_details_json',
+        'billing_details_json',
+        'payment_method_details_json',
     ];
 
     protected $casts = [

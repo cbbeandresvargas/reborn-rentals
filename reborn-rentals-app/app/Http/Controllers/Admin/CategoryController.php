@@ -14,6 +14,12 @@ class CategoryController extends Controller
         return view('admin.categories.index', compact('categories'));
     }
 
+    public function show(Category $category)
+    {
+        $category->load('products');
+        return view('admin.categories.show', compact('category'));
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -24,7 +30,7 @@ class CategoryController extends Controller
         Category::create($validated);
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Categoría creada exitosamente');
+            ->with('success', 'Category created successfully');
     }
 
     public function update(Request $request, Category $category)
@@ -36,20 +42,20 @@ class CategoryController extends Controller
 
         $category->update($validated);
 
-        return redirect()->route('admin.categories.index')
-            ->with('success', 'Categoría actualizada exitosamente');
+        return redirect()->route('admin.categories.show', $category)
+            ->with('success', 'Category updated successfully');
     }
 
     public function destroy(Category $category)
     {
         if ($category->products()->count() > 0) {
             return redirect()->route('admin.categories.index')
-                ->with('error', 'No se puede eliminar una categoría con productos asociados');
+                ->with('error', 'Cannot delete a category with associated products');
         }
 
         $category->delete();
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Categoría eliminada exitosamente');
+            ->with('success', 'Category deleted successfully');
     }
 }

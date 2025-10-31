@@ -55,7 +55,7 @@
                 @if($product->image_url)
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Current Image</label>
-                    <img src="{{ asset('storage/' . $product->image_url) }}" alt="{{ $product->name }}" class="w-32 h-32 object-contain border border-gray-300 rounded">
+                    <img src="{{ asset($product->image_url) }}" alt="{{ $product->name }}" class="w-32 h-32 object-contain border border-gray-300 rounded">
                 </div>
                 @endif
 

@@ -207,7 +207,7 @@
       window.parent && window.parent.postMessage({ type:'map:cleared' }, '*');
     });
 
-    // Escuchar mensajes del padre para handshake
+    // Escuchar mensajes del padre para handshake y selecciones externas
     window.addEventListener('message', function(event) {
       const data = event.data || {};
       if (data.type === 'map:parentPing') {
@@ -218,6 +218,10 @@
           const { lat, lng, address } = lastSelection;
           window.parent && window.parent.postMessage({ type:'map:locationSelected', lat, lng, address }, '*');
         }
+      } else if (data.type === 'map:selectLocation' && data.lat && data.lng) {
+        // Recibir ubicación desde el input de búsqueda
+        console.log('Received location from parent:', data);
+        handleSelect(data.lat, data.lng);
       }
     });
   </script>

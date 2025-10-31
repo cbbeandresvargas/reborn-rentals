@@ -40,7 +40,7 @@
 <div class="max-w-7xl mx-auto px-6 mt-20 mb-20">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="products-grid">
         @forelse($products as $product)
-        <div class="bg-white rounded-lg border border-gray-200 overflow-visible hover:shadow-2xl shadow-[#CE9704]/20 transition-shadow duration-300 cursor-move product-card" 
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-2xl shadow-[#CE9704]/20 transition-shadow duration-300 cursor-move product-card flex flex-col h-full" 
              draggable="true" 
              data-product-id="{{ $product->id }}" 
              data-product-name="{{ $product->name }}" 
@@ -57,13 +57,13 @@
                         <path d="m1 1 4 4 13 1 2 8H6l-2-8z"></path>
                     </svg>
                 </button>
-                <img src="{{ $product->image_url ? asset('storage/' . $product->image_url) : asset('Product1.png') }}" alt="{{ $product->name }}" class="w-full h-64 object-contain" />
+                <img src="{{ $product->image_url ? asset($product->image_url) : asset('Product1.png') }}" alt="{{ $product->name }}" class="w-full h-64 object-contain" />
             </div>
             <div class="bg-[#4A4A4A] px-4 py-3 text-center">
                 <h3 class="text-white font-bold text-lg">{{ $product->name }}</h3>
             </div>
             <div class="border-t border-gray-500"></div>
-            <div class="bg-[#4A4A4A] px-4 py-3 space-y-2">
+            <div class="bg-[#4A4A4A] px-4 py-3 space-y-2 flex-1">
                 <div class="flex justify-between items-center">
                     <span class="text-white">ID: <span class="text-[#CE9704]">{{ $product->id }}</span></span>
                     <span class="text-white font-bold text-lg">${{ number_format($product->price, 2) }}/day*</span>
@@ -71,7 +71,7 @@
                 @if($product->description)
                 <div>
                     <span class="text-gray-300">Description:</span>
-                    <div class="text-white text-sm">{{ $product->description }}</div>
+                    <div class="text-white text-sm line-clamp-2">{{ $product->description }}</div>
                 </div>
                 @endif
                 @if($product->category)
@@ -81,7 +81,7 @@
                 </div>
                 @endif
             </div>
-            <a href="{{ route('products.show', $product->id) }}" class="block w-full bg-[#CE9704] text-white font-bold py-2 px-4 rounded hover:bg-[#B8860B] transition-colors duration-200 text-center">
+            <a href="{{ route('products.show', $product->id) }}" class="block w-full bg-[#CE9704] text-white font-bold py-2 px-4 rounded hover:bg-[#B8860B] transition-colors duration-200 text-center mt-auto">
                 SEE SPECIFICATION
             </a>
         </div>

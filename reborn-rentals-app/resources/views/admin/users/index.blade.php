@@ -33,7 +33,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @forelse($users as $user)
-                    <tr>
+                    <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location.href='{{ route('admin.users.show', $user) }}'">
                         <td class="px-6 py-4">
                             <div class="font-medium text-gray-900">{{ $user->name }} {{ $user->last_name }}</div>
                             <div class="text-sm text-gray-500">{{ $user->username ?? 'N/A' }}</div>
@@ -45,15 +45,8 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500">{{ $user->created_at->format('M d, Y') }}</td>
-                        <td class="px-6 py-4 text-sm font-medium">
-                            <a href="{{ route('admin.users.edit', $user) }}" class="text-[#CE9704] hover:text-[#B8860B] mr-3">Edit</a>
-                            @if($user->id !== auth()->id())
-                            <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
-                            </form>
-                            @endif
+                        <td class="px-6 py-4 text-sm font-medium text-gray-500">
+                            Click to view details →
                         </td>
                     </tr>
                     @empty
