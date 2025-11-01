@@ -3,12 +3,12 @@
 @section('title', 'Checkout Summary - Reborn Rentals')
 
 @section('content')
-<main class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-4xl mx-auto px-6">
+<main class="min-h-screen bg-gray-50 py-4 sm:py-6 md:py-8">
+    <div class="max-w-4xl mx-auto px-3 sm:px-4 md:px-6">
         <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Checkout Summary</h1>
-            <p class="text-gray-600">Review your rental items and complete your order</p>
+        <div class="mb-6 sm:mb-8">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Checkout Summary</h1>
+            <p class="text-sm sm:text-base text-gray-600">Review your rental items and complete your order</p>
         </div>
 
         @if(session('error'))
@@ -23,15 +23,15 @@
             <!-- Checkout Content -->
             <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                 <!-- Items Section -->
-                <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4">Items: {{ count($cart) }}</h2>
+                <div class="p-4 sm:p-6 border-b border-gray-200">
+                    <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Items: {{ count($cart) }}</h2>
                     
                     <!-- Items List -->
-                    <div class="space-y-4">
+                    <div class="space-y-3 sm:space-y-4">
                         @foreach($cart as $productId => $quantity)
                             @php $product = $products->get($productId); @endphp
                             @if($product)
-                            <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg" 
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg" 
                                  data-product-id="{{ $productId }}"
                                  data-price="{{ $product->price }}"
                                  data-quantity="{{ $quantity }}">
@@ -47,10 +47,10 @@
                                 </div>
                                 
                                 <!-- Product Details -->
-                                <div class="flex-1 min-w-0">
-                                    <h4 class="text-lg font-semibold text-gray-900 truncate">{{ $product->name }}</h4>
-                                    <p class="text-sm text-gray-600">{{ $product->capacity ?? 'N/A' }}</p>
-                                    <div class="flex items-center space-x-4 mt-2">
+                                <div class="flex-1 min-w-0 w-full sm:w-auto">
+                                    <h4 class="text-base sm:text-lg font-semibold text-gray-900 truncate">{{ $product->name }}</h4>
+                                    <p class="text-xs sm:text-sm text-gray-600">{{ $product->capacity ?? 'N/A' }}</p>
+                                    <div class="flex flex-wrap items-center gap-2 sm:gap-4 mt-2">
                                         <span class="text-[#CE9704] font-semibold text-sm">ID: {{ $product->sku ?? $productId }}</span>
                                         <span class="text-gray-500 text-sm">{{ $quantity }}pc</span>
                                         <span class="text-gray-500 text-sm">${{ number_format($product->price, 2) }} / Day</span>
@@ -65,8 +65,8 @@
                                 </div>
                                 
                                 <!-- Item Total -->
-                                <div class="text-right">
-                                    <div class="text-xl font-bold text-gray-900" id="item-total-{{ $productId }}">${{ number_format($product->price * $quantity * 30, 2) }}</div>
+                                <div class="text-left sm:text-right w-full sm:w-auto">
+                                    <div class="text-lg sm:text-xl font-bold text-gray-900" id="item-total-{{ $productId }}">${{ number_format($product->price * $quantity * 30, 2) }}</div>
                                 </div>
                             </div>
                             @endif
@@ -86,24 +86,24 @@
                 </div>
 
                 <!-- Sales Tax Section -->
-                <div class="p-6 border-b border-gray-200">
-                    <div class="flex items-center justify-between">
+                <div class="p-4 sm:p-6 border-b border-gray-200">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900">Sales Tax</h3>
-                            <p class="text-sm text-gray-600">Based on your location</p>
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-900">Sales Tax</h3>
+                            <p class="text-xs sm:text-sm text-gray-600">Based on your location</p>
                         </div>
-                        <div class="text-right">
-                            <span class="text-[#CE9704] font-semibold">2% Tax</span>
-                            <div class="text-lg font-bold text-gray-900" id="sales-tax">${{ number_format($total * 0.02, 2) }}</div>
+                        <div class="text-left sm:text-right">
+                            <span class="text-[#CE9704] font-semibold text-sm sm:text-base">2% Tax</span>
+                            <div class="text-base sm:text-lg font-bold text-gray-900" id="sales-tax">${{ number_format($total * 0.02, 2) }}</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Total Section -->
-                <div class="p-6 bg-gray-50">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-2xl font-bold text-gray-900">Total:</h3>
-                        <div class="text-3xl font-bold text-gray-900" id="grand-total">${{ number_format($total * 1.02, 2) }}</div>
+                <div class="p-4 sm:p-6 bg-gray-50">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-2 sm:gap-0">
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Total:</h3>
+                        <div class="text-2xl sm:text-3xl font-bold text-gray-900" id="grand-total">${{ number_format($total * 1.02, 2) }}</div>
                     </div>
                     
                     <!-- Message about verification -->

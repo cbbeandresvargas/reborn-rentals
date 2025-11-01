@@ -3,22 +3,22 @@
 @section('title', $product->name . ' - Reborn Rentals')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-6 mt-8 mb-20">
-    <a href="{{ route('home') }}" class="text-[#CE9704] hover:underline mb-4 inline-block">← Back to Products</a>
+<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-4 sm:mt-6 md:mt-8 mb-12 sm:mb-16 md:mb-20">
+    <a href="{{ route('home') }}" class="text-[#CE9704] hover:underline mb-3 sm:mb-4 inline-block text-sm sm:text-base">← Back to Products</a>
     
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         <!-- Product Image -->
-        <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <div class="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
             <img src="{{ $product->image_url ? asset($product->image_url) : asset('Product1.png') }}" 
                  alt="{{ $product->name }}" 
                  class="w-full h-auto object-contain rounded-lg" />
         </div>
         
         <!-- Product Info -->
-        <div class="space-y-6">
+        <div class="space-y-4 sm:space-y-6">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $product->name }}</h1>
-                <p class="text-2xl font-bold text-[#CE9704]">${{ number_format($product->price, 2) }}/day*</p>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{{ $product->name }}</h1>
+                <p class="text-xl sm:text-2xl font-bold text-[#CE9704]">${{ number_format($product->price, 2) }}/day*</p>
             </div>
             
             @if($product->description)
@@ -36,8 +36,8 @@
             @endif
             
             <!-- Add to Cart -->
-            <div class="border-t pt-6">
-                <button class="w-full bg-[#CE9704] text-white font-bold py-4 px-6 rounded-lg hover:bg-[#B8860B] transition-colors duration-200 add-to-cart-btn" 
+            <div class="border-t pt-4 sm:pt-6">
+                <button class="w-full bg-[#CE9704] text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg text-base sm:text-lg hover:bg-[#B8860B] transition-colors duration-200 add-to-cart-btn" 
                         data-product-id="{{ $product->id }}" 
                         data-product-name="{{ $product->name }}" 
                         data-product-price="{{ $product->price }}">
@@ -55,9 +55,9 @@
     
     <!-- Related Products -->
     @if($relatedProducts->count() > 0)
-    <div class="mt-16">
-        <h2 class="text-2xl font-bold mb-6">Related Products</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="mt-8 sm:mt-12 md:mt-16">
+        <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Related Products</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
             @foreach($relatedProducts as $related)
             <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                 <a href="{{ route('products.show', $related->id) }}">

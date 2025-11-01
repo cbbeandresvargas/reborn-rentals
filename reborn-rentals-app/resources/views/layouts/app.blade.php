@@ -9,9 +9,6 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Leaflet CSS - Load globally for directions page -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-    
     <!-- Custom Tailwind Config -->
     <script>
         tailwind.config = {
@@ -39,40 +36,97 @@
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
+        
+        /* Asegurar que los elementos del navbar sean clicables */
+        nav a,
+        nav button {
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 10 !important;
+        }
+        
+        /* Asegurar que el overlay no bloquee cuando está oculto */
+        #sidebar-overlay[style*="opacity: 0"],
+        #sidebar-overlay.invisible {
+            pointer-events: none !important;
+            z-index: -1 !important;
+        }
+        
+        /* Los sidebars cuando están fuera de la pantalla no deben bloquear clics */
+        #menu-sidebar.-translate-x-full {
+            pointer-events: none !important;
+        }
+        
+        #cart-sidebar.translate-x-full {
+            pointer-events: none !important;
+        }
+        
+        /* Z-index inicial del navbar */
+        nav {
+            position: relative !important;
+            z-index: 10 !important;
+            transition: z-index 0s;
+        }
+        
+        /* Z-index inicial de los sidebars (más bajo que header) */
+        #menu-sidebar {
+            z-index: 9 !important;
+            transition: z-index 0s;
+        }
+        
+        #cart-sidebar-container,
+        #cart-sidebar {
+            z-index: 9 !important;
+            transition: z-index 0s;
+        }
+        
+        /* Cuando el sidebar está abierto, tiene z-index 10 y el header baja a 5 */
+        nav.sidebar-open {
+            z-index: 5 !important;
+        }
+        
+        #menu-sidebar.translate-x-0 {
+            z-index: 10 !important;
+        }
+        
+        #cart-sidebar.translate-x-0 ~ *,
+        #cart-sidebar-container:has(#cart-sidebar.translate-x-0) {
+            z-index: 10 !important;
+        }
     </style>
     
     @stack('styles')
 </head>
 <body class="m-0 w-full h-full font-sans">
     <!-- Navbar -->
-    <nav class="bg-[#4A4A4A] py-4 md:py-6 shadow-lg sticky top-0 z-30">
-        <div class="max-w-6xl mx-auto px-4 md:px-8">
-            <div class="flex justify-between items-center">
+    <nav class="bg-[#4A4A4A] py-3 sm:py-4 md:py-6 shadow-lg relative">
+        <div class="max-w-6xl mx-auto px-3 sm:px-4 md:px-8">
+            <div class="flex justify-between items-center relative">
                 <!-- Logo -->
-                <div class="shrink-0">
+                <div class="shrink-0 z-10 relative">
                     <a href="{{ route('home') }}" class="block">
-                        <img src="{{ asset('Logo.png') }}" alt="Reborn Rentals" class="h-8 md:h-10 w-auto object-contain" />
+                        <img src="{{ asset('Logo.png') }}" alt="Reborn Rentals" class="h-7 sm:h-8 md:h-10 w-auto object-contain" />
                     </a>
                 </div>
                 
                 <!-- Right Side: Auth Links / Menu & Cart -->
-                <div class="flex items-center gap-2 md:gap-4">
+                <div class="flex items-center gap-2 md:gap-4 relative z-10">
                     @auth
-                        <span class="text-white text-sm hidden md:block">{{ Auth::user()->name }}</span>
-                        <form method="POST" action="{{ route('logout') }}" class="hidden md:block">
+                        <span class="text-white text-xs sm:text-sm hidden sm:block">{{ Auth::user()->name }}</span>
+                        <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
                             @csrf
-                            <button type="submit" class="text-white text-sm hover:text-[#CE9704] transition-colors">
+                            <button type="submit" class="text-white text-xs sm:text-sm hover:text-[#CE9704] transition-colors cursor-pointer">
                                 Logout
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="text-white text-sm hidden md:block hover:text-[#CE9704] transition-colors">Login</a>
-                        <a href="{{ route('register') }}" class="text-white text-sm hidden md:block hover:text-[#CE9704] transition-colors">Register</a>
+                        <a href="{{ route('login') }}" class="text-white text-xs sm:text-sm hover:text-[#CE9704] transition-colors px-2 py-1 cursor-pointer relative z-10">Login</a>
+                        <a href="{{ route('register') }}" class="text-white text-xs sm:text-sm hover:text-[#CE9704] transition-colors px-2 py-1 cursor-pointer relative z-10">Register</a>
                     @endauth
                     
                     <!-- Menu Button -->
-                    <button class="bg-none border-none text-white cursor-pointer p-2 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-white/10 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/20" id="menu-btn" aria-label="Menu">
-                        <svg width="20" height="20" class="md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <button type="button" class="bg-none border-none text-white cursor-pointer p-2 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-white/10 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/20 relative z-10" id="menu-btn" aria-label="Menu">
+                        <svg width="20" height="20" class="sm:w-5 sm:h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="3" y1="6" x2="21" y2="6"></line>
                             <line x1="3" y1="12" x2="21" y2="12"></line>
                             <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -80,8 +134,8 @@
                     </button>
                     
                     <!-- Cart Button -->
-                    <button class="bg-none border-none text-white cursor-pointer p-2 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-white/10 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/20 relative" id="cart-btn" aria-label="Carrito">
-                        <svg width="20" height="20" class="md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <button type="button" class="bg-none border-none text-white cursor-pointer p-2 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-white/10 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/20 relative z-10" id="cart-btn" aria-label="Carrito">
+                        <svg width="20" height="20" class="sm:w-5 sm:h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="9" cy="21" r="1"></circle>
                             <circle cx="20" cy="21" r="1"></circle>
                             <path d="m1 1 4 4 13 1 2 8H6l-2-8z"></path>
@@ -94,11 +148,11 @@
     </nav>
     
     <!-- Menu Sidebar (Left) -->
-    <div id="menu-sidebar" class="fixed top-0 left-0 h-screen w-full sm:w-80 lg:w-96 max-w-[90vw] bg-[#4A4A4A] shadow-2xl -translate-x-full transition-transform duration-300 ease-in-out z-50 overflow-y-auto scrollbar-hide">
-        <div class="px-6 py-8 min-h-full flex flex-col">
+    <div id="menu-sidebar" class="fixed top-0 left-0 h-screen w-full sm:w-80 lg:w-96 max-w-[85vw] bg-[#4A4A4A] shadow-2xl -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto scrollbar-hide">
+        <div class="px-4 sm:px-6 py-6 sm:py-8 min-h-full flex flex-col">
             <!-- Close Button -->
             <div class="flex justify-end mb-6 shrink-0">
-                <button class="bg-none border-none cursor-pointer p-3 rounded-lg transition-colors duration-300 ease-in-out hover:bg-white/10 text-white" id="close-menu">
+                <button type="button" class="bg-none border-none cursor-pointer p-2 sm:p-3 rounded-lg transition-colors duration-300 ease-in-out hover:bg-white/10 text-white" id="close-menu">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -161,8 +215,8 @@
     </div>
 
     <!-- Cart Sidebar (Right) -->
-    <div id="cart-sidebar-container" class="fixed top-0 right-0 h-screen z-30 overflow-visible">
-        <div id="cart-sidebar" class="text-white w-full sm:w-80 lg:w-96 max-w-[90vw] bg-[#2F2F2F] shadow-2xl translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto scrollbar-hide h-full relative overflow-visible">
+    <div id="cart-sidebar-container" class="fixed top-0 right-0 h-screen overflow-visible">
+        <div id="cart-sidebar" class="text-white w-full sm:w-80 lg:w-96 max-w-[85vw] bg-[#2F2F2F] shadow-2xl translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto scrollbar-hide h-full relative overflow-visible">
             <!-- Step Indicator on left edge (protruding) -->
             <div id="step-indicator-container" class="absolute -left-[42px] top-[170px] w-[42px] h-[236px] bg-[#2F2F2F] flex flex-col items-center justify-center gap-[21px]" style="border-radius: 26px 0px 0px 26px; display: none;">
                 <!-- Step 1 -->
@@ -179,10 +233,10 @@
                 </div>
             </div>
         
-        <div class="p-8 min-h-full flex flex-col">
-            <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-300" id="cart-header">
-                <h3 class="m-0 text-[#CE9704] text-2xl">YOUR CART</h3>
-                <button class="bg-none border-none cursor-pointer p-2 rounded transition-colors duration-300 ease-in-out hover:bg-gray-200" id="close-cart">
+        <div class="p-4 sm:p-6 md:p-8 min-h-full flex flex-col">
+            <div class="flex justify-between items-center mb-6 sm:mb-8 pb-3 sm:pb-4 border-b border-gray-300" id="cart-header">
+                <h3 class="m-0 text-[#CE9704] text-xl sm:text-2xl">YOUR CART</h3>
+                <button type="button" class="bg-none border-none cursor-pointer p-2 rounded transition-colors duration-300 ease-in-out hover:bg-gray-200" id="close-cart">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -227,15 +281,15 @@
     </div>
 
     <!-- Overlay -->
-    <div id="sidebar-overlay" class="fixed top-0 left-0 w-full h-full bg-black/50 z-40 opacity-0 invisible transition-all duration-300 ease-in-out"></div>
+    <div id="sidebar-overlay" class="fixed top-0 left-0 w-full h-full bg-black/50 opacity-0 invisible pointer-events-none transition-all duration-300 ease-in-out"></div>
 
     <!-- Payment Method Modal -->
-    <div id="payment-method-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
-        <div class="bg-white rounded-lg max-w-md w-full shadow-2xl">
+    <div id="payment-method-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl mx-2 sm:mx-4 my-4">
             <!-- Header -->
-            <div class="p-6 border-b border-gray-200">
+            <div class="p-4 sm:p-6 border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-xl font-semibold text-gray-900" id="payment-modal-title">Payment Method Details</h2>
+                    <h2 class="text-lg sm:text-xl font-semibold text-gray-900" id="payment-modal-title">Payment Method Details</h2>
                     <button onclick="closePaymentMethodModal()" class="text-gray-400 hover:text-gray-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -245,23 +299,23 @@
             </div>
             
             <!-- Content -->
-            <div class="p-6" id="payment-method-form-container">
+            <div class="p-4 sm:p-6" id="payment-method-form-container">
                 <!-- Form content will be inserted here dynamically -->
             </div>
         </div>
     </div>
 
     <!-- Verification Code Modal -->
-    <div id="verification-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex flex-col items-center justify-center p-4" style="display: none;">
+    <div id="verification-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex flex-col items-center justify-center p-3 sm:p-4 overflow-y-auto" style="display: none;">
         <!-- Instructions above modal -->
-        <div id="verification-instructions" class="text-center text-white text-sm mb-4 w-full max-w-md">
+        <div id="verification-instructions" class="text-center text-white text-xs sm:text-sm mb-3 sm:mb-4 w-full max-w-md px-2">
             <p>To proceed with the payment, please enter the verification code sent to your email <span id="instructions-email" class="font-semibold"></span></p>
         </div>
         
         <!-- Modal Container -->
-        <div class="bg-white rounded-lg max-w-md w-full shadow-2xl relative mb-4">
+        <div class="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl relative mb-3 sm:mb-4 mx-2 sm:mx-4">
             <!-- Header with Payment Method Icons and Close Button -->
-            <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+            <div class="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <!-- Generic Card Icon -->
                     <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
@@ -287,43 +341,43 @@
             </div>
             
             <!-- Title -->
-            <div class="px-6 pt-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-2">We need to verify you</h2>
-                <p class="text-gray-600 text-sm mb-6">Enter the code Mastercard sent to <span id="verification-email-display" class="font-medium"></span></p>
+            <div class="px-4 sm:px-6 pt-4 sm:pt-6">
+                <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-2">We need to verify you</h2>
+                <p class="text-gray-600 text-xs sm:text-sm mb-4 sm:mb-6">Enter the code Mastercard sent to <span id="verification-email-display" class="font-medium"></span></p>
             </div>
             
             <!-- Verification Code Inputs (5 digits) -->
-            <div class="px-6 mb-4">
-                <div class="flex gap-3 justify-center">
-                    <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-0" />
-                    <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-1" />
-                    <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-2" />
-                    <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-3" />
-                    <input type="text" maxlength="1" class="w-14 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-4" />
+            <div class="px-4 sm:px-6 mb-4">
+                <div class="flex gap-2 sm:gap-3 justify-center">
+                    <input type="text" maxlength="1" class="w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-0" />
+                    <input type="text" maxlength="1" class="w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-1" />
+                    <input type="text" maxlength="1" class="w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-2" />
+                    <input type="text" maxlength="1" class="w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-3" />
+                    <input type="text" maxlength="1" class="w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-4" />
                 </div>
             </div>
             
             <!-- Resend Code -->
-            <div class="px-6 mb-4">
-                <button type="button" id="resend-code-btn" onclick="sendVerificationCode()" class="text-sm text-blue-600 hover:text-blue-800 underline">Resend Code</button>
+            <div class="px-4 sm:px-6 mb-4">
+                <button type="button" id="resend-code-btn" onclick="sendVerificationCode()" class="text-xs sm:text-sm text-blue-600 hover:text-blue-800 underline">Resend Code</button>
             </div>
             
             <!-- Footer Buttons -->
-            <div class="px-6 pb-6 flex gap-3">
-                <button type="button" onclick="closeVerificationModal()" class="flex-1 bg-white border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200">Cancel</button>
-                <button type="button" onclick="verifyCode()" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200">Verify</button>
+            <div class="px-4 sm:px-6 pb-4 sm:pb-6 flex gap-2 sm:gap-3">
+                <button type="button" onclick="closeVerificationModal()" class="flex-1 bg-white border-2 border-gray-300 text-gray-700 py-2 sm:py-3 px-3 sm:px-6 rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-50 transition-colors duration-200">Cancel</button>
+                <button type="button" onclick="verifyCode()" class="flex-1 bg-blue-600 text-white py-2 sm:py-3 px-3 sm:px-6 rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 transition-colors duration-200">Verify</button>
             </div>
         </div>
         
         <!-- Session Timer (outside modal, below it) -->
-        <div class="text-center text-white text-sm w-full max-w-md">
+        <div class="text-center text-white text-xs sm:text-sm w-full max-w-md px-2">
             <p>For security reasons, your session will expire in <span id="session-timer" class="font-semibold text-[#CE9704]">20:00</span></p>
         </div>
     </div>
 
     <!-- Success Modal -->
-    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity duration-300" style="display: none; opacity: 0;">
-        <div class=" from-[#333333] to-[#2a2a2a] rounded-2xl max-w-lg w-full relative shadow-2xl border-2 border-[#CE9704] transform transition-all duration-300 scale-95" style="opacity: 0; transform: scale(0.95) translateY(20px);" id="success-modal-content">
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 transition-opacity duration-300 overflow-y-auto" style="display: none; opacity: 0;">
+        <div class=" from-[#333333] to-[#2a2a2a] rounded-2xl max-w-lg w-full max-h-[95vh] overflow-y-auto mx-2 sm:mx-4 relative shadow-2xl border-2 border-[#CE9704] transform transition-all duration-300 scale-95 my-4 sm:my-0" style="opacity: 0; transform: scale(0.95) translateY(20px);" id="success-modal-content">
             <!-- Decorative Top Border -->
             <div class="absolute top-0 left-0 right-0 h-1  from-[#CE9704] via-[#FFD700] to-[#CE9704] rounded-t-2xl"></div>
             
@@ -337,27 +391,27 @@
             </div>
             
             <!-- Content Container -->
-            <div class="p-10 md:p-12">
+            <div class="p-6 sm:p-8 md:p-10 lg:p-12">
                 <!-- Success Icon with Animation -->
-                <div class="flex justify-center mb-6">
-                    <div class="w-20 h-20 bg-[#CE9704] rounded-full flex items-center justify-center shadow-lg transform transition-all duration-500 hover:scale-110">
-                        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex justify-center mb-4 sm:mb-6">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 bg-[#CE9704] rounded-full flex items-center justify-center shadow-lg transform transition-all duration-500 hover:scale-110">
+                        <svg class="w-10 h-10 sm:w-12 sm:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
                 </div>
                 
                 <!-- Logo -->
-                <div class="flex justify-center mb-8">
-                    <img src="{{ asset('Logo.png') }}" alt="Reborn Rental" class="h-20 w-auto object-contain drop-shadow-lg" />
+                <div class="flex justify-center mb-6 sm:mb-8">
+                    <img src="{{ asset('Logo.png') }}" alt="Reborn Rental" class="h-16 sm:h-20 w-auto object-contain drop-shadow-lg" />
                 </div>
                 
                 <!-- Success Message -->
-                <div class="text-center mb-8">
-                    <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-3 drop-shadow-lg">
+                <div class="text-center mb-6 sm:mb-8">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-2 sm:mb-3 drop-shadow-lg">
                         Success<span class="text-[#CE9704] animate-pulse">!!!</span>
                     </h1>
-                    <p class="text-xl md:text-2xl font-bold text-white mb-6 leading-tight">
+                    <p class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sm:mb-6 leading-tight">
                         Your Reservation is in place!<br />you're all set!
                     </p>
                 </div>
@@ -434,20 +488,43 @@
 
             // Open menu sidebar
             if (menuBtn && menuSidebar) {
-                menuBtn.addEventListener('click', function() {
+                menuBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     menuSidebar.classList.remove('-translate-x-full');
                     menuSidebar.classList.add('translate-x-0');
-                    overlay.classList.remove('opacity-0', 'invisible');
-                    overlay.classList.add('opacity-100', 'visible');
+                    // Cambiar z-index: header baja a 5, sidebar sube a 10, overlay a 9 (debajo del sidebar)
+                    const nav = document.querySelector('nav');
+                    if (nav) {
+                        nav.classList.add('sidebar-open');
+                        nav.style.zIndex = '5';
+                    }
+                    menuSidebar.style.zIndex = '10';
+                    overlay.classList.remove('opacity-0', 'invisible', 'pointer-events-none');
+                    overlay.classList.add('opacity-100', 'visible', 'pointer-events-auto');
+                    overlay.style.zIndex = '9'; // Debajo del sidebar (10) pero por encima del header (5)
                     document.body.style.overflow = 'hidden';
                 });
             }
 
             // Open cart sidebar
             if (cartBtn && cartSidebar) {
-                cartBtn.addEventListener('click', function() {
+                cartBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     cartSidebar.classList.remove('translate-x-full');
                     cartSidebar.classList.add('translate-x-0');
+                    // Cambiar z-index: header baja a 5, sidebar sube a 10
+                    const nav = document.querySelector('nav');
+                    if (nav) {
+                        nav.classList.add('sidebar-open');
+                        nav.style.zIndex = '5';
+                    }
+                    const cartContainer = document.getElementById('cart-sidebar-container');
+                    if (cartContainer) {
+                        cartContainer.style.zIndex = '10';
+                    }
+                    cartSidebar.style.zIndex = '10';
                     
                     // Show step indicator
                     const stepIndicatorContainer = document.getElementById('step-indicator-container');
@@ -457,19 +534,34 @@
                     
                     const mainContent = document.getElementById('main-content');
                     if (mainContent) {
-                        // Añadir padding derecho para dejar espacio al sidebar (sm: w-80, lg: w-96)
-                        mainContent.classList.add('pr-80', 'lg:pr-96');
+                        // Añadir padding derecho solo en pantallas grandes
+                        if (window.innerWidth >= 640) {
+                            mainContent.classList.add('pr-80');
+                        }
+                        if (window.innerWidth >= 1024) {
+                            mainContent.classList.add('lg:pr-96');
+                        }
                     }
                 });
             }
 
             // Close menu sidebar
             if (closeMenuBtn && menuSidebar) {
-                closeMenuBtn.addEventListener('click', function() {
+                closeMenuBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     menuSidebar.classList.remove('translate-x-0');
                     menuSidebar.classList.add('-translate-x-full');
-                    overlay.classList.remove('opacity-100', 'visible');
-                    overlay.classList.add('opacity-0', 'invisible');
+                    // Restaurar z-index: header vuelve a 10, sidebar a 9
+                    const nav = document.querySelector('nav');
+                    if (nav) {
+                        nav.classList.remove('sidebar-open');
+                        nav.style.zIndex = '10';
+                    }
+                    menuSidebar.style.zIndex = '9';
+                    overlay.classList.remove('opacity-100', 'visible', 'pointer-events-auto');
+                    overlay.classList.add('opacity-0', 'invisible', 'pointer-events-none');
+                    overlay.style.zIndex = '9';
                     document.body.style.overflow = '';
                 });
             }
@@ -479,6 +571,17 @@
                 closeCartBtn.addEventListener('click', function() {
                     cartSidebar.classList.remove('translate-x-0');
                     cartSidebar.classList.add('translate-x-full');
+                    // Restaurar z-index: header vuelve a 10, sidebar a 9
+                    const nav = document.querySelector('nav');
+                    if (nav) {
+                        nav.classList.remove('sidebar-open');
+                        nav.style.zIndex = '10';
+                    }
+                    const cartContainer = document.getElementById('cart-sidebar-container');
+                    if (cartContainer) {
+                        cartContainer.style.zIndex = '9';
+                    }
+                    cartSidebar.style.zIndex = '9';
                     
                     // Hide step indicator
                     const stepIndicatorContainer = document.getElementById('step-indicator-container');
@@ -495,11 +598,21 @@
 
             // Close menu sidebar when clicking overlay
             if (overlay && menuSidebar) {
-                overlay.addEventListener('click', function() {
+                overlay.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     menuSidebar.classList.remove('translate-x-0');
                     menuSidebar.classList.add('-translate-x-full');
-                    overlay.classList.remove('opacity-100', 'visible');
-                    overlay.classList.add('opacity-0', 'invisible');
+                    // Restaurar z-index: header vuelve a 10, sidebar a 9
+                    const nav = document.querySelector('nav');
+                    if (nav) {
+                        nav.classList.remove('sidebar-open');
+                        nav.style.zIndex = '10';
+                    }
+                    menuSidebar.style.zIndex = '9';
+                    overlay.classList.remove('opacity-100', 'visible', 'pointer-events-auto');
+                    overlay.classList.add('opacity-0', 'invisible', 'pointer-events-none');
+                    overlay.style.zIndex = '9';
                     document.body.style.overflow = '';
                 });
             }
@@ -507,13 +620,21 @@
             // Close menu sidebar with Escape key
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
-                    if (menuSidebar) {
+                    if (menuSidebar && !menuSidebar.classList.contains('-translate-x-full')) {
                         menuSidebar.classList.remove('translate-x-0');
                         menuSidebar.classList.add('-translate-x-full');
+                        // Restaurar z-index: header vuelve a 10, sidebar a 9
+                        const nav = document.querySelector('nav');
+                        if (nav) {
+                            nav.classList.remove('sidebar-open');
+                            nav.style.zIndex = '10';
+                        }
+                        menuSidebar.style.zIndex = '9';
                     }
                     if (overlay) {
-                        overlay.classList.remove('opacity-100', 'visible');
-                        overlay.classList.add('opacity-0', 'invisible');
+                        overlay.classList.remove('opacity-100', 'visible', 'pointer-events-auto');
+                        overlay.classList.add('opacity-0', 'invisible', 'pointer-events-none');
+                        overlay.style.zIndex = '40';
                     }
                     document.body.style.overflow = '';
                 }
@@ -592,12 +713,6 @@
     
     <!-- Cart JS -->
     <script src="{{ asset('js/cart.js') }}"></script>
-    
-    <!-- Leaflet JS - Load globally for directions page -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        console.log('=== LEAFlet LOADED ===', typeof window.L !== 'undefined' ? 'YES' : 'NO');
-    </script>
     
     @stack('scripts')
     

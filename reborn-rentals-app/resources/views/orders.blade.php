@@ -3,22 +3,22 @@
 @section('title', 'My Orders - Reborn Rentals')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-6 mt-8 mb-20">
-    <h1 class="text-3xl font-bold mb-6">My Orders</h1>
+<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-4 sm:mt-6 md:mt-8 mb-12 sm:mb-16 md:mb-20">
+    <h1 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">My Orders</h1>
     
     @if($orders->count() > 0)
-    <div class="space-y-6">
+    <div class="space-y-4 sm:space-y-6">
         @foreach($orders as $order)
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div class="p-6">
-                <div class="flex justify-between items-start mb-4">
+            <div class="p-4 sm:p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start mb-4 gap-3 sm:gap-0">
                     <div>
-                        <h3 class="text-xl font-bold">Order #{{ $order->id }}</h3>
-                        <p class="text-gray-600 text-sm">Date: {{ $order->ordered_at->format('M d, Y') }}</p>
+                        <h3 class="text-lg sm:text-xl font-bold">Order #{{ $order->id }}</h3>
+                        <p class="text-gray-600 text-xs sm:text-sm">Date: {{ $order->ordered_at->format('M d, Y') }}</p>
                     </div>
-                    <div class="text-right">
-                        <p class="text-2xl font-bold text-[#CE9704]">${{ number_format($order->total_amount, 2) }}</p>
-                        <span class="inline-block px-3 py-1 rounded-full text-sm {{ $order->status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                    <div class="text-left sm:text-right w-full sm:w-auto">
+                        <p class="text-xl sm:text-2xl font-bold text-[#CE9704]">${{ number_format($order->total_amount, 2) }}</p>
+                        <span class="inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm {{ $order->status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                             {{ $order->status ? 'Active' : 'Inactive' }}
                         </span>
                     </div>
@@ -62,9 +62,9 @@
     @endif
     
     @else
-    <div class="bg-white rounded-lg shadow-lg p-12 text-center">
-        <p class="text-gray-600 text-lg mb-4">You haven't made any orders yet.</p>
-        <a href="{{ route('home') }}" class="inline-block bg-[#CE9704] text-white px-6 py-3 rounded-lg hover:bg-[#B8860B] transition-colors">
+    <div class="bg-white rounded-lg shadow-lg p-8 sm:p-12 text-center">
+        <p class="text-gray-600 text-base sm:text-lg mb-4">You haven't made any orders yet.</p>
+        <a href="{{ route('home') }}" class="inline-block bg-[#CE9704] text-white px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-lg hover:bg-[#B8860B] transition-colors">
             Start Shopping
         </a>
     </div>

@@ -4,22 +4,22 @@
 
 @section('content')
 <!-- Filters and Search -->
-<div class="bg-[#BBBBBB] py-4 shadow-md">
-    <div class="max-w-7xl mx-auto px-6">
-        <form method="GET" action="{{ route('products.index') }}" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="bg-[#BBBBBB] py-4 sm:py-4 shadow-md">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6">
+        <form method="GET" action="{{ route('products.index') }}" class="space-y-3 sm:space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <!-- Search -->
-                <div class="md:col-span-2">
+                <div class="sm:col-span-2 lg:col-span-2">
                     <input type="text" 
                            name="search" 
                            placeholder="Search products..." 
                            value="{{ request('search') }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" />
+                           class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" />
                 </div>
                 
                 <!-- Category Filter -->
                 <div>
-                    <select name="category_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]">
+                    <select name="category_id" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]">
                         <option value="">All Categories</option>
                         @foreach($categories as $category)
                         <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
@@ -35,11 +35,11 @@
                            name="max_price" 
                            placeholder="Max Price" 
                            value="{{ request('max_price') }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" />
+                           class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]" />
                 </div>
             </div>
             
-            <button type="submit" class="bg-[#CE9704] text-white px-6 py-2 rounded-lg hover:bg-[#B8860B] transition-colors">
+            <button type="submit" class="bg-[#CE9704] text-white px-4 sm:px-6 py-2 text-sm sm:text-base rounded-lg hover:bg-[#B8860B] transition-colors w-full sm:w-auto">
                 Apply Filters
             </button>
         </form>
@@ -47,8 +47,8 @@
 </div>
 
 <!-- Products Grid -->
-<div class="max-w-7xl mx-auto px-6 mt-8 mb-20">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-6 sm:mt-8 mb-12 sm:mb-16 md:mb-20">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
         @forelse($products as $product)
         <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-2xl shadow-[#CE9704]/20 transition-shadow duration-300 cursor-move flex flex-col h-full" 
              draggable="true" 
@@ -69,16 +69,16 @@
                 </button>
                 <img src="{{ $product->image_url ? asset($product->image_url) : asset('Product1.png') }}" 
                      alt="{{ $product->name }}" 
-                     class="w-full h-64 object-contain" />
+                     class="w-full h-48 sm:h-56 md:h-64 object-contain" />
             </div>
-            <div class="bg-[#4A4A4A] px-4 py-3 text-center">
-                <h3 class="text-white font-bold text-lg">{{ $product->name }}</h3>
+            <div class="bg-[#4A4A4A] px-3 sm:px-4 py-2 sm:py-3 text-center">
+                <h3 class="text-white font-bold text-base sm:text-lg">{{ $product->name }}</h3>
             </div>
             <div class="border-t border-gray-500"></div>
-            <div class="bg-[#4A4A4A] px-4 py-3 space-y-2 flex-1">
-                <div class="flex justify-between items-center">
-                    <span class="text-white">ID: <span class="text-[#CE9704]">{{ $product->id }}</span></span>
-                    <span class="text-white font-bold text-lg">${{ number_format($product->price, 2) }}/day*</span>
+            <div class="bg-[#4A4A4A] px-3 sm:px-4 py-2 sm:py-3 space-y-2 flex-1">
+                <div class="flex justify-between items-center flex-wrap gap-1 sm:gap-0">
+                    <span class="text-white text-sm sm:text-base">ID: <span class="text-[#CE9704]">{{ $product->id }}</span></span>
+                    <span class="text-white font-bold text-base sm:text-lg">${{ number_format($product->price, 2) }}/day*</span>
                 </div>
                 @if($product->category)
                 <div>
@@ -87,7 +87,7 @@
                 </div>
                 @endif
             </div>
-            <a href="{{ route('products.show', $product->id) }}" class="block w-full bg-[#CE9704] text-white font-bold py-2 px-4 rounded hover:bg-[#B8860B] transition-colors duration-200 text-center mt-auto">
+            <a href="{{ route('products.show', $product->id) }}" class="block w-full bg-[#CE9704] text-white font-bold py-2 sm:py-2.5 px-3 sm:px-4 rounded text-sm sm:text-base hover:bg-[#B8860B] transition-colors duration-200 text-center mt-auto">
                 SEE SPECIFICATION
             </a>
         </div>

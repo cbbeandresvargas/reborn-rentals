@@ -3,11 +3,11 @@
 @section('title', 'Register - Reborn Rentals')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-6 sm:space-y-8 bg-white p-6 sm:p-8 rounded-lg shadow-lg">
         <div class="text-center">
-            <img src="{{ asset('Logo.png') }}" alt="Reborn Rentals" class="mx-auto h-16 mb-6" />
-            <h2 class="text-3xl font-extrabold text-gray-900">Create your account</h2>
+            <img src="{{ asset('Logo.png') }}" alt="Reborn Rentals" class="mx-auto h-12 sm:h-16 mb-4 sm:mb-6" />
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Create your account</h2>
         </div>
         
         @if($errors->any())
