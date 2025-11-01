@@ -4,26 +4,26 @@
 
 @section('content')
 <!-- Step 2: Select Jobsite & Time -->
-<div class="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 mt-8 sm:mt-12 md:mt-20 mb-12 sm:mb-16 md:mb-20">
-    <div class="bg-white rounded-lg p-4 sm:p-6 md:p-8">
+<div class="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 mt-4 sm:mt-8 md:mt-12 lg:mt-20 mb-8 sm:mb-12 md:mb-16 lg:mb-20">
+    <div class="bg-white rounded-lg p-3 sm:p-4 md:p-6 lg:p-8">
         <!-- Section Title -->
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">Select Jobsite & Time</h1>
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-2 sm:mb-3 md:mb-4">Select Jobsite & Time</h1>
         
         <!-- Introductory Text -->
-        <p class="text-gray-600 text-xs sm:text-sm mb-6 sm:mb-8 leading-relaxed">
+        <p class="text-gray-600 text-xs sm:text-sm md:text-base mb-4 sm:mb-6 md:mb-8 leading-relaxed">
             Select date and place of delivery, depending on your location, delivery fees may apply, Long fares apply if jobsite is located 4 hours away or more. Orders outside of Mainland US, not accepted.
         </p>
         
         <div>
             <!-- Date Selection Section -->
-            <div class="mb-6 sm:mb-8">
-                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
+            <div class="mb-4 sm:mb-6 md:mb-8">
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-3 sm:mb-4">
                     <!-- Start Date -->
                     <div class="flex-1 w-full">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Start Date</label>
                         <input 
                             type="date" 
-                            class="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
+                            class="w-full px-2.5 sm:px-3 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
                             id="start-date"
                             name="start_date"
                             required
@@ -32,17 +32,17 @@
                     
                     <!-- End Date -->
                     <div class="flex-1 w-full">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">End Date</label>
                         <div class="relative">
                             <input 
                                 type="date" 
-                                class="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent pr-10"
+                                class="w-full px-2.5 sm:px-3 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent pr-8 sm:pr-10"
                                 id="end-date"
                                 name="end_date"
                                 required
                             />
-                            <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
@@ -51,21 +51,21 @@
                 </div>
                 
                 <!-- Date Selection Instructions -->
-                <p class="text-gray-600 text-sm leading-relaxed">
+                <p class="text-gray-600 text-xs sm:text-sm leading-relaxed">
                     Choose start and end dates for your rental period. Weekend deliveries are available. Tap a start date and then an end date to set your delivery period. You can select weekends too. The selected range will be highlighted.
                 </p>
             </div>
             
             <!-- Jobsite Address Section -->
-            <div class="mb-6 sm:mb-8">
-                <div class="flex flex-col sm:flex-row justify-between items-start mb-3 sm:mb-4 gap-2 sm:gap-0">
-                    <h2 class="text-lg sm:text-xl font-semibold text-gray-800">Insert Jobsite Address</h2>
+            <div class="mb-4 sm:mb-6 md:mb-8">
+                <div class="flex flex-col sm:flex-row justify-between items-start mb-2 sm:mb-3 md:mb-4 gap-2 sm:gap-0">
+                    <h2 class="text-base sm:text-lg md:text-xl font-semibold text-gray-800">Insert Jobsite Address</h2>
                     <span class="text-xs sm:text-sm text-gray-500 underline">*Cancellation Fees may apply.</span>
                 </div>
                 
                 <!-- Address Search Input -->
                 <div class="relative">
-                    <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10">
+                    <div class="absolute left-2.5 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10">
                         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
@@ -74,7 +74,7 @@
                         type="text" 
                         name="jobsite_address"
                         placeholder="Start typing and select from suggestions..."
-                        class="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
+                        class="w-full pl-8 sm:pl-9 md:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
                         id="jobsite-address"
                         autocomplete="off"
                     />
@@ -82,40 +82,40 @@
             </div>
             
             <!-- Pickup Options -->
-            <div class="mb-8">
-                <div class="space-y-4">
+            <div class="mb-4 sm:mb-6 md:mb-8">
+                <div class="space-y-3 sm:space-y-4">
                     <label class="flex items-center cursor-pointer">
-                        <input type="checkbox" name="pickup-option" class="w-4 h-4 text-[#CE9704] border-gray-300 rounded focus:ring-[#CE9704] focus:ring-2" id="self-pickup" value="self-pickup">
-                        <span class="ml-3 text-gray-700">Self-Pickup</span>
+                        <input type="checkbox" name="pickup-option" class="w-4 h-4 sm:w-5 sm:h-5 text-[#CE9704] border-gray-300 rounded focus:ring-[#CE9704] focus:ring-2" id="self-pickup" value="self-pickup">
+                        <span class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700">Self-Pickup</span>
                     </label>
                     
                     <label class="flex items-center cursor-pointer">
-                        <input type="checkbox" name="pickup-option" class="w-4 h-4 text-[#CE9704] border-gray-300 rounded focus:ring-[#CE9704] focus:ring-2" id="no-address" value="no-address">
-                        <span class="ml-3 text-gray-700">Jobsite Lot doesn't have an address.</span>
+                        <input type="checkbox" name="pickup-option" class="w-4 h-4 sm:w-5 sm:h-5 text-[#CE9704] border-gray-300 rounded focus:ring-[#CE9704] focus:ring-2" id="no-address" value="no-address">
+                        <span class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700">Jobsite Lot doesn't have an address.</span>
                     </label>
                 </div>
                 
                 <!-- Interactive Map Section -->
-                <div class="mt-6 sm:mt-8">
-                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Select Delivery Location on Map</h3>
-                    <p class="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4">
+                <div class="mt-4 sm:mt-6 md:mt-8">
+                    <h3 class="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-2 sm:mb-3 md:mb-4">Select Delivery Location on Map</h3>
+                    <p class="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">
                         Click on the map to select your delivery location. The map will show the route from our office to your selected location.
                     </p>
                     
                     <!-- Map Container -->
                     <div class="relative" style="z-index: 1;">
-                        <div id="delivery-map" class="w-full h-64 sm:h-80 md:h-96 rounded-lg overflow-hidden border border-gray-300 shadow-lg">
+                        <div id="delivery-map" class="w-full h-56 sm:h-64 md:h-80 lg:h-96 rounded-lg overflow-hidden border border-gray-300 shadow-lg">
                             <iframe 
                                 src="/map.html"
                                 title="Delivery Map"
                                 id="delivery-map-iframe"
-                                style="border:0; width:100%; height:100%; min-height: 400px;"
+                                style="border:0; width:100%; height:100%; min-height: 250px;"
                                 loading="lazy"
                             ></iframe>
                         </div>
                         
                         <!-- Google Maps iframe (hidden by default, shown for self-pickup and no-address) -->
-                        <div id="google-maps-static" class="w-full h-96 rounded-lg overflow-hidden border border-gray-300 shadow-lg hidden">
+                        <div id="google-maps-static" class="w-full h-56 sm:h-64 md:h-80 lg:h-96 rounded-lg overflow-hidden border border-gray-300 shadow-lg hidden">
                             <iframe 
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3077.576787884259!2d-119.80605779999999!3d39.5240405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x809940b3fe48bd53%3A0x4e3afeee9f24c1bc!2s401%20Ryland%20St%20Suite%20200-A%2C%20Reno%2C%20NV%2089502%2C%20EE.%20UU.!5e0!3m2!1ses-419!2sbo!4v1761325010616!5m2!1ses-419!2sbo" 
                                 width="100%" 
@@ -128,11 +128,11 @@
                         </div>
                         
                         <!-- Map Controls -->
-                        <div class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white rounded-lg shadow-lg p-1.5 sm:p-2 space-y-1.5 sm:space-y-2">
+                        <div class="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 bg-white rounded-lg shadow-lg p-1 sm:p-1.5 md:p-2 space-y-1 sm:space-y-1.5 md:space-y-2">
                             <button 
                                 type="button"
                                 id="center-map-btn" 
-                                class="bg-[#CE9704] text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded text-xs sm:text-sm font-medium hover:bg-[#B8860B] transition-colors duration-200 block w-full"
+                                class="bg-[#CE9704] text-white px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded text-xs sm:text-sm font-medium hover:bg-[#B8860B] transition-colors duration-200 block w-full whitespace-nowrap"
                                 title="Center on Reborn Rentals Office"
                             >
                                 📍 Our Office
@@ -140,7 +140,7 @@
                             <button 
                                 type="button"
                                 id="clear-route-btn" 
-                                class="bg-gray-600 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded text-xs sm:text-sm font-medium hover:bg-gray-700 transition-colors duration-200 block w-full"
+                                class="bg-gray-600 text-white px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded text-xs sm:text-sm font-medium hover:bg-gray-700 transition-colors duration-200 block w-full whitespace-nowrap"
                                 title="Clear Route"
                             >
                                 🗑️ Clear Route
@@ -148,17 +148,17 @@
                         </div>
                         
                         <!-- Selected Location Info -->
-                        <div id="selected-location-info" class="absolute bottom-4 left-4 right-4 bg-white rounded-lg shadow-lg p-4">
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <h4 class="font-semibold text-gray-800 text-sm">Selected Location:</h4>
-                                    <p id="selected-address" class="text-gray-600 text-sm mt-1">Click on the map to select a delivery location</p>
+                        <div id="selected-location-info" class="absolute bottom-2 sm:bottom-3 md:bottom-4 left-2 sm:left-3 md:left-4 right-2 sm:right-3 md:right-4 bg-white rounded-lg shadow-lg p-2 sm:p-3 md:p-4">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-2 sm:gap-0">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-gray-800 text-xs sm:text-sm">Selected Location:</h4>
+                                    <p id="selected-address" class="text-gray-600 text-xs sm:text-sm mt-1 break-words">Click on the map to select a delivery location</p>
                                     <p id="distance-info" class="text-[#CE9704] text-xs mt-1"></p>
                                 </div>
                                 <button 
                                     type="button"
                                     id="use-location-btn" 
-                                    class="bg-[#CE9704] text-white px-3 py-1 rounded text-xs font-medium hover:bg-[#B8860B] transition-colors duration-200 ml-2"
+                                    class="bg-[#CE9704] text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-[#B8860B] transition-colors duration-200 whitespace-nowrap sm:ml-2 mt-2 sm:mt-0 w-full sm:w-auto"
                                 >
                                     Use This Location
                                 </button>
@@ -167,16 +167,16 @@
                     </div>
                     
                     <!-- Map Instructions -->
-                    <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="mt-3 sm:mt-4 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
                         <div class="flex items-start">
                             <div class="shrink-0">
-                                <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
-                            <div class="ml-3">
-                                <h4 class="text-sm font-medium text-blue-800">How to use the map:</h4>
-                                <ul class="text-sm text-blue-700 mt-1 space-y-1">
+                            <div class="ml-2 sm:ml-3 flex-1">
+                                <h4 class="text-xs sm:text-sm font-medium text-blue-800">How to use the map:</h4>
+                                <ul class="text-xs sm:text-sm text-blue-700 mt-1 space-y-0.5 sm:space-y-1">
                                     <li>• Click anywhere on the map to select your delivery location</li>
                                     <li>• The map will automatically show the route from our office to your location</li>
                                     <li>• Use "📍 Our Office" to center the map on our location</li>
@@ -189,14 +189,14 @@
                 </div>
                 
                 <!-- Self-Pickup Dropdown -->
-                <div id="self-pickup-details" class="mt-6 p-4 sm:p-6 bg-gray-50 rounded-lg border border-gray-200 hidden">
-                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Pickup Location Details</h3>
+                <div id="self-pickup-details" class="mt-4 sm:mt-6 p-3 sm:p-4 md:p-6 bg-gray-50 rounded-lg border border-gray-200 hidden">
+                    <h3 class="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-2 sm:mb-3 md:mb-4">Pickup Location Details</h3>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
                         <!-- Address -->
                         <div>
-                            <h4 class="text-base font-semibold text-gray-900 mb-3">Our Address</h4>
-                            <div class="space-y-1 text-gray-700">
+                            <h4 class="text-sm sm:text-base font-semibold text-gray-900 mb-2 sm:mb-3">Our Address</h4>
+                            <div class="space-y-0.5 sm:space-y-1 text-xs sm:text-sm text-gray-700">
                                 <p>401 Ryland St.</p>
                                 <p>Ste 200 A</p>
                                 <p>Reno, NV 89502</p>
@@ -207,8 +207,8 @@
                         
                         <!-- Hours -->
                         <div>
-                            <h4 class="text-base font-semibold text-gray-900 mb-3">Hours</h4>
-                            <ul class="text-gray-700 space-y-1">
+                            <h4 class="text-sm sm:text-base font-semibold text-gray-900 mb-2 sm:mb-3">Hours</h4>
+                            <ul class="text-xs sm:text-sm text-gray-700 space-y-0.5 sm:space-y-1">
                                 <li><span class="font-medium">Mon–Fri:</span> 08:00 – 18:00</li>
                                 <li><span class="font-medium">Sat:</span> 09:00 – 14:00</li>
                                 <li><span class="font-medium">Sun:</span> Closed</li>
@@ -217,8 +217,8 @@
                     </div>
                     
                     <!-- Map -->
-                    <div class="mt-6">
-                        <h4 class="text-base font-semibold text-gray-900 mb-3">Location Map</h4>
+                    <div class="mt-4 sm:mt-6">
+                        <h4 class="text-sm sm:text-base font-semibold text-gray-900 mb-2 sm:mb-3">Location Map</h4>
                         <div class="rounded-lg overflow-hidden border border-gray-300">
                             <iframe 
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3077.576787884259!2d-119.80605779999999!3d39.5240405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x809940b3fe48bd53%3A0x4e3afeee9f24c1bc!2s401%20Ryland%20St%20Suite%20200-A%2C%20Reno%2C%20NV%2089502%2C%20EE.%20UU.!5e0!3m2!1ses-419!2sbo!4v1761325010616!5m2!1ses-419!2sbo" 
@@ -228,7 +228,7 @@
                                 allowfullscreen="" 
                                 loading="lazy" 
                                 referrerpolicy="no-referrer-when-downgrade"
-                                class="w-full h-64"
+                                class="w-full h-48 sm:h-56 md:h-64"
                             ></iframe>
                         </div>
                     </div>
@@ -241,12 +241,38 @@
 @push('styles')
 <style>
     #delivery-map {
-        min-height: 400px !important;
+        min-height: 250px !important;
         height: 100%;
+    }
+    @media (min-width: 640px) {
+        #delivery-map {
+            min-height: 300px !important;
+        }
+    }
+    @media (min-width: 768px) {
+        #delivery-map {
+            min-height: 400px !important;
+        }
     }
     .leaflet-container {
         height: 100%;
         width: 100%;
+    }
+    /* Mejorar visibilidad del panel de ubicación en móviles */
+    #selected-location-info {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+    /* Mejorar sugerencias de autocompletado en móviles */
+    #address-suggestions {
+        max-height: 200px;
+        font-size: 0.875rem;
+    }
+    @media (min-width: 640px) {
+        #address-suggestions {
+            max-height: 240px;
+            font-size: 1rem;
+        }
     }
 </style>
 @endpush
@@ -773,7 +799,7 @@ function initNominatimAutocomplete() {
     let timeoutId;
     const suggestionsDiv = document.createElement('div');
     suggestionsDiv.id = 'address-suggestions';
-    suggestionsDiv.className = 'absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto';
+                    suggestionsDiv.className = 'absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 sm:max-h-60 overflow-y-auto';
     suggestionsDiv.style.display = 'none';
     addressInput.parentElement.appendChild(suggestionsDiv);
 

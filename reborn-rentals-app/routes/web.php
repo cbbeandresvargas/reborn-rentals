@@ -72,6 +72,7 @@ Route::get('/site-map', [PageController::class, 'sitemap'])->name('sitemap');
 Route::get('/terms-conditions', [PageController::class, 'terms'])->name('terms');
 Route::get('/directions', [PageController::class, 'directions'])->name('directions');
 Route::get('/blog', [PageController::class, 'blog'])->name('blog');
+Route::get('/blog/{slug}', [PageController::class, 'showPost'])->name('blog.post');
 
 // Admin Panel (requiere autenticación y rol admin)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

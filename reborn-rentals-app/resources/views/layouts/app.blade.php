@@ -121,7 +121,6 @@
                         </form>
                     @else
                         <a href="{{ route('login') }}" class="text-white text-xs sm:text-sm hover:text-[#CE9704] transition-colors px-2 py-1 cursor-pointer relative z-10">Login</a>
-                        <a href="{{ route('register') }}" class="text-white text-xs sm:text-sm hover:text-[#CE9704] transition-colors px-2 py-1 cursor-pointer relative z-10">Register</a>
                     @endauth
                     
                     <!-- Menu Button -->
