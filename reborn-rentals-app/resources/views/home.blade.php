@@ -46,10 +46,11 @@
              data-product-name="{{ $product->name }}" 
              data-product-price="{{ $product->price }}">
             <div class="relative bg-white p-4">
-                <button class="absolute top-2 left-2 bg-[#CE9704] p-2 rounded hover:bg-[#B8860B] transition-colors duration-200 group z-10 add-to-cart-btn" 
+                <button class="absolute top-2 left-2 bg-[#CE9704] p-2 rounded hover:bg-[#B8860B] transition-colors duration-200 group z-0 add-to-cart-btn" 
                         data-product-id="{{ $product->id }}" 
                         data-product-name="{{ $product->name }}" 
                         data-product-price="{{ $product->price }}" 
+                        style="z-index: 1;"
                         title="Click to add to cart or drag and drop the item into the cart">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <circle cx="9" cy="21" r="1"></circle>
