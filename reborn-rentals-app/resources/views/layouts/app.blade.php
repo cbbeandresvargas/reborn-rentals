@@ -93,191 +93,59 @@
         #cart-sidebar-container:has(#cart-sidebar.translate-x-0) {
             z-index: 10 !important;
         }
+
+        /* Contact Float Button Styles */
+        #contact-float-container {
+            z-index: 50;
+        }
+
+        #contact-panel {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        #contact-panel.open {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
+        }
+
+        /* Hover effect for contact button */
+        #contact-float-btn:hover #contact-icon-default {
+            opacity: 0;
+        }
+
+        #contact-float-btn:hover #contact-icon-hover {
+            opacity: 1;
+        }
+
+        /* When panel is open, keep hover icon visible */
+        #contact-float-btn.panel-open #contact-icon-default {
+            opacity: 0;
+        }
+
+        #contact-float-btn.panel-open #contact-icon-hover {
+            opacity: 1;
+        }
+
+        /* Responsive adjustments for contact button */
+        @media (max-width: 640px) {
+            #contact-float-container {
+                bottom: 4rem;
+                left: 1rem;
+            }
+
+            #contact-panel {
+                min-width: 180px;
+            }
+        }
     </style>
     
     @stack('styles')
 </head>
 <body class="m-0 w-full h-full font-sans">
-    <!-- Navbar -->
-    <nav class="bg-[#4A4A4A] py-3 sm:py-4 md:py-6 shadow-lg relative">
-        <div class="max-w-6xl mx-auto px-3 sm:px-4 md:px-8">
-            <div class="flex justify-between items-center relative">
-                <!-- Logo -->
-                <div class="shrink-0 z-10 relative">
-                    <a href="{{ route('home') }}" class="block">
-                        <img src="{{ asset('Logo.png') }}" alt="Reborn Rentals" class="h-7 sm:h-8 md:h-10 w-auto object-contain" />
-                    </a>
-                </div>
-                
-                <!-- Right Side: Auth Links / Menu & Cart -->
-                <div class="flex items-center gap-2 md:gap-4 relative z-10">
-                    @auth
-                        <span class="text-white text-xs sm:text-sm hidden sm:block">{{ Auth::user()->name }}</span>
-                        <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
-                            @csrf
-                            <button type="submit" class="text-white text-xs sm:text-sm hover:text-[#CE9704] transition-colors cursor-pointer">
-                                Logout
-                            </button>
-                        </form>
-                    @else
-                        <a href="{{ route('login') }}" class="text-white text-xs sm:text-sm hover:text-[#CE9704] transition-colors px-2 py-1 cursor-pointer relative z-10">Login</a>
-                    @endauth
-                    
-                    <!-- Menu Button -->
-                    <button type="button" class="bg-none border-none text-white cursor-pointer p-2 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-white/10 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/20 relative z-10" id="menu-btn" aria-label="Menu">
-                        <svg width="20" height="20" class="sm:w-5 sm:h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                        </svg>
-                    </button>
-                    
-                    <!-- Cart Button -->
-                    <button type="button" class="bg-none border-none text-white cursor-pointer p-2 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-white/10 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/20 relative z-10" id="cart-btn" aria-label="Carrito">
-                        <svg width="20" height="20" class="sm:w-5 sm:h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="9" cy="21" r="1"></circle>
-                            <circle cx="20" cy="21" r="1"></circle>
-                            <path d="m1 1 4 4 13 1 2 8H6l-2-8z"></path>
-                        </svg>
-                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 items-center justify-center hidden" id="cart-badge">0</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
-    
-    <!-- Menu Sidebar (Left) -->
-    <div id="menu-sidebar" class="fixed top-0 left-0 h-screen w-full sm:w-80 lg:w-96 max-w-[85vw] bg-[#4A4A4A] shadow-2xl -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto scrollbar-hide">
-        <div class="px-4 sm:px-6 py-6 sm:py-8 min-h-full flex flex-col">
-            <!-- Close Button -->
-            <div class="flex justify-end mb-6 shrink-0">
-                <button type="button" class="bg-none border-none cursor-pointer p-2 sm:p-3 rounded-lg transition-colors duration-300 ease-in-out hover:bg-white/10 text-white" id="close-menu">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Logo Section -->
-            <div class="flex justify-center mb-10 shrink-0">
-                <img src="{{ asset('Logo.png') }}" alt="Reborn Rentals" class="h-20 w-auto object-contain" />
-            </div>
-
-            <!-- Navigation Sections -->
-            <div class="flex flex-col gap-10 flex-1">
-                <!-- About Us Section -->
-                <div class="flex gap-6">
-                    <div class="w-2 h-36 bg-white rounded-sm shrink-0"></div>
-                    <div class="flex-1">
-                        <h3 class="text-gray-300 font-bold text-sm uppercase mb-5 tracking-wider">About Us</h3>
-                        <nav class="flex flex-col gap-4">
-                            <a href="{{ route('faq') }}" class="text-[#CE9704] no-underline text-sm hover:text-white transition-colors duration-300 py-1">FAQ</a>
-                            <a href="{{ route('about') }}" class="text-[#CE9704] no-underline text-sm hover:text-white transition-colors duration-300 py-1">About Us</a>
-                            <a href="https://grb-group.com/en/" class="text-[#CE9704] no-underline text-sm hover:text-white transition-colors duration-300 py-1" target="_blank">Corporate</a>
-                        </nav>
-                    </div>
-                </div>
-
-                <!-- General Section -->
-                <div class="flex gap-6">
-                    <div class="w-2 h-36 bg-[#CE9704] rounded-sm shrink-0"></div>
-                    <div class="flex-1">
-                        <h3 class="text-gray-300 font-bold text-sm uppercase mb-5 tracking-wider">General</h3>
-                        <nav class="flex flex-col gap-4">
-                            <a href="{{ route('sitemap') }}" class="text-[#CE9704] no-underline text-sm hover:text-white transition-colors duration-300 py-1">Site Map</a>
-                            <a href="{{ route('blog') }}" class="text-[#CE9704] no-underline text-sm hover:text-white transition-colors duration-300 py-1">Blog</a>
-                            <a href="https://grb-group.com/en/open-opportunities/" class="text-[#CE9704] no-underline text-sm hover:text-white transition-colors duration-300 py-1" target="_blank">Careers</a>
-                        </nav>
-                    </div>
-                </div>
-
-                <!-- Legal Section -->
-                <div class="flex gap-6">
-                    <div class="w-2 h-36 bg-white rounded-sm shrink-0"></div>
-                    <div class="flex-1">
-                        <h3 class="text-gray-300 font-bold text-sm uppercase mb-5 tracking-wider">Legal</h3>
-                        <nav class="flex flex-col gap-4">
-                            <a href="{{ route('terms') }}" class="text-[#CE9704] no-underline text-sm hover:text-white transition-colors duration-300 py-1">Terms & Conditions</a>
-                            <a href="{{ route('privacy') }}" class="text-[#CE9704] no-underline text-sm hover:text-white transition-colors duration-300 py-1">Privacy Policy</a>
-                            <a href="{{ route('fees') }}" class="text-[#CE9704] no-underline text-sm hover:text-white transition-colors duration-300 py-1">Fees & Surcharges</a>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Copyright -->
-            <div class="pt-6 shrink-0">
-                <p class="text-white text-xs text-center leading-relaxed">© 2025 Reborn Rentals, All Rights Reserved.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Cart Sidebar (Right) -->
-    <div id="cart-sidebar-container" class="fixed top-0 right-0 h-screen overflow-visible">
-        <div id="cart-sidebar" class="text-white w-full sm:w-80 lg:w-96 max-w-[85vw] bg-[#2F2F2F] shadow-2xl translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto scrollbar-hide h-full relative overflow-visible">
-            <!-- Step Indicator on left edge (protruding) -->
-            <div id="step-indicator-container" class="absolute -left-[42px] top-[170px] w-[42px] h-[236px] bg-[#2F2F2F] flex flex-col items-center justify-center gap-[21px]" style="border-radius: 26px 0px 0px 26px; display: none;">
-                <!-- Step 1 -->
-                <div class="w-8 h-12 text-[#CE9704] font-black text-base leading-[48px] text-center flex items-center justify-center" id="step-indicator-1">
-                    1
-                </div>
-                <!-- Step 2 -->
-                <div class="w-8 h-12 text-white font-black text-base leading-[48px] text-center flex items-center justify-center" id="step-indicator-2">
-                    2
-                </div>
-                <!-- Step 3 -->
-                <div class="w-8 h-12 text-white font-black text-base leading-[48px] text-center flex items-center justify-center" id="step-indicator-3">
-                    3
-                </div>
-            </div>
-        
-        <div class="p-4 sm:p-6 md:p-8 min-h-full flex flex-col">
-            <div class="flex justify-between items-center mb-6 sm:mb-8 pb-3 sm:pb-4 border-b border-gray-300" id="cart-header">
-                <h3 class="m-0 text-[#CE9704] text-xl sm:text-2xl">YOUR CART</h3>
-                <button type="button" class="bg-none border-none cursor-pointer p-2 rounded transition-colors duration-300 ease-in-out hover:bg-gray-200" id="close-cart">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-            
-            <!-- Cart Items -->
-            <div class="flex-1 cart-items">
-                <div class="flex flex-col items-center justify-center h-full">
-                    <p class="text-white font-semibold italic text-center">Your cart is empty.</p>
-                    <p class="text-white text-sm text-center">Looks like you haven't made your choice yet.</p>
-                    <p class="text-white text-sm text-center">Start by adding items to your cart.</p>
-                </div>
-            </div>
-            
-            <!-- Subtotal Section -->
-            <div class="border-t border-gray-600 pt-4 mb-4 hidden" id="subtotal-section">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-white font-semibold">Subtotal:</span>
-                    <span class="text-[#CE9704] font-bold text-lg" id="subtotal-amount">$0</span>
-                </div>
-                <div class="flex justify-between items-center mb-3">
-                    <span class="text-gray-300 text-sm">Items:</span>
-                    <span class="text-gray-300 text-sm" id="total-items">0</span>
-                </div>
-                
-                <!-- Terms and Conditions -->
-                <div class="text-gray-300 text-xs space-y-1">
-                    <p class="font-medium">*Additional charges for delivery, rough terrain and express orders may apply.</p>
-                </div>
-            </div>
-            
-            <!-- Proceed Button -->
-            <div class="mt-auto pt-4" id="proceed-button-container">
-                <button type="button" class="block w-full bg-gray-600 text-gray-400 py-3 px-4 rounded-lg font-bold text-lg text-center cursor-not-allowed transition-all duration-300" id="when-where-btn" disabled>
-                    Proceed to Payment
-                </button>
-            </div>
-        </div>
-        </div>
-    </div>
+    @include('components.header')
+    @include('components.menu-sidebar')
+    @include('components.cart-sidebar')
 
     <!-- Overlay -->
     <div id="sidebar-overlay" class="fixed top-0 left-0 w-full h-full bg-black/50 opacity-0 invisible pointer-events-none transition-all duration-300 ease-in-out"></div>
@@ -460,6 +328,112 @@
         @yield('content')
     </main>
 
+    <!-- Floating Contact Button -->
+    <div class="fixed bottom-6 left-6 z-50" id="contact-float-container">
+        <!-- Contact Panel (hidden by default) -->
+        <div id="contact-panel" class="mb-4 bg-white rounded-lg shadow-2xl p-4 transform transition-all duration-300 ease-in-out opacity-0 invisible translate-y-4" style="min-width: 200px;">
+            <div class="flex flex-col gap-3">
+                <!-- Messenger -->
+                <a href="https://m.me/rebornrentals" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+                    <img src="{{ asset('icons/messenger.svg') }}" alt="Messenger" class="w-10 h-10 flex-shrink-0" />
+                    <span class="text-gray-700 font-medium text-sm group-hover:text-[#CE9704]">Messenger</span>
+                </a>
+
+                <!-- WhatsApp -->
+                <a href="https://wa.me/18001234567" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+                    <img src="{{ asset('icons/whatsapp.svg') }}" alt="WhatsApp" class="w-10 h-10 flex-shrink-0" />
+                    <span class="text-gray-700 font-medium text-sm group-hover:text-[#CE9704]">WhatsApp</span>
+                </a>
+
+                <!-- Telegram -->
+                <a href="https://t.me/rebornrentals" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+                    <img src="{{ asset('icons/telegram.svg') }}" alt="Telegram" class="w-10 h-10 flex-shrink-0" />
+                    <span class="text-gray-700 font-medium text-sm group-hover:text-[#CE9704]">Telegram</span>
+                </a>
+
+                <!-- Email -->
+                <a href="mailto:Support@RebornRental.com" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+                    <img src="{{ asset('icons/email.svg') }}" alt="Email" class="w-10 h-10 flex-shrink-0" />
+                    <span class="text-gray-700 font-medium text-sm group-hover:text-[#CE9704]">Email</span>
+                </a>
+
+                <!-- QR Code -->
+                <button type="button" onclick="showQRCode()" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group text-left w-full">
+                    <img src="{{ asset('icons/qr.svg') }}" alt="QR Code" class="w-10 h-10 flex-shrink-0" />
+                    <span class="text-gray-700 font-medium text-sm group-hover:text-[#CE9704]">QR</span>
+                </button>
+
+                <!-- Callback -->
+                <button type="button" onclick="openCallback()" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group text-left w-full">
+                    <img src="{{ asset('icons/support.svg') }}" alt="Callback" class="w-10 h-10 flex-shrink-0" />
+                    <span class="text-gray-700 font-medium text-sm group-hover:text-[#CE9704]">Callback</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Floating Button -->
+        <button type="button" id="contact-float-btn" onclick="toggleContactPanel()" class="bg-transparent flex items-center justify-center transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:ring-offset-2 relative p-0 border-none w-auto h-auto">
+            <img id="contact-icon-default" src="{{ asset('icons/chats.svg') }}" alt="Chat" class="w-12 h-12 transition-opacity duration-300" />
+            <img id="contact-icon-hover" src="{{ asset('icons/chatshover.svg') }}" alt="Chat" class="w-12 h-12 transition-opacity duration-300 opacity-0 absolute inset-0 m-auto" />
+        </button>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qr-code-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-white rounded-lg max-w-sm w-full p-6 relative">
+            <button onclick="closeQRCode()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Scan QR Code</h3>
+            <div class="flex justify-center mb-4">
+                <div class="w-48 h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <p class="text-gray-500 text-sm">QR Code Placeholder</p>
+                </div>
+            </div>
+            <p class="text-sm text-gray-600 text-center">Scan this QR code to contact us or visit our website</p>
+        </div>
+    </div>
+
+    <!-- Callback Modal -->
+    <div id="callback-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-white rounded-lg max-w-md w-full p-6 relative">
+            <button onclick="closeCallback()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Request a Callback</h3>
+            <form id="callback-form" onsubmit="submitCallback(event)">
+                <div class="mb-4">
+                    <label for="callback-name" class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                    <input type="text" id="callback-name" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]">
+                </div>
+                <div class="mb-4">
+                    <label for="callback-phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <input type="tel" id="callback-phone" name="phone" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]">
+                </div>
+                <div class="mb-4">
+                    <label for="callback-time" class="block text-sm font-medium text-gray-700 mb-2">Preferred Time</label>
+                    <select id="callback-time" name="time" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]">
+                        <option value="">Select a time</option>
+                        <option value="morning">Morning (9 AM - 12 PM)</option>
+                        <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
+                        <option value="evening">Evening (5 PM - 8 PM)</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="callback-message" class="block text-sm font-medium text-gray-700 mb-2">Message (Optional)</label>
+                    <textarea id="callback-message" name="message" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-[#CE9704] hover:bg-[#B8860B] text-white py-2 px-4 rounded-lg font-semibold transition-colors duration-200">
+                    Request Callback
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script>
         // Load cart on page load
@@ -484,6 +458,38 @@
             const overlay = document.getElementById('sidebar-overlay');
             const closeMenuBtn = document.getElementById('close-menu');
             const closeCartBtn = document.getElementById('close-cart');
+            
+            // Initialize cart sidebar as open by default
+            if (cartSidebar && cartSidebar.classList.contains('translate-x-0')) {
+                // Set z-index for open cart sidebar
+                const nav = document.querySelector('nav');
+                if (nav) {
+                    nav.classList.add('sidebar-open');
+                    nav.style.zIndex = '5';
+                }
+                const cartContainer = document.getElementById('cart-sidebar-container');
+                if (cartContainer) {
+                    cartContainer.style.zIndex = '10';
+                }
+                cartSidebar.style.zIndex = '10';
+                
+                // Show step indicator
+                const stepIndicatorContainer = document.getElementById('step-indicator-container');
+                if (stepIndicatorContainer) {
+                    stepIndicatorContainer.style.display = 'block';
+                }
+                
+                // Add padding to main content
+                const mainContent = document.getElementById('main-content');
+                if (mainContent) {
+                    if (window.innerWidth >= 640) {
+                        mainContent.classList.add('pr-80');
+                    }
+                    if (window.innerWidth >= 1024) {
+                        mainContent.classList.add('lg:pr-96');
+                    }
+                }
+            }
 
             // Open menu sidebar
             if (menuBtn && menuSidebar) {
@@ -665,15 +671,18 @@
             }
         };
         
-        // Update step indicator based on current page
+        // Update step indicator and tabs based on current page
         function updateStepIndicator() {
             const currentPath = window.location.pathname;
             
             const step1 = document.getElementById('step-indicator-1');
             const step2 = document.getElementById('step-indicator-2');
             const step3 = document.getElementById('step-indicator-3');
+            const tab1 = document.getElementById('step-tab-1');
+            const tab2 = document.getElementById('step-tab-2');
+            const tab3 = document.getElementById('step-tab-3');
             
-            // Remove all active states
+            // Remove all active states from indicators
             if (step1) {
                 step1.classList.remove('text-[#CE9704]');
                 step1.classList.add('text-white');
@@ -687,27 +696,207 @@
                 step3.classList.add('text-white');
             }
             
+            // Remove all active states from tabs
+            if (tab1) {
+                tab1.classList.remove('bg-[#CE9704]', 'text-white');
+                tab1.classList.add('bg-gray-600', 'text-gray-300');
+            }
+            if (tab2) {
+                tab2.classList.remove('bg-[#CE9704]', 'text-white');
+                tab2.classList.add('bg-gray-600', 'text-gray-300');
+            }
+            if (tab3) {
+                tab3.classList.remove('bg-[#CE9704]', 'text-white');
+                tab3.classList.add('bg-gray-600', 'text-gray-300');
+            }
+            
             // Set active step based on current page
-            if (currentPath === '/' || currentPath.includes('home')) {
+            if (currentPath === '/' || currentPath.includes('home') || currentPath.includes('products')) {
                 if (step1) {
                     step1.classList.remove('text-white');
                     step1.classList.add('text-[#CE9704]');
+                }
+                if (tab1) {
+                    tab1.classList.remove('bg-gray-600', 'text-gray-300');
+                    tab1.classList.add('bg-[#CE9704]', 'text-white');
                 }
             } else if (currentPath.includes('directions')) {
                 if (step2) {
                     step2.classList.remove('text-white');
                     step2.classList.add('text-[#CE9704]');
                 }
+                if (tab2) {
+                    tab2.classList.remove('bg-gray-600', 'text-gray-300');
+                    tab2.classList.add('bg-[#CE9704]', 'text-white');
+                }
             } else if (currentPath.includes('checkout')) {
                 if (step3) {
                     step3.classList.remove('text-white');
                     step3.classList.add('text-[#CE9704]');
                 }
+                if (tab3) {
+                    tab3.classList.remove('bg-gray-600', 'text-gray-300');
+                    tab3.classList.add('bg-[#CE9704]', 'text-white');
+                }
             }
         }
         
-        // Initialize step indicator on page load
+        // Step tabs functionality
+        function setupStepTabs() {
+            const stepTabs = document.querySelectorAll('.step-tab');
+            const stepIndicator1 = document.getElementById('step-indicator-1');
+            const stepIndicator2 = document.getElementById('step-indicator-2');
+            const stepIndicator3 = document.getElementById('step-indicator-3');
+            
+            stepTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const step = parseInt(this.getAttribute('data-step'));
+                    
+                    // Update tab styles
+                    stepTabs.forEach(t => {
+                        t.classList.remove('bg-[#CE9704]', 'text-white');
+                        t.classList.add('bg-gray-600', 'text-gray-300');
+                    });
+                    this.classList.remove('bg-gray-600', 'text-gray-300');
+                    this.classList.add('bg-[#CE9704]', 'text-white');
+                    
+                    // Update step indicators
+                    if (stepIndicator1 && stepIndicator2 && stepIndicator3) {
+                        stepIndicator1.classList.remove('text-[#CE9704]');
+                        stepIndicator1.classList.add('text-white');
+                        stepIndicator2.classList.remove('text-[#CE9704]');
+                        stepIndicator2.classList.add('text-white');
+                        stepIndicator3.classList.remove('text-[#CE9704]');
+                        stepIndicator3.classList.add('text-white');
+                        
+                        if (step === 1 && stepIndicator1) {
+                            stepIndicator1.classList.remove('text-white');
+                            stepIndicator1.classList.add('text-[#CE9704]');
+                        } else if (step === 2 && stepIndicator2) {
+                            stepIndicator2.classList.remove('text-white');
+                            stepIndicator2.classList.add('text-[#CE9704]');
+                        } else if (step === 3 && stepIndicator3) {
+                            stepIndicator3.classList.remove('text-white');
+                            stepIndicator3.classList.add('text-[#CE9704]');
+                        }
+                    }
+                    
+                    // Navigate to step page
+                    if (step === 1) {
+                        window.location.href = '{{ route("home") }}';
+                    } else if (step === 2) {
+                        window.location.href = '{{ route("directions") }}';
+                    } else if (step === 3) {
+                        window.location.href = '{{ route("checkout") }}';
+                    }
+                });
+            });
+        }
+        
+        // Initialize step indicator and tabs on page load
         updateStepIndicator();
+        setupStepTabs();
+
+        // Contact Float Panel functionality
+        function toggleContactPanel() {
+            const panel = document.getElementById('contact-panel');
+            const button = document.getElementById('contact-float-btn');
+            const defaultIcon = document.getElementById('contact-icon-default');
+            const hoverIcon = document.getElementById('contact-icon-hover');
+            
+            if (panel.classList.contains('open')) {
+                panel.classList.remove('open');
+                button.classList.remove('panel-open');
+                // Restore default icon
+                defaultIcon.style.opacity = '1';
+                hoverIcon.style.opacity = '0';
+            } else {
+                panel.classList.add('open');
+                button.classList.add('panel-open');
+                // Keep hover icon visible
+                defaultIcon.style.opacity = '0';
+                hoverIcon.style.opacity = '1';
+            }
+        }
+
+        function showQRCode() {
+            const modal = document.getElementById('qr-code-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeQRCode() {
+            const modal = document.getElementById('qr-code-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function openCallback() {
+            const modal = document.getElementById('callback-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeCallback() {
+            const modal = document.getElementById('callback-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Close contact panel when clicking outside
+        document.addEventListener('click', function(event) {
+            const container = document.getElementById('contact-float-container');
+            const panel = document.getElementById('contact-panel');
+            const button = document.getElementById('contact-float-btn');
+            
+            if (container && panel && button) {
+                // Check if click is outside both the button and the panel
+                const isClickInsideButton = button.contains(event.target);
+                const isClickInsidePanel = panel.contains(event.target);
+                
+                if (!isClickInsideButton && !isClickInsidePanel && panel.classList.contains('open')) {
+                    panel.classList.remove('open');
+                    button.classList.remove('panel-open');
+                    const defaultIcon = document.getElementById('contact-icon-default');
+                    const hoverIcon = document.getElementById('contact-icon-hover');
+                    if (defaultIcon) defaultIcon.style.opacity = '1';
+                    if (hoverIcon) hoverIcon.style.opacity = '0';
+                }
+            }
+        });
+
+        // Close QR modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('qr-code-modal');
+            if (modal && event.target === modal) {
+                closeQRCode();
+            }
+        });
+
+        // Close Callback modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('callback-modal');
+            if (modal && event.target === modal) {
+                closeCallback();
+            }
+        });
+
+        // Submit callback form
+        function submitCallback(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Here you would typically send the data to your backend
+            // For now, we'll just show an alert and close the modal
+            alert('Callback request submitted! We will contact you soon.');
+            closeCallback();
+            form.reset();
+        }
     </script>
     
     <!-- Cart JS -->
