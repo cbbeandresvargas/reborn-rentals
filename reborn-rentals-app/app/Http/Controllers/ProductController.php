@@ -18,9 +18,44 @@ class ProductController extends Controller
             $query->search($request->search);
         }
 
-        // Filtro por categoría
-        if ($request->has('category_id')) {
+        // Filtro por categoría (array)
+        if ($request->has('categories') && is_array($request->categories)) {
+            $query->whereIn('category_id', $request->categories);
+        } elseif ($request->has('category_id')) {
             $query->byCategory($request->category_id);
+        }
+
+        // Filtro por dimensiones
+        if ($request->has('dimensions') && is_array($request->dimensions)) {
+            $query->where(function($q) use ($request) {
+                foreach ($request->dimensions as $dimension) {
+                    $q->orWhere('description', 'like', '%' . $dimension . '%');
+                }
+            });
+        }
+
+        // Filtro por tonelaje
+        if ($request->has('tonnage') && is_array($request->tonnage)) {
+            $query->where(function($q) use ($request) {
+                foreach ($request->tonnage as $tonnage) {
+                    // Extract number from "18.25 Ton capacity"
+                    if (preg_match('/([\d.]+)/', $tonnage, $matches)) {
+                        $q->orWhere('description', 'like', '%' . $matches[1] . '%ton%');
+                    }
+                }
+            });
+        }
+
+        // Filtro por capacidad de galones
+        if ($request->has('gallons') && is_array($request->gallons)) {
+            $query->where(function($q) use ($request) {
+                foreach ($request->gallons as $gallon) {
+                    // Extract number from "587 Gallon capacity"
+                    if (preg_match('/(\d+)/', $gallon, $matches)) {
+                        $q->orWhere('description', 'like', '%' . $matches[1] . '%gallon%');
+                    }
+                }
+            });
         }
 
         // Filtro por precio

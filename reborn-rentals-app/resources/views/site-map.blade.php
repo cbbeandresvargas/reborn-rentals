@@ -117,6 +117,140 @@
                 </ul>
             </div>
         </div>
+        <!-- Affiliate Links Section -->
+        <div class="bg-white rounded-lg border border-gray-200 p-8">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-[#CE9704] rounded-lg flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">Affiliate Links</h2>
+            </div>
+            <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <li>
+                    <a href="https://www.grb-group.com/en/" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">grb-group.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://svaneholmhotel.se" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">svaneholmhotel.se</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://reborndevelopments.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">reborndevelopments.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://rebornhotels.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">rebornhotels.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://igloow.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">igloow.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://reborn-realty.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">reborn-realty.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://slatefort.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">slatefort.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://reborn-alpha.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">reborn-alpha.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://reborn-bravo.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">reborn-bravo.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://reborn-charlie.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">reborn-charlie.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://reborn-delta.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">reborn-delta.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://rebornbank.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">rebornbank.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://rekaliber.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">rekaliber.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://refistack.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">refistack.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://mytropolskyi.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">mytropolskyi.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://rbcmswusa.grb-group.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">rbcmswusa.grb-group.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://rbcmneusa.grb-group.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">rbcmneusa.grb-group.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://rbcmuk.grb-group.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">rbcmuk.grb-group.com</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://rbcmche.ch" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">rbcmche.ch</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://rbcmind.grb-group.com" class="group flex items-center text-gray-700 hover:text-[#CE9704] transition-colors duration-200">
+                        <div class="w-2 h-2 bg-[#CE9704] rounded-full mr-3"></div>
+                        <span class="group-hover:translate-x-1 transition-transform duration-200">rbcmind.grb-group.com</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        </div>
     </div>
 </main>
 @endsection

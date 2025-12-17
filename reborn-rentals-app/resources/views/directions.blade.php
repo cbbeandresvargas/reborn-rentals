@@ -73,11 +73,19 @@
                     <input 
                         type="text" 
                         name="jobsite_address"
-                        placeholder="Start typing and select from suggestions..."
-                        class="w-full pl-8 sm:pl-9 md:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
+                        placeholder="Type an address or select from suggestions..."
+                        class="w-full pl-8 sm:pl-9 md:pl-10 pr-20 sm:pr-24 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
                         id="jobsite-address"
                         autocomplete="off"
                     />
+                    <button 
+                        type="button"
+                        id="search-address-btn"
+                        class="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 bg-[#CE9704] hover:bg-[#B8860B] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 z-10"
+                        title="Search address"
+                    >
+                        Search
+                    </button>
                 </div>
             </div>
             
@@ -96,26 +104,20 @@
                 </div>
                 
                 <!-- Interactive Map Section -->
-                <div class="mt-4 sm:mt-6 md:mt-8">
-                    <h3 class="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-2 sm:mb-3 md:mb-4">Select Delivery Location on Map</h3>
-                    <p class="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">
-                        Click on the map to select your delivery location. The map will show the route from our office to your selected location.
+                <div class="mt-6 sm:mt-8 md:mt-10">
+                    <div class="mb-4 sm:mb-5 md:mb-6">
+                        <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">Select Delivery Location on Map</h3>
+                        <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+                            Click on the map to select your delivery location. The map will automatically show the route from our office to your selected location.
                     </p>
+                    </div>
                     
                     <!-- Map Container -->
                     <div class="relative" style="z-index: 1;">
-                        <div id="delivery-map" class="w-full h-56 sm:h-64 md:h-80 lg:h-96 rounded-lg overflow-hidden border border-gray-300 shadow-lg">
-                            <iframe 
-                                src="/map.html"
-                                title="Delivery Map"
-                                id="delivery-map-iframe"
-                                style="border:0; width:100%; height:100%; min-height: 250px;"
-                                loading="lazy"
-                            ></iframe>
-                        </div>
+                        <div id="delivery-map" class="w-full h-72 sm:h-96 md:h-[500px] lg:h-[600px] xl:h-[700px] rounded-xl overflow-hidden border-2 border-gray-300 shadow-2xl"></div>
                         
                         <!-- Google Maps iframe (hidden by default, shown for self-pickup and no-address) -->
-                        <div id="google-maps-static" class="w-full h-56 sm:h-64 md:h-80 lg:h-96 rounded-lg overflow-hidden border border-gray-300 shadow-lg hidden">
+                        <div id="google-maps-static" class="w-full h-72 sm:h-96 md:h-[500px] lg:h-[600px] xl:h-[700px] rounded-xl overflow-hidden border-2 border-gray-300 shadow-2xl hidden">
                             <iframe 
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3077.576787884259!2d-119.80605779999999!3d39.5240405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x809940b3fe48bd53%3A0x4e3afeee9f24c1bc!2s401%20Ryland%20St%20Suite%20200-A%2C%20Reno%2C%20NV%2089502%2C%20EE.%20UU.!5e0!3m2!1ses-419!2sbo!4v1761325010616!5m2!1ses-419!2sbo" 
                                 width="100%" 
@@ -128,11 +130,11 @@
                         </div>
                         
                         <!-- Map Controls -->
-                        <div class="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 bg-white rounded-lg shadow-lg p-1 sm:p-1.5 md:p-2 space-y-1 sm:space-y-1.5 md:space-y-2">
+                        <div class="absolute top-3 sm:top-4 md:top-5 right-3 sm:right-4 md:right-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 sm:p-2.5 md:p-3 space-y-2 border border-gray-200">
                             <button 
                                 type="button"
                                 id="center-map-btn" 
-                                class="bg-[#CE9704] text-white px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded text-xs sm:text-sm font-medium hover:bg-[#B8860B] transition-colors duration-200 block w-full whitespace-nowrap"
+                                class="bg-gradient-to-r from-[#CE9704] to-[#B8860B] text-white px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 rounded-lg text-xs sm:text-sm font-semibold hover:from-[#B8860B] hover:to-[#CE9704] transition-all duration-300 block w-full whitespace-nowrap shadow-md hover:shadow-lg transform hover:scale-105"
                                 title="Center on Reborn Rentals Office"
                             >
                                 📍 Our Office
@@ -140,7 +142,7 @@
                             <button 
                                 type="button"
                                 id="clear-route-btn" 
-                                class="bg-gray-600 text-white px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded text-xs sm:text-sm font-medium hover:bg-gray-700 transition-colors duration-200 block w-full whitespace-nowrap"
+                                class="bg-gradient-to-r from-gray-600 to-gray-700 text-white px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 rounded-lg text-xs sm:text-sm font-semibold hover:from-gray-700 hover:to-gray-800 transition-all duration-300 block w-full whitespace-nowrap shadow-md hover:shadow-lg transform hover:scale-105"
                                 title="Clear Route"
                             >
                                 🗑️ Clear Route
@@ -148,17 +150,17 @@
                         </div>
                         
                         <!-- Selected Location Info -->
-                        <div id="selected-location-info" class="absolute bottom-2 sm:bottom-3 md:bottom-4 left-2 sm:left-3 md:left-4 right-2 sm:right-3 md:right-4 bg-white rounded-lg shadow-lg p-2 sm:p-3 md:p-4">
+                        <div id="selected-location-info" class="absolute bottom-3 sm:bottom-4 md:bottom-5 left-3 sm:left-4 md:left-5 right-3 sm:right-4 md:right-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-3 sm:p-4 md:p-5 border border-gray-200">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-2 sm:gap-0">
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-semibold text-gray-800 text-xs sm:text-sm">Selected Location:</h4>
-                                    <p id="selected-address" class="text-gray-600 text-xs sm:text-sm mt-1 break-words">Click on the map to select a delivery location</p>
-                                    <p id="distance-info" class="text-[#CE9704] text-xs mt-1"></p>
+                                    <h4 class="font-bold text-gray-900 text-sm sm:text-base mb-1.5">Selected Location:</h4>
+                                    <p id="selected-address" class="text-gray-700 text-sm sm:text-base mt-1 break-words font-medium">Click on the map to select a delivery location</p>
+                                    <p id="distance-info" class="text-[#CE9704] text-sm sm:text-base mt-2 font-semibold"></p>
                                 </div>
                                 <button 
                                     type="button"
                                     id="use-location-btn" 
-                                    class="bg-[#CE9704] text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-[#B8860B] transition-colors duration-200 whitespace-nowrap sm:ml-2 mt-2 sm:mt-0 w-full sm:w-auto"
+                                    class="bg-gradient-to-r from-[#CE9704] to-[#B8860B] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold hover:from-[#B8860B] hover:to-[#CE9704] transition-all duration-300 whitespace-nowrap sm:ml-3 mt-2 sm:mt-0 w-full sm:w-auto shadow-md hover:shadow-lg transform hover:scale-105"
                                 >
                                     Use This Location
                                 </button>
@@ -167,21 +169,38 @@
                     </div>
                     
                     <!-- Map Instructions -->
-                    <div class="mt-3 sm:mt-4 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="mt-4 sm:mt-5 md:mt-6 p-4 sm:p-5 md:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 shadow-lg">
                         <div class="flex items-start">
                             <div class="shrink-0">
-                                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
-                            <div class="ml-2 sm:ml-3 flex-1">
-                                <h4 class="text-xs sm:text-sm font-medium text-blue-800">How to use the map:</h4>
-                                <ul class="text-xs sm:text-sm text-blue-700 mt-1 space-y-0.5 sm:space-y-1">
-                                    <li>• Click anywhere on the map to select your delivery location</li>
-                                    <li>• The map will automatically show the route from our office to your location</li>
-                                    <li>• Use "📍 Our Office" to center the map on our location</li>
-                                    <li>• Use "🗑️ Clear Route" to remove the current route and start over</li>
-                                    <li>• Click "Use This Location" to set the address in the form above</li>
+                            </div>
+                            <div class="ml-3 sm:ml-4 flex-1">
+                                <h4 class="text-sm sm:text-base font-bold text-blue-900 mb-2">How to use the map:</h4>
+                                <ul class="text-xs sm:text-sm md:text-base text-blue-800 mt-2 space-y-1.5 sm:space-y-2">
+                                    <li class="flex items-start">
+                                        <span class="text-blue-500 mr-2 font-bold">•</span>
+                                        <span>Click anywhere on the map to select your delivery location</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-blue-500 mr-2 font-bold">•</span>
+                                        <span>The map will automatically show the route from our office to your location</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-blue-500 mr-2 font-bold">•</span>
+                                        <span>Use "📍 Our Office" to center the map on our location</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-blue-500 mr-2 font-bold">•</span>
+                                        <span>Use "🗑️ Clear Route" to remove the current route and start over</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-blue-500 mr-2 font-bold">•</span>
+                                        <span>Click "Use This Location" to set the address in the form above</span>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -241,29 +260,39 @@
 @push('styles')
 <style>
     #delivery-map {
-        min-height: 250px !important;
+        min-height: 300px !important;
         height: 100%;
     }
     @media (min-width: 640px) {
         #delivery-map {
-            min-height: 300px !important;
+            min-height: 400px !important;
         }
     }
     @media (min-width: 768px) {
         #delivery-map {
-            min-height: 400px !important;
+            min-height: 500px !important;
+        }
+    }
+    @media (min-width: 1024px) {
+        #delivery-map {
+            min-height: 600px !important;
+        }
+    }
+    @media (min-width: 1280px) {
+        #delivery-map {
+            min-height: 700px !important;
         }
     }
     .leaflet-container {
         height: 100%;
         width: 100%;
     }
-    /* Mejorar visibilidad del panel de ubicación en móviles */
+    /* Improve visibility of location panel on mobile devices */
     #selected-location-info {
         max-height: calc(100vh - 200px);
         overflow-y: auto;
     }
-    /* Mejorar sugerencias de autocompletado en móviles */
+    /* Improve autocomplete suggestions on mobile devices */
     #address-suggestions {
         max-height: 200px;
         font-size: 0.875rem;
@@ -280,11 +309,12 @@
 @push('scripts')
 <script>
     console.log('=== DIRECTIONS PAGE LOADED ===');
-    const USE_IFRAME_MAP = true;
+    const USE_IFRAME_MAP = false;
 let map;
 let selectedMarker;
 let officeMarker;
-let routeLayer;
+let directionsService;
+let directionsRenderer;
 
 // Expose map globally for invalidateSize calls
 window.map = null;
@@ -296,16 +326,12 @@ const officeLocation = {
     address: "401 Ryland St Suite 200-A, Reno, NV 89502, USA"
 };
 
-// Initialize Map
-function initMap() {
-    console.log('Initializing Leaflet map...');
+// Initialize Google Map
+function initGoogleMap() {
+    console.log('Initializing Google Maps...');
     
-    // Get L from window
-    const L = window.L;
-    
-    // Check if Leaflet is available
-    if (typeof L === 'undefined' || typeof L.map !== 'function') {
-        console.error('Leaflet not loaded');
+    if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+        console.error('Google Maps not loaded');
         const mapElement = document.getElementById('delivery-map');
         if (mapElement) {
             mapElement.innerHTML = '<div class="flex items-center justify-center h-full bg-gray-100 text-gray-600">Map loading failed. Please refresh the page.</div>';
@@ -314,61 +340,61 @@ function initMap() {
     }
     
     try {
-        // Create map with OpenStreetMap tiles
-        map = L.map('delivery-map').setView([officeLocation.lat, officeLocation.lng], 12);
+        // Create map
+        map = new google.maps.Map(document.getElementById('delivery-map'), {
+            center: { lat: officeLocation.lat, lng: officeLocation.lng },
+            zoom: 12,
+            mapTypeControl: true,
+            streetViewControl: false,
+            fullscreenControl: true
+        });
         
         // Expose map globally
         window.map = map;
         
-        // Add OpenStreetMap tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            maxZoom: 19
-        }).addTo(map);
-        
-        console.log('Map created successfully');
-        
-        // Ensure map is properly sized
-        setTimeout(() => {
-            if (map) {
-                map.invalidateSize();
+        // Initialize directions service and renderer
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer({
+            map: map,
+            suppressMarkers: false, // Show default markers for origin and destination
+            polylineOptions: {
+                strokeColor: '#CE9704', // Gold color matching brand
+                strokeWeight: 6,
+                strokeOpacity: 0.9
+            },
+            markerOptions: {
+                // Customize markers if needed
             }
-        }, 500);
-
-        // Add office marker
-        const officeIcon = L.divIcon({
-            html: `
-                <div style="
-                    width: 40px; 
-                    height: 40px; 
-                    background: #CE9704; 
-                    border: 3px solid white; 
-                    border-radius: 50%; 
-                    display: flex; 
-                    align-items: center; 
-                    justify-content: center;
-                    font-size: 20px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-                ">
-                    🏢
-                </div>
-            `,
-            className: 'custom-div-icon',
-            iconSize: [40, 40],
-            iconAnchor: [20, 20]
         });
-
-        officeMarker = L.marker([officeLocation.lat, officeLocation.lng], { icon: officeIcon })
-            .addTo(map)
-            .bindPopup('Reborn Rentals Office');
-
+        
+        // Store current route destination globally
+        window.currentRouteDestination = null;
+        
+        console.log('Google Map created successfully');
+        
+        // Add office marker
+        officeMarker = new google.maps.Marker({
+            position: { lat: officeLocation.lat, lng: officeLocation.lng },
+            map: map,
+            title: 'Reborn Rentals Office',
+            icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="20" cy="20" r="18" fill="#CE9704" stroke="white" stroke-width="3"/>
+                        <text x="20" y="26" font-size="20" text-anchor="middle" fill="white">🏢</text>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(40, 40),
+                anchor: new google.maps.Point(20, 20)
+            }
+        });
+        
         // Add click listener to map
-        map.on('click', function(event) {
+        map.addListener('click', function(event) {
             const clickedLocation = {
-                lat: event.latlng.lat,
-                lng: event.latlng.lng
+                lat: event.latLng.lat(),
+                lng: event.latLng.lng()
             };
-            
             selectLocation(clickedLocation);
         });
 
@@ -376,7 +402,8 @@ function initMap() {
         const centerBtn = document.getElementById('center-map-btn');
         if (centerBtn) {
             centerBtn.addEventListener('click', function() {
-                map.setView([officeLocation.lat, officeLocation.lng], 12);
+                map.setCenter({ lat: officeLocation.lat, lng: officeLocation.lng });
+                map.setZoom(12);
             });
         }
 
@@ -384,15 +411,17 @@ function initMap() {
         const clearRouteBtn = document.getElementById('clear-route-btn');
         if (clearRouteBtn) {
             clearRouteBtn.addEventListener('click', function() {
-                // Remove route layer
-                if (routeLayer) {
-                    map.removeLayer(routeLayer);
-                    routeLayer = null;
+                // Clear directions
+                if (directionsRenderer) {
+                    directionsRenderer.setDirections({ routes: [] });
                 }
+                
+                // Clear stored destination
+                window.currentRouteDestination = null;
                 
                 // Remove selected marker
                 if (selectedMarker) {
-                    map.removeLayer(selectedMarker);
+                    selectedMarker.setMap(null);
                     selectedMarker = null;
                 }
                 
@@ -413,75 +442,119 @@ function initMap() {
             });
         }
 
-        // Use location button
+        // Use location button - Show route from office to selected location (like Google Maps directions)
         const useLocationBtn = document.getElementById('use-location-btn');
         if (useLocationBtn) {
             useLocationBtn.addEventListener('click', function() {
                 const selectedAddress = document.getElementById('selected-address');
                 const addressInput = document.getElementById('jobsite-address');
-                if (selectedAddress && addressInput && selectedAddress.textContent !== 'Click on the map to select a delivery location') {
-                    addressInput.value = selectedAddress.textContent;
+                
+                // If there's a stored destination, show the route
+                if (window.currentRouteDestination) {
+                    const location = window.currentRouteDestination;
+                    const address = selectedAddress && selectedAddress.textContent !== 'Click on the map to select a delivery location' 
+                        ? selectedAddress.textContent 
+                        : (addressInput ? addressInput.value : '');
+                    
+                    // Update input with selected address
+                    if (selectedAddress && addressInput && selectedAddress.textContent !== 'Click on the map to select a delivery location') {
+                        addressInput.value = selectedAddress.textContent;
+                    }
+                    
+                    // Calculate and show route from office to selected location (like Google Maps)
+                    calculateRoute(location, address);
+                    
+                    // Ensure location info panel is visible
+                    const locationInfo = document.getElementById('selected-location-info');
+                    if (locationInfo) {
+                        locationInfo.style.display = 'block';
+                    }
+                } else if (selectedAddress && addressInput && selectedAddress.textContent !== 'Click on the map to select a delivery location') {
+                    // If no destination stored but there's an address, geocode it and show route
+                    const address = selectedAddress.textContent;
+                    addressInput.value = address;
+                    
+                    // Search for the address and show route
+                    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
+                        const geocoder = new google.maps.Geocoder();
+                        geocoder.geocode({ address: address }, function(results, status) {
+                            if (status === 'OK' && results[0]) {
+                                const location = {
+                                    lat: results[0].geometry.location.lat(),
+                                    lng: results[0].geometry.location.lng()
+                                };
+                                selectLocation(location);
+                            }
+                        });
+                    }
                 }
             });
         }
         
+        // Resize map when sidebar opens
+        setTimeout(() => {
+            if (map) {
+                google.maps.event.trigger(map, 'resize');
+            }
+        }, 500);
+        
+        // Initialize autocomplete after map is ready (wait for Places API to be fully loaded)
+        setTimeout(() => {
+            if (typeof google !== 'undefined' && typeof google.maps !== 'undefined' && typeof google.maps.places !== 'undefined') {
+                initNominatimAutocomplete();
+            } else {
+                console.warn('Places API not ready yet, retrying...');
+                // Retry after a bit more time
+                setTimeout(() => {
+                    initNominatimAutocomplete();
+                }, 500);
+            }
+        }, 300);
+        
     } catch (error) {
-        console.error('Error creating map:', error);
+        console.error('Error creating Google Map:', error);
         const mapElement = document.getElementById('delivery-map');
         if (mapElement) {
             mapElement.innerHTML = '<div class="flex items-center justify-center h-full bg-gray-100 text-gray-600">Error loading map. Please refresh the page.</div>';
         }
     }
-}
+};
 
 // Select location on map
 function selectLocation(location) {
     window.selectLocation = selectLocation;
-    const L = window.L;
     
-    // Remove previous marker
-    if (selectedMarker) {
-        map.removeLayer(selectedMarker);
+    if (!map) {
+        console.error('Map not initialized');
+        return;
     }
-
-    // Add new marker
-    const selectedIcon = L.divIcon({
-        html: `
-            <div style="
-                width: 40px; 
-                height: 40px; 
-                background: #4A4A4A; 
-                border: 3px solid white; 
-                border-radius: 50%; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center;
-                font-size: 20px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            ">
-                📍
-            </div>
-        `,
-        className: 'custom-div-icon',
-        iconSize: [40, 40],
-        iconAnchor: [20, 20]
-    });
-
-    selectedMarker = L.marker([location.lat, location.lng], { icon: selectedIcon })
-        .addTo(map)
-        .bindPopup('Selected Delivery Location');
+    
+    // Store destination globally
+    window.currentRouteDestination = location;
+    
+    // Remove previous marker (we'll let DirectionsRenderer handle markers)
+    if (selectedMarker) {
+        selectedMarker.setMap(null);
+        selectedMarker = null;
+    }
 
     // Show loading state
     const distanceInfo = document.getElementById('distance-info');
     if (distanceInfo) {
         distanceInfo.textContent = 'Getting address...';
     }
+    
+    // Show location info panel
+    const locationInfo = document.getElementById('selected-location-info');
+    if (locationInfo) {
+        locationInfo.style.display = 'block';
+    }
 
-    // Use Nominatim for reverse geocoding
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}`)
-        .then(response => response.json())
-        .then(data => {
-            const address = data.display_name || 'Address not found';
+    // Use Google Geocoding API for reverse geocoding
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: { lat: location.lat, lng: location.lng } }, function(results, status) {
+        if (status === 'OK' && results[0]) {
+            const address = results[0].formatted_address;
             
             // Update UI
             const selectedAddress = document.getElementById('selected-address');
@@ -494,101 +567,130 @@ function selectLocation(location) {
                 addressInput.value = address;
             }
             
-            // Calculate distance and show route
+            // Automatically calculate and show route from office to selected location
+            // This will display the route like Google Maps directions
             calculateRoute(location, address);
-        })
-        .catch(error => {
-            console.error('Error getting address:', error);
+        } else {
+            console.error('Geocoder failed:', status);
+            
+            // Show user-friendly error message
+            if (status === 'REQUEST_DENIED') {
+                const distanceInfo = document.getElementById('distance-info');
+                if (distanceInfo) {
+                    distanceInfo.textContent = 'Please enable Geocoding API in Google Cloud Console';
+                    distanceInfo.style.color = '#ef4444';
+                }
+            }
+            
             const address = `Lat: ${location.lat.toFixed(4)}, Lng: ${location.lng.toFixed(4)}`;
             
             const selectedAddress = document.getElementById('selected-address');
-            
             if (selectedAddress) selectedAddress.textContent = address;
             
+            // Still calculate route even if geocoding fails
             calculateRoute(location, address);
-        });
+        }
+    });
 }
 
-// Calculate route and distance using OpenRouteService
+// Calculate route and distance using Google Directions API
 function calculateRoute(destination, address) {
-    const L = window.L;
+    if (!directionsService || !directionsRenderer || !map) {
+        console.error('Directions service not initialized');
+        return;
+    }
     
     // Show loading state
     const distanceInfo = document.getElementById('distance-info');
     if (distanceInfo) {
-        distanceInfo.textContent = 'Calculating route...';
+        distanceInfo.textContent = 'Calculating route from office...';
     }
 
-    // Use free OpenRouteService
-    const start = `${officeLocation.lng},${officeLocation.lat}`;
-    const end = `${destination.lng},${destination.lat}`;
-    
-    fetch(`https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf6248b4b8b8b8&start=${start}&end=${end}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.features && data.features[0]) {
-                const route = data.features[0];
-                const distance = (route.properties.summary.distance / 1000).toFixed(1);
-                const duration = Math.round(route.properties.summary.duration / 60);
-                
-                // Remove previous route layer
-                if (routeLayer) {
-                    map.removeLayer(routeLayer);
-                }
-                
-                // Draw route on map
-                const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
-                routeLayer = L.polyline(coordinates, {
-                    color: '#CE9704',
-                    weight: 6,
-                    opacity: 0.9,
-                    dashArray: '10, 5'
-                }).addTo(map);
-                
-                // Update distance info
-                if (distanceInfo) {
-                    distanceInfo.textContent = `Distance: ${distance} km • Duration: ${duration} min`;
-                }
-                
-                // Fit map to show entire route
-                const group = new L.featureGroup([routeLayer]);
-                map.fitBounds(group.getBounds().pad(0.1));
-                
-            } else {
-                throw new Error('No route found');
-            }
-        })
-        .catch(error => {
-            console.error('Error calculating route:', error);
+    // Use Google Directions Service - route from office to selected destination
+    const request = {
+        origin: { lat: officeLocation.lat, lng: officeLocation.lng },
+        destination: { lat: destination.lat, lng: destination.lng },
+        travelMode: google.maps.TravelMode.DRIVING,
+        optimizeWaypoints: false
+    };
+
+    directionsService.route(request, function(result, status) {
+        if (status === 'OK') {
+            // Display the route on the map (this automatically draws the route line like Google Maps)
+            // The DirectionsRenderer will show:
+            // - A route line from office to destination
+            // - Markers for origin (office) and destination
+            // - Turn-by-turn directions visualization
+            directionsRenderer.setDirections(result);
             
-            // Fallback: calculate straight line distance
-            const distance = calculateDistance(officeLocation, destination);
+            // Get route information
+            const route = result.routes[0];
+            const leg = route.legs[0];
+            const distance = (leg.distance.value / 1000).toFixed(1); // Convert to km
+            const duration = Math.round(leg.duration.value / 60); // Convert to minutes
             
-            // Remove previous route layer
-            if (routeLayer) {
-                map.removeLayer(routeLayer);
-            }
-            
-            // Draw straight line as fallback
-            routeLayer = L.polyline([
-                [officeLocation.lat, officeLocation.lng],
-                [destination.lat, destination.lng]
-            ], {
-                color: '#CE9704',
-                weight: 4,
-                opacity: 0.6,
-                dashArray: '5, 5'
-            }).addTo(map);
-            
+            // Update distance info (like Google Maps shows)
             if (distanceInfo) {
-                distanceInfo.textContent = `Straight line distance: ${distance.toFixed(1)} km (approximate)`;
+                distanceInfo.textContent = `Distance: ${distance} km • Duration: ${duration} min`;
+                distanceInfo.style.color = '#CE9704';
+                distanceInfo.style.fontWeight = '600';
             }
-        });
+            
+            // Fit map to show entire route (office to destination) with padding
+            // This ensures both origin and destination are visible, just like Google Maps
+            const bounds = new google.maps.LatLngBounds();
+            
+            // Add origin and destination
+            bounds.extend({ lat: officeLocation.lat, lng: officeLocation.lng }); // Office
+            bounds.extend({ lat: destination.lat, lng: destination.lng }); // Destination
+            
+            // Also extend bounds with all route waypoints to show complete route
+            route.legs.forEach(leg => {
+                bounds.extend(leg.start_location);
+                bounds.extend(leg.end_location);
+            });
+            
+            // Fit bounds with padding (like Google Maps does)
+            map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
+            
+        } else {
+            console.error('Directions request failed:', status);
+            
+            // Show user-friendly error message
+            if (status === 'REQUEST_DENIED') {
+                if (distanceInfo) {
+                    distanceInfo.innerHTML = '<span style="color: #ef4444;">Please enable Directions API in Google Cloud Console</span>';
+                }
+                
+                // Fallback: draw a simple line between points
+                const routeLine = new google.maps.Polyline({
+                    path: [
+                        { lat: officeLocation.lat, lng: officeLocation.lng },
+                        { lat: destination.lat, lng: destination.lng }
+                    ],
+                    geodesic: true,
+                    strokeColor: '#CE9704',
+                    strokeOpacity: 0.6,
+                    strokeWeight: 4
+                });
+                routeLine.setMap(map);
+                
+                // Calculate straight line distance
+                const distance = calculateDistance(officeLocation, destination);
+                if (distanceInfo) {
+                    distanceInfo.innerHTML = `<span style="color: #ef4444;">API not enabled. Straight line: ${distance.toFixed(1)} km (approximate)</span>`;
+                }
+            } else {
+                // Fallback: calculate straight line distance
+                const distance = calculateDistance(officeLocation, destination);
+                
+                if (distanceInfo) {
+                    distanceInfo.textContent = `Straight line distance: ${distance.toFixed(1)} km (approximate)`;
+                    distanceInfo.style.color = '#ef4444';
+                }
+            }
+        }
+    });
 }
 
 // Calculate straight line distance
@@ -651,40 +753,53 @@ function toggleSelfPickup() {
 
 // Make checkboxes work like radio buttons (only one selected at a time)
 function initDirectionsPage() {
-    // Open cart sidebar automatically when on directions page
-    // Wait longer to ensure map initializes first
-    setTimeout(() => {
-        const cartSidebar = document.getElementById('cart-sidebar');
+    // Open cart sidebar immediately when on directions page (no delay to avoid layout shift)
+    const cartSidebar = document.getElementById('cart-sidebar');
+    
+    if (cartSidebar) {
+        // Ensure sidebar is open from the start
+        cartSidebar.classList.remove('translate-x-full');
+        cartSidebar.classList.add('translate-x-0');
         
-        if (cartSidebar) {
-            cartSidebar.classList.remove('translate-x-full');
-            cartSidebar.classList.add('translate-x-0');
-            
-            // Show step indicator
-            const stepIndicatorContainer = document.getElementById('step-indicator-container');
-            if (stepIndicatorContainer) {
-                stepIndicatorContainer.style.display = 'block';
-            }
-            
-            // Adjust main content margin
-            const mainContent = document.getElementById('main-content');
-            if (mainContent) {
-                mainContent.classList.add('cart-open');
-                if (window.innerWidth >= 1024) {
-                    mainContent.style.marginRight = '384px';
-                } else if (window.innerWidth >= 640) {
-                    mainContent.style.marginRight = '320px';
-                }
-            }
-            
-            // Recalculate map size when sidebar opens
-            setTimeout(() => {
-                if (typeof window.map !== 'undefined' && window.map) {
-                    window.map.invalidateSize();
-                }
-            }, 300);
+        // Show step indicator
+        const stepIndicatorContainer = document.getElementById('step-indicator-container');
+        if (stepIndicatorContainer) {
+            stepIndicatorContainer.style.display = 'block';
         }
-    }, 2000); // Wait 2 seconds for map to initialize
+        
+        // Set z-index for open cart sidebar (same as in app.blade.php)
+        const nav = document.querySelector('nav');
+        if (nav) {
+            nav.classList.add('sidebar-open');
+            nav.style.zIndex = '5';
+        }
+        const cartContainer = document.getElementById('cart-sidebar-container');
+        if (cartContainer) {
+            cartContainer.style.zIndex = '10';
+        }
+        cartSidebar.style.zIndex = '10';
+        
+        // Use Tailwind classes that are already handled in app.blade.php
+        // Don't modify margins here to avoid layout shift
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+            // The padding is already handled in app.blade.php when sidebar opens
+            // Just ensure it's applied
+            if (window.innerWidth >= 640) {
+                mainContent.classList.add('pr-80');
+            }
+            if (window.innerWidth >= 1024) {
+                mainContent.classList.add('lg:pr-96');
+            }
+        }
+        
+        // Recalculate map size after sidebar is open
+        setTimeout(() => {
+            if (typeof window.map !== 'undefined' && window.map && typeof google !== 'undefined') {
+                google.maps.event.trigger(window.map, 'resize');
+            }
+        }, 100);
+    }
     
     const selfPickup = document.getElementById('self-pickup');
     const noAddress = document.getElementById('no-address');
@@ -711,38 +826,20 @@ function initDirectionsPage() {
         });
     }
     
-    // Initialize autocomplete (using Nominatim)
-    initNominatimAutocomplete();
-    
-    // Cargar mapa: si usamos iframe, no inicializamos Leaflet aquí
-    if (!USE_IFRAME_MAP) {
-        setTimeout(() => {
-            try {
-                initMap();
-            } catch (error) {
-                console.error('Error initializing map:', error);
-                const mapElement = document.getElementById('delivery-map');
-                if (mapElement) {
-                    mapElement.innerHTML = '<div class="flex items-center justify-center h-full bg-gray-100 text-gray-600">Error loading map. Please refresh the page.</div>';
-                }
-            }
-        }, 500);
+    // Load Google Maps API with callback (will initialize autocomplete after map loads)
+    if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD_Nb12Kw5gcqefI5sJNwL45M24vxDh5wM&libraries=places,geometry&callback=initGoogleMap';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
     } else {
-        // Ocultar controles del mapa de Leaflet cuando se usa iframe
-        const mapControls = document.querySelector('.absolute.top-4.right-4');
-        if (mapControls) mapControls.style.display = 'none';
-        // Handshake con iframe
-        const iframe = document.getElementById('delivery-map-iframe');
-        if (iframe) {
-            iframe.addEventListener('load', function() {
-                try {
-                    console.log('Iframe loaded, sending map:parentPing');
-                    iframe.contentWindow && iframe.contentWindow.postMessage({ type: 'map:parentPing' }, '*');
-                } catch (e) {
-                    console.warn('No se pudo enviar postMessage al iframe:', e);
-                }
-            });
-        }
+        // Google Maps already loaded, initialize immediately
+        initGoogleMap();
+        // Initialize autocomplete after a short delay to ensure Places API is ready
+        setTimeout(() => {
+            initNominatimAutocomplete();
+        }, 100);
     }
     
     // Update when-where button based on cart
@@ -791,81 +888,127 @@ if (document.readyState === 'loading') {
     initDirectionsPage();
 }
 
-// Initialize Nominatim autocomplete
+// Initialize Google Places Autocomplete
 function initNominatimAutocomplete() {
     const addressInput = document.getElementById('jobsite-address');
-    if (!addressInput) return;
+    if (!addressInput) {
+        console.warn('Address input not found');
+        return;
+    }
 
-    let timeoutId;
-    const suggestionsDiv = document.createElement('div');
-    suggestionsDiv.id = 'address-suggestions';
-                    suggestionsDiv.className = 'absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 sm:max-h-60 overflow-y-auto';
-    suggestionsDiv.style.display = 'none';
-    addressInput.parentElement.appendChild(suggestionsDiv);
+    // Check if Google Places API is loaded
+    if (typeof google === 'undefined' || typeof google.maps === 'undefined' || typeof google.maps.places === 'undefined') {
+        console.warn('Google Places API not loaded yet, will retry...');
+        // Retry after a delay
+        setTimeout(() => {
+            initNominatimAutocomplete();
+        }, 500);
+        return;
+    }
 
-    addressInput.addEventListener('input', function() {
-        clearTimeout(timeoutId);
-        const query = addressInput.value.trim();
+    // Create autocomplete using Google Places API
+    try {
+        const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+            componentRestrictions: { country: 'us' },
+            fields: ['geometry', 'formatted_address', 'address_components', 'name'],
+            types: ['address', 'establishment', 'geocode']
+        });
 
-        if (query.length < 3) {
-            suggestionsDiv.style.display = 'none';
-            return;
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+            
+            if (!place.geometry) {
+                console.error('No geometry found for place');
+                return;
+            }
+
+            const location = {
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+            };
+
+            // Update map with selected location and show route automatically
+            selectLocation(location);
+            
+            // Center map on selected location first, then route will be shown
+            if (map) {
+                map.setCenter(location);
+                map.setZoom(14);
+            }
+        });
+        
+        console.log('Google Places Autocomplete initialized successfully');
+        
+    } catch (error) {
+        console.error('Error initializing Google Places Autocomplete:', error);
+    }
+    
+    // Always add Enter key and Search button functionality (works with or without autocomplete)
+    addressInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchAddress();
         }
+    });
+    
+    const searchBtn = document.getElementById('search-address-btn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function() {
+            searchAddress();
+        });
+    }
+}
 
-        timeoutId = setTimeout(() => {
-            // Search only in Colorado, USA - append "Colorado" to the query
-            const coloradoQuery = query.includes(', CO') || query.includes('Colorado') ? query : `${query}, Colorado`;
-            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(coloradoQuery)}&limit=5&countrycodes=us`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.length === 0) {
-                        suggestionsDiv.style.display = 'none';
-                        return;
+// Search address function (works with or without autocomplete)
+function searchAddress() {
+    const addressInput = document.getElementById('jobsite-address');
+    if (!addressInput || !addressInput.value.trim()) {
+        return;
+    }
+    
+    const query = addressInput.value.trim();
+    
+    // Show loading state
+    const distanceInfo = document.getElementById('distance-info');
+    if (distanceInfo) {
+        distanceInfo.textContent = 'Searching address...';
+    }
+    
+    // Use Google Geocoding API to search for the address
+    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
+        const geocoder = new google.maps.Geocoder();
+        
+        geocoder.geocode({ address: query }, function(results, status) {
+            if (status === 'OK' && results[0]) {
+                const location = {
+                    lat: results[0].geometry.location.lat(),
+                    lng: results[0].geometry.location.lng()
+                };
+                
+                // Update input with formatted address
+                addressInput.value = results[0].formatted_address;
+                
+                // Select location on map
+                selectLocation(location);
+            } else {
+                console.error('Geocoding failed:', status);
+                if (distanceInfo) {
+                    if (status === 'REQUEST_DENIED') {
+                        distanceInfo.textContent = 'Please enable Geocoding API in Google Cloud Console';
+                    } else {
+                        distanceInfo.textContent = 'Address not found. Please try a different address.';
                     }
-
-                    // Filter results to ensure they're in Colorado
-                    const coloradoResults = data.filter(item => {
-                        const addr = item.display_name.toLowerCase();
-                        return addr.includes('colorado') || addr.includes(', co');
-                    });
-
-                    suggestionsDiv.innerHTML = coloradoResults.map(item => {
-                        return `
-                            <div class="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200 last:border-b-0 address-suggestion" 
-                                 data-lat="${item.lat}" 
-                                 data-lon="${item.lon}" 
-                                 data-name="${item.display_name.replace(/"/g, '&quot;')}">
-                                <div class="text-sm text-gray-900">${item.display_name}</div>
-                            </div>
-                        `;
-                    }).join('');
-                    suggestionsDiv.style.display = coloradoResults.length > 0 ? 'block' : 'none';
-                    
-                    // Add click listeners to suggestions
-                    suggestionsDiv.querySelectorAll('.address-suggestion').forEach(el => {
-                        el.addEventListener('click', function() {
-                            const lat = parseFloat(this.dataset.lat);
-                            const lon = parseFloat(this.dataset.lon);
-                            const name = this.dataset.name;
-                            if (typeof selectAddressSuggestion === 'function') {
-                                selectAddressSuggestion(name, lat, lon);
-                            }
-                        });
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching suggestions:', error);
-                    suggestionsDiv.style.display = 'none';
-                });
-        }, 300);
-    });
-
-    // Hide suggestions when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!addressInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
-            suggestionsDiv.style.display = 'none';
-        }
-    });
+                    distanceInfo.style.color = '#ef4444';
+                    setTimeout(() => {
+                        distanceInfo.textContent = '';
+                        distanceInfo.style.color = '';
+                    }, 5000);
+                }
+            }
+        });
+    } else {
+        console.error('Google Maps not loaded');
+    }
 }
 
 // Select address suggestion
@@ -880,78 +1023,13 @@ window.selectAddressSuggestion = function(address, lat, lng) {
         suggestionsDiv.style.display = 'none';
     }
     
-    // Update map with selected location (both iframe and Leaflet modes)
-    setTimeout(() => {
-        // Try iframe mode first
-        const iframe = document.getElementById('delivery-map-iframe');
-        if (iframe && iframe.contentWindow) {
-            try {
-                console.log('Sending location to iframe:', { lat, lng, address });
-                iframe.contentWindow.postMessage({
-                    type: 'map:selectLocation',
-                    lat: lat,
-                    lng: lng,
-                    address: address
-                }, '*');
-            } catch (e) {
-                console.warn('Error sending to iframe:', e);
-            }
-        }
-        
-        // Also try Leaflet mode if available
-        if (typeof window.selectLocation === 'function') {
-            window.selectLocation({ lat, lng });
-        }
-    }, 100);
+    // Update map with selected location using Google Maps
+    if (typeof window.selectLocation === 'function') {
+        window.selectLocation({ lat, lng });
+    }
 };
 
-// Escuchar selección desde el iframe del mapa
-window.addEventListener('message', function(event) {
-    const data = event.data || {};
-    try { console.log('Map iframe message:', data); } catch (e) {}
-    if (data.type === 'map:locationSelected') {
-        const { address, lat, lng, distanceKm, durationMin } = data;
-        const selectedAddress = document.getElementById('selected-address');
-        const distanceInfo = document.getElementById('distance-info');
-        const addressInput = document.getElementById('jobsite-address');
-        const fallback = (lat && lng) ? `Lat: ${Number(lat).toFixed(4)}, Lng: ${Number(lng).toFixed(4)}` : '';
-        if (selectedAddress) selectedAddress.textContent = address || fallback || 'Location selected';
-        if (addressInput) addressInput.value = address || fallback || '';
-        if (distanceInfo) {
-            if (distanceKm && durationMin != null) {
-                distanceInfo.textContent = `Distance: ${distanceKm} km • Duration: ${durationMin} min`;
-            } else if (distanceKm) {
-                distanceInfo.textContent = `Straight line distance: ${parseFloat(distanceKm).toFixed(1)} km (approximate)`;
-            } else {
-                distanceInfo.textContent = '';
-            }
-        }
-        // Asegurar que el panel sea visible
-        const locationInfo = document.getElementById('selected-location-info');
-        if (locationInfo) locationInfo.style.display = 'block';
-    } else if (data.type === 'map:cleared') {
-        const selectedAddress = document.getElementById('selected-address');
-        const distanceInfo = document.getElementById('distance-info');
-        const addressInput = document.getElementById('jobsite-address');
-        if (selectedAddress) selectedAddress.textContent = 'Click on the map to select a delivery location';
-        if (distanceInfo) distanceInfo.textContent = '';
-        if (addressInput) addressInput.value = '';
-    } else if (data.type === 'map:ready') {
-        // El iframe está listo, enviar ping para sincronizar
-        const iframe = document.getElementById('delivery-map-iframe');
-        if (iframe && iframe.contentWindow) {
-            try {
-                console.log('Received map:ready, sending map:parentPing');
-                iframe.contentWindow.postMessage({ type: 'map:parentPing' }, '*');
-            } catch (e) {
-                console.warn('No se pudo enviar map:parentPing tras map:ready:', e);
-            }
-        }
-    } else if (data.type === 'map:pong') {
-        // Confirmación del handshake
-        try { console.log('Handshake OK (map:pong)'); } catch (e) {}
-    }
-});
+// Google Maps is now integrated, no need for iframe message handling
 
 // Form validation
 function validateForm() {
@@ -962,7 +1040,7 @@ function validateForm() {
     const noAddress = document.getElementById('no-address');
     const selectedAddressEl = document.getElementById('selected-address');
 
-    // Copiar dirección del panel si el input está vacío
+    // Copy address from panel if input is empty
     if (jobsiteAddress && selectedAddressEl && !jobsiteAddress.value.trim()) {
         const txt = selectedAddressEl.textContent || '';
         if (txt && txt !== 'Click on the map to select a delivery location') {
@@ -970,7 +1048,7 @@ function validateForm() {
         }
     }
 
-    // Autocompletar fechas si faltan: hoy y mañana
+    // Auto-fill dates if missing: today and tomorrow
     if (startDate && !startDate.value) {
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -997,7 +1075,7 @@ function validateForm() {
         return false;
     }
 
-    // Solo exigir dirección si no es self-pickup ni no-address
+    // Only require address if not self-pickup or no-address
     if (!selfPickup.checked && !noAddress.checked && !jobsiteAddress.value.trim()) {
         alert('Please enter a jobsite address or select a pickup option.');
         return false;

@@ -334,28 +334,22 @@
         <div id="contact-panel" class="mb-4 bg-white rounded-lg shadow-2xl p-4 transform transition-all duration-300 ease-in-out opacity-0 invisible translate-y-4" style="min-width: 200px;">
             <div class="flex flex-col gap-3">
                 <!-- Messenger -->
-                <a href="https://m.me/rebornrentals" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+                <a href="https://www.messenger.com/t/604615049411143/?messaging_source=source%3Apages%3Amessage_shortlink&source_id=1441792&recurring_notification=0" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group">
                     <img src="{{ asset('icons/messenger.svg') }}" alt="Messenger" class="w-10 h-10 flex-shrink-0" />
                     <span class="text-gray-700 font-medium text-sm group-hover:text-[#CE9704]">Messenger</span>
                 </a>
 
                 <!-- WhatsApp -->
-                <a href="https://wa.me/18001234567" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+                <a href="https://api.whatsapp.com/send/?phone=%2B17207349337&text=Hello%2C%20I%27m%20interested%20in%20your%20rental%20services.%20How%20can%20you%20help%20me%20today?&type=phone_number&app_absent=0" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group">
                     <img src="{{ asset('icons/whatsapp.svg') }}" alt="WhatsApp" class="w-10 h-10 flex-shrink-0" />
                     <span class="text-gray-700 font-medium text-sm group-hover:text-[#CE9704]">WhatsApp</span>
                 </a>
 
-                <!-- Telegram -->
-                <a href="https://t.me/rebornrentals" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group">
-                    <img src="{{ asset('icons/telegram.svg') }}" alt="Telegram" class="w-10 h-10 flex-shrink-0" />
-                    <span class="text-gray-700 font-medium text-sm group-hover:text-[#CE9704]">Telegram</span>
-                </a>
-
                 <!-- Email -->
-                <a href="mailto:Support@RebornRental.com" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+                <button type="button" onclick="openEmailModal()" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group text-left w-full">
                     <img src="{{ asset('icons/email.svg') }}" alt="Email" class="w-10 h-10 flex-shrink-0" />
                     <span class="text-gray-700 font-medium text-sm group-hover:text-[#CE9704]">Email</span>
-                </a>
+                </button>
 
                 <!-- QR Code -->
                 <button type="button" onclick="showQRCode()" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors group text-left w-full">
@@ -379,20 +373,65 @@
     </div>
 
     <!-- QR Code Modal -->
-    <div id="qr-code-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
-        <div class="bg-white rounded-lg max-w-sm w-full p-6 relative">
-            <button onclick="closeQRCode()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">Scan QR Code</h3>
-            <div class="flex justify-center mb-4">
-                <div class="w-48 h-48 bg-gray-200 rounded-lg flex items-center justify-center">
-                    <p class="text-gray-500 text-sm">QR Code Placeholder</p>
+    <div id="qr-code-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-[#2F2F2F] rounded-2xl max-w-md w-full p-5 sm:p-6 md:p-8 relative shadow-2xl my-auto">
+            <!-- Logo -->
+            <div class="flex justify-center mb-4 sm:mb-5">
+                <img src="{{ asset('Logo.png') }}" alt="Reborn Rental" class="h-12 sm:h-16 md:h-20 w-auto object-contain" />
+            </div>
+            
+            <!-- Title -->
+            <h3 class="text-xl sm:text-2xl md:text-3xl font-bold text-white text-center mb-3 sm:mb-4">Scan QR Code</h3>
+            
+            <!-- Description -->
+            <p class="text-white text-xs sm:text-sm md:text-base text-center mb-4 sm:mb-5 px-1 sm:px-2 leading-relaxed">
+                Scan this QR code to get all our contact information.
+            </p>
+            
+            <!-- QR Code Container -->
+            <div class="flex justify-center mb-4 sm:mb-5">
+                <div class="bg-white rounded-lg p-3 sm:p-4 flex items-center justify-center">
+                    <img src="{{ asset('qr-code.webp') }}" alt="QR Code" class="max-w-full h-auto w-64 sm:w-72 md:w-80" />
                 </div>
             </div>
-            <p class="text-sm text-gray-600 text-center">Scan this QR code to contact us or visit our website</p>
+            
+            <!-- Done Button -->
+            <button onclick="closeQRCode()" class="w-full bg-[#CE9704] hover:bg-[#B8860B] text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-semibold text-sm sm:text-base md:text-lg transition-colors duration-200">
+                Done
+            </button>
+        </div>
+    </div>
+
+    <!-- Email Modal -->
+    <div id="email-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-[#2F2F2F] rounded-2xl max-w-md w-full p-5 sm:p-6 md:p-8 relative shadow-2xl my-auto">
+            <!-- Logo -->
+            <div class="flex justify-center mb-4 sm:mb-5">
+                <img src="{{ asset('Logo.png') }}" alt="Reborn Rental" class="h-12 sm:h-16 md:h-20 w-auto object-contain" />
+            </div>
+            
+            <!-- Title -->
+            <h3 class="text-xl sm:text-2xl md:text-3xl font-bold text-white text-center mb-3 sm:mb-4">Copy Email Address</h3>
+            
+            <!-- Description -->
+            <p class="text-white text-xs sm:text-sm md:text-base text-center mb-4 sm:mb-5 px-1 sm:px-2 leading-relaxed">
+                Feel free to email us to get assistance with your purchase, or if you have any questions.
+            </p>
+            
+            <!-- Email Field with Copy Button -->
+            <div class="bg-white rounded-lg p-3 sm:p-4 mb-4 sm:mb-5 flex items-center justify-between gap-2 sm:gap-3">
+                <span id="email-address" class="text-gray-800 font-medium text-xs sm:text-sm md:text-base flex-1 text-center break-all">support@rebornrental.com</span>
+                <button onclick="copyEmail()" class="flex-shrink-0 p-1.5 sm:p-2 hover:bg-gray-100 rounded transition-colors" title="Copy email">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Done Button -->
+            <button onclick="closeEmailModal()" class="w-full bg-[#CE9704] hover:bg-[#B8860B] text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-semibold text-sm sm:text-base md:text-lg transition-colors duration-200">
+                Done
+            </button>
         </div>
     </div>
 
@@ -660,6 +699,99 @@
                     });
                 }
             }
+            
+            // Setup social media links in menu sidebar
+            function setupMenuSidebarSocialLinks() {
+                const facebookLink = document.getElementById('facebook-link');
+                const instagramLink = document.getElementById('instagram-link');
+                const linkedinLink = document.getElementById('linkedin-link');
+                const careersLink = document.getElementById('careers-link');
+                
+                if (facebookLink) {
+                    facebookLink.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        window.open('https://www.facebook.com/rebornrentals/', '_blank', 'noopener,noreferrer');
+                    }, true);
+                }
+                
+                if (instagramLink) {
+                    instagramLink.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        window.open('https://www.instagram.com/reborn_rentals/', '_blank', 'noopener,noreferrer');
+                    }, true);
+                }
+                
+                if (linkedinLink) {
+                    linkedinLink.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        window.open('https://www.linkedin.com/company/reborn-rental/', '_blank', 'noopener,noreferrer');
+                    }, true);
+                }
+                
+                if (careersLink) {
+                    careersLink.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        window.open('https://grb-group.com/en/open-opportunities/', '_blank', 'noopener,noreferrer');
+                    }, true);
+                }
+            }
+            
+            // Setup legal & policies links in menu sidebar
+            function setupMenuSidebarLegalLinks() {
+                const termsLink = document.getElementById('terms-link');
+                const privacyLink = document.getElementById('privacy-link');
+                const feesLink = document.getElementById('fees-link');
+                
+                if (termsLink) {
+                    termsLink.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        // Allow default navigation
+                        window.location.href = this.href;
+                    }, true);
+                }
+                
+                if (privacyLink) {
+                    privacyLink.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        // Allow default navigation
+                        window.location.href = this.href;
+                    }, true);
+                }
+                
+                if (feesLink) {
+                    feesLink.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        // Allow default navigation
+                        window.location.href = this.href;
+                    }, true);
+                }
+            }
+            
+            // Setup immediately and also when sidebar opens
+            setupMenuSidebarSocialLinks();
+            setupMenuSidebarLegalLinks();
+            setTimeout(function() {
+                setupMenuSidebarSocialLinks();
+                setupMenuSidebarLegalLinks();
+            }, 500);
+            
+            // Re-setup when menu sidebar is opened
+            if (menuBtn && menuSidebar) {
+                const originalMenuClick = menuBtn.onclick;
+                menuBtn.addEventListener('click', function() {
+                    setTimeout(function() {
+                        setupMenuSidebarSocialLinks();
+                        setupMenuSidebarLegalLinks();
+                    }, 100);
+                });
+            }
         });
 
         // CSRF Token for AJAX
@@ -698,16 +830,16 @@
             
             // Remove all active states from tabs
             if (tab1) {
-                tab1.classList.remove('bg-[#CE9704]', 'text-white');
-                tab1.classList.add('bg-gray-600', 'text-gray-300');
+                tab1.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
+                tab1.classList.add('bg-gray-700', 'border-gray-600');
             }
             if (tab2) {
-                tab2.classList.remove('bg-[#CE9704]', 'text-white');
-                tab2.classList.add('bg-gray-600', 'text-gray-300');
+                tab2.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
+                tab2.classList.add('bg-gray-700', 'border-gray-600');
             }
             if (tab3) {
-                tab3.classList.remove('bg-[#CE9704]', 'text-white');
-                tab3.classList.add('bg-gray-600', 'text-gray-300');
+                tab3.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
+                tab3.classList.add('bg-gray-700', 'border-gray-600');
             }
             
             // Set active step based on current page
@@ -717,8 +849,8 @@
                     step1.classList.add('text-[#CE9704]');
                 }
                 if (tab1) {
-                    tab1.classList.remove('bg-gray-600', 'text-gray-300');
-                    tab1.classList.add('bg-[#CE9704]', 'text-white');
+                    tab1.classList.remove('bg-gray-700', 'border-gray-600');
+                    tab1.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
                 }
             } else if (currentPath.includes('directions')) {
                 if (step2) {
@@ -726,8 +858,8 @@
                     step2.classList.add('text-[#CE9704]');
                 }
                 if (tab2) {
-                    tab2.classList.remove('bg-gray-600', 'text-gray-300');
-                    tab2.classList.add('bg-[#CE9704]', 'text-white');
+                    tab2.classList.remove('bg-gray-700', 'border-gray-600');
+                    tab2.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
                 }
             } else if (currentPath.includes('checkout')) {
                 if (step3) {
@@ -735,8 +867,8 @@
                     step3.classList.add('text-[#CE9704]');
                 }
                 if (tab3) {
-                    tab3.classList.remove('bg-gray-600', 'text-gray-300');
-                    tab3.classList.add('bg-[#CE9704]', 'text-white');
+                    tab3.classList.remove('bg-gray-700', 'border-gray-600');
+                    tab3.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
                 }
             }
         }
@@ -754,11 +886,11 @@
                     
                     // Update tab styles
                     stepTabs.forEach(t => {
-                        t.classList.remove('bg-[#CE9704]', 'text-white');
-                        t.classList.add('bg-gray-600', 'text-gray-300');
+                        t.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
+                        t.classList.add('bg-gray-700', 'border-gray-600');
                     });
-                    this.classList.remove('bg-gray-600', 'text-gray-300');
-                    this.classList.add('bg-[#CE9704]', 'text-white');
+                    this.classList.remove('bg-gray-700', 'border-gray-600');
+                    this.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
                     
                     // Update step indicators
                     if (stepIndicator1 && stepIndicator2 && stepIndicator3) {
@@ -847,6 +979,39 @@
             }
         }
 
+        function openEmailModal() {
+            const modal = document.getElementById('email-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeEmailModal() {
+            const modal = document.getElementById('email-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function copyEmail() {
+            const email = 'support@rebornrental.com';
+            navigator.clipboard.writeText(email).then(function() {
+                // Show feedback
+                const emailField = document.getElementById('email-address');
+                const originalText = emailField.textContent;
+                emailField.textContent = 'Copied!';
+                emailField.classList.add('text-green-600');
+                
+                setTimeout(function() {
+                    emailField.textContent = originalText;
+                    emailField.classList.remove('text-green-600');
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Failed to copy email:', err);
+                alert('Failed to copy email. Please copy manually: ' + email);
+            });
+        }
+
         // Close contact panel when clicking outside
         document.addEventListener('click', function(event) {
             const container = document.getElementById('contact-float-container');
@@ -882,6 +1047,14 @@
             const modal = document.getElementById('callback-modal');
             if (modal && event.target === modal) {
                 closeCallback();
+            }
+        });
+
+        // Close Email modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('email-modal');
+            if (modal && event.target === modal) {
+                closeEmailModal();
             }
         });
 

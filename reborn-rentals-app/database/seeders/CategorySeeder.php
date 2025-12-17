@@ -10,11 +10,8 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['name' => 'Excavators', 'description' => 'Heavy machinery for excavation'],
-            ['name' => 'Mixers', 'description' => 'Concrete and material mixers'],
-            ['name' => 'Pans & Containers', 'description' => 'Washout pans and containers'],
-            ['name' => 'Generators', 'description' => 'Power generators for job sites'],
-            ['name' => 'Trailers', 'description' => 'Utility trailers'],
+            ['name' => 'Washout Pans', 'description' => 'Concrete washout pans'],
+            ['name' => 'Lids', 'description' => 'Lids for containers'],
         ];
 
         foreach ($categories as $category) {
