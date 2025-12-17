@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', $category->name . ' - Category Details')
 
 @section('content')
-<div class="ml-0 md:ml-64">
+<div class="ml-0 md:ml-72">
     <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40 px-6 py-4 flex justify-between items-center">
         <div class="flex items-center gap-4">
             <a href="{{ route('admin.categories.index') }}" class="text-[#CE9704] hover:text-[#B8860B] transition-colors">
@@ -120,7 +120,6 @@
     </main>
 </div>
 
-@include('admin.sidebar')
 
 <!-- Edit Category Modal -->
 <div id="edit-category-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none; pointer-events: none;">

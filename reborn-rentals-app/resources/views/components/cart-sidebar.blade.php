@@ -1,6 +1,6 @@
 <!-- Cart Sidebar (Right) -->
 <div id="cart-sidebar-container" class="fixed top-0 right-0 h-screen overflow-visible z-10">
-    <div id="cart-sidebar" class="text-white w-full sm:w-80 lg:w-96 max-w-[85vw] bg-[#2F2F2F] shadow-2xl translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto scrollbar-hide h-full relative" style="overflow-x: visible;">
+    <div id="cart-sidebar" class="text-white w-full sm:w-80 lg:w-96 max-w-[85vw] bg-[#2F2F2F] shadow-2xl translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto scrollbar-hide h-full relative" style="overflow-x: visible;">
    
     
     <div class="p-4 sm:p-6 md:p-8 min-h-full flex flex-col">

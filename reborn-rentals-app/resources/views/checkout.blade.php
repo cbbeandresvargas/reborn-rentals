@@ -3,25 +3,26 @@
 @section('title', 'Checkout Summary - Reborn Rentals')
 
 @section('content')
-<main class="min-h-screen bg-gray-50 py-4 sm:py-6 md:py-8">
-    <div class="max-w-4xl mx-auto px-3 sm:px-4 md:px-6">
+<!-- Step 3: Checkout Summary -->
+<div class="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 mt-4 sm:mt-8 md:mt-12 lg:mt-20 mb-8 sm:mb-12 md:mb-16 lg:mb-20">
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden p-3 sm:p-4 md:p-6 lg:p-8">
         <!-- Header -->
         <div class="mb-6 sm:mb-8">
             <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Checkout Summary</h1>
             <p class="text-sm sm:text-base text-gray-600">Review your rental items and complete your order</p>
         </div>
-
+        
         @if(session('error'))
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             {{ session('error') }}
         </div>
         @endif
-
+        
         <form method="POST" action="{{ route('checkout.store') }}">
             @csrf
             
             <!-- Checkout Content -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div>
                 <!-- Items Section -->
                 <div class="p-4 sm:p-6 border-b border-gray-200">
                     <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Items: {{ count($cart) }}</h2>
@@ -114,7 +115,7 @@
             </div>
         </form>
     </div>
-</main>
+</div>
 
 <script>
 // Open cart sidebar automatically when on checkout page
@@ -129,17 +130,6 @@ setTimeout(() => {
         const stepIndicatorContainer = document.getElementById('step-indicator-container');
         if (stepIndicatorContainer) {
             stepIndicatorContainer.style.display = 'block';
-        }
-        
-        // Adjust main content margin
-        const mainContent = document.getElementById('main-content');
-        if (mainContent) {
-            mainContent.classList.add('cart-open');
-            if (window.innerWidth >= 1024) {
-                mainContent.style.marginRight = '384px';
-            } else if (window.innerWidth >= 640) {
-                mainContent.style.marginRight = '320px';
-            }
         }
         
         // Hide cart header and proceed button on checkout page

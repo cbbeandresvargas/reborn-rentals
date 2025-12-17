@@ -17,10 +17,34 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::check()) {
+            $host = $request->getHost();
+            $parts = explode('.', $host);
+            $subdomain = count($parts) > 2 ? $parts[0] : null;
+            $isLocalhost = in_array($host, ['localhost', '127.0.0.1']) || str_contains($host, 'localhost');
+            
+            // Si estamos en el subdominio admin o en localhost con ruta /admin
+            if ($subdomain === 'admin' || (app()->environment('local') && $isLocalhost && $request->is('admin*'))) {
+                return redirect()->route('admin.login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
+            }
+            
             return redirect()->route('login')->with('error', 'You must be logged in to access this page.');
         }
 
         if (Auth::user()->role !== 'admin') {
+            $host = $request->getHost();
+            $parts = explode('.', $host);
+            $subdomain = count($parts) > 2 ? $parts[0] : null;
+            $isLocalhost = in_array($host, ['localhost', '127.0.0.1']) || str_contains($host, 'localhost');
+            
+            // Si no es admin y está en el subdominio admin o ruta /admin
+            if ($subdomain === 'admin' || (app()->environment('local') && $isLocalhost && $request->is('admin*'))) {
+                if ($isLocalhost) {
+                    return redirect()->route('home')->with('error', 'No tienes permisos para acceder al panel de administración.');
+                }
+                $mainUrl = 'http://' . config('app.domain', 'rebornrentals.com');
+                return redirect($mainUrl)->with('error', 'No tienes permisos para acceder al panel de administración.');
+            }
+            
             return redirect()->route('home')->with('error', 'You do not have permission to access the admin panel.');
         }
 

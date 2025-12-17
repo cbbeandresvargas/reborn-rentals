@@ -57,7 +57,7 @@
         <!-- Google Maps -->
         <div class="rounded-xl overflow-hidden border border-gray-200 mb-8">
             <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3077.576787884259!2d-119.80605779999999!3d39.5240405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x809940b3fe48bd53%3A0x4e3afeee9f24c1bc!2s401%20Ryland%20St%20Suite%20200-A%2C%20Reno%2C%20NV%2089502%2C%20EE.%20UU.!5e0!3m2!1ses-419!2sbo!4v1761325010616!5m2!1ses-419!2sbo" 
+                src="https://www.google.com/maps?q=39.726372,-105.055759&hl=es&z=14&output=embed&markers=39.726372,-105.055759" 
                 width="100%" 
                 height="420" 
                 style="border:0;" 
@@ -73,10 +73,8 @@
             <div>
                 <h5 class="text-base md:text-lg font-semibold text-gray-900 mb-2">Our Address</h5>
                 <div class="space-y-1 text-gray-700">
-                    <p>401 Ryland St.</p>
-                    <p>Ste 200 A</p>
-                    <p>Reno, NV 89502</p>
-                    <p>Denver, CO 80202</p>
+                    <p>39°43'34.9"N 105°03'20.7"W</p>
+                    <p>Denver, CO</p>
                     <p>United States</p>
                 </div>
             </div>

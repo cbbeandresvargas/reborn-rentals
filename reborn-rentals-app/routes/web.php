@@ -8,13 +8,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\PageController;
-use App\Http\Controllers\Admin\ProductController as AdminProductController;
-use App\Http\Controllers\Admin\OrderController as AdminOrderController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
-use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,9 +37,11 @@ Route::get('/cart', [CartController::class, 'show'])->name('cart.show')->middlew
 Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.applyCoupon');
 Route::delete('/cart/remove-coupon', [CartController::class, 'removeCoupon'])->name('cart.removeCoupon');
 
-// Checkout (requiere autenticación)
+// Checkout
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+
+// Checkout (acciones) y Órdenes que requieren autenticación
 Route::middleware('auth')->group(function () {
-    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::post('/checkout/send-verification-code', [CheckoutController::class, 'sendVerificationCode'])->name('checkout.send-verification-code');
     Route::post('/checkout/verify-code', [CheckoutController::class, 'verifyCode'])->name('checkout.verify-code');
@@ -73,23 +69,3 @@ Route::get('/terms-conditions', [PageController::class, 'terms'])->name('terms')
 Route::get('/directions', [PageController::class, 'directions'])->name('directions');
 Route::get('/blog', [PageController::class, 'blog'])->name('blog');
 Route::get('/blog/{slug}', [PageController::class, 'showPost'])->name('blog.post');
-
-// Admin Panel (requiere autenticación y rol admin)
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', [AdminController::class, 'index'])->name('dashboard');
-    
-    // Products CRUD
-    Route::resource('products', AdminProductController::class);
-    
-    // Orders CRUD
-    Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update', 'destroy']);
-    
-    // Users CRUD
-    Route::resource('users', AdminUserController::class);
-    
-    // Categories CRUD
-    Route::resource('categories', AdminCategoryController::class)->except(['create', 'edit']);
-    
-    // Coupons CRUD
-    Route::resource('coupons', AdminCouponController::class);
-});

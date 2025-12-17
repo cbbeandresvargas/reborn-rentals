@@ -1,84 +1,147 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Products - Admin Panel')
 
 @section('content')
-<div class="ml-0 md:ml-64">
-    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
-        <div class="px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">Products</h1>
-            <button onclick="openCreateProductModal()" class="bg-[#CE9704] text-white px-4 py-2 rounded-lg hover:bg-[#B8860B] transition-colors">
-                + Add Product
-            </button>
+<div class="ml-0 md:ml-72 bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-white via-gray-50 to-white shadow-lg border-b-2 border-[#CE9704]/20 sticky top-0 z-40 backdrop-blur-sm">
+        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#CE9704] to-[#B8860B] bg-clip-text text-transparent">Product Management</h1>
+                    <p class="text-sm text-gray-600 mt-1">Manage your product catalog</p>
+                </div>
+                <button onclick="openCreateProductModal()" class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-[#CE9704] to-[#B8860B] text-white rounded-lg hover:shadow-lg transition-all duration-200 font-semibold text-sm shadow-md">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add Product
+                </button>
+            </div>
         </div>
     </header>
     
-    <main class="p-6">
+    <main class="p-4 sm:p-6 lg:p-8">
         @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            {{ session('success') }}
+        <div class="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-lg shadow-sm">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="font-medium">{{ session('success') }}</span>
+            </div>
         </div>
         @endif
 
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-            <table class="w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    @forelse($products as $product)
-                    <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location.href='{{ route('admin.products.show', $product) }}'">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center">
-                                <img src="{{ $product->image_url ? asset($product->image_url) : asset('Product1.png') }}" alt="{{ $product->name }}" class="w-12 h-12 object-contain mr-3">
-                                <div>
-                                    <div class="font-medium text-gray-900">{{ $product->name }}</div>
-                                    <div class="text-sm text-gray-500">ID: {{ $product->id }}</div>
+        <!-- Products Table -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-gray-50 to-white px-4 sm:px-6 lg:px-8 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg sm:text-xl font-bold text-gray-800">Products Catalog</h2>
+                    <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full font-medium">
+                        {{ $products->total() }} {{ $products->total() === 1 ? 'Product' : 'Products' }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <tr>
+                            <th class="px-4 sm:px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-b-2 border-[#CE9704]/30">Product</th>
+                            <th class="px-4 sm:px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-b-2 border-[#CE9704]/30 hidden md:table-cell">Category</th>
+                            <th class="px-4 sm:px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-b-2 border-[#CE9704]/30">Price</th>
+                            <th class="px-4 sm:px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-b-2 border-[#CE9704]/30">Status</th>
+                            <th class="px-4 sm:px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-b-2 border-[#CE9704]/30">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        @forelse($products as $product)
+                        <tr class="hover:bg-gradient-to-r hover:from-[#CE9704]/5 hover:to-transparent transition-all duration-150 group">
+                            <td class="px-4 sm:px-6 py-4">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-14 w-14 sm:h-16 sm:w-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg p-2 border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow">
+                                        <img src="{{ $product->image_url ? asset($product->image_url) : asset('Product1.png') }}" alt="{{ $product->name }}" class="w-full h-full object-contain">
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="font-bold text-gray-900 text-sm sm:text-base">{{ $product->name }}</div>
+                                        <div class="text-xs text-gray-500 mt-1">ID: #{{ $product->id }}</div>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-500">{{ $product->category->name ?? 'N/A' }}</td>
-                        <td class="px-6 py-4 text-sm font-semibold text-gray-900">${{ number_format($product->price, 2) }}</td>
-                        <td class="px-6 py-4">
-                            <span class="px-2 py-1 text-xs rounded-full {{ $product->active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                {{ $product->active ? 'Active' : 'Inactive' }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-500">
-                            Click to view details →
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">No products found</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                            </td>
+                            <td class="px-4 sm:px-6 py-4 text-sm text-gray-700 font-medium hidden md:table-cell">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-gray-100 text-gray-700 text-xs font-semibold">
+                                    {{ $product->category->name ?? 'Uncategorized' }}
+                                </span>
+                            </td>
+                            <td class="px-4 sm:px-6 py-4">
+                                <span class="text-base sm:text-lg font-bold text-gray-900">${{ number_format($product->price, 2) }}</span>
+                            </td>
+                            <td class="px-4 sm:px-6 py-4">
+                                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold {{ $product->active ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200' }}">
+                                    <span class="w-2 h-2 mr-1.5 rounded-full {{ $product->active ? 'bg-green-500' : 'bg-red-500' }}"></span>
+                                    {{ $product->active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            <td class="px-4 sm:px-6 py-4">
+                                <a href="{{ route('admin.products.show', $product) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#CE9704] to-[#B8860B] text-white rounded-lg hover:shadow-lg transition-all duration-200 text-xs sm:text-sm font-semibold">
+                                    View Details
+                                    <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="px-4 sm:px-6 py-12 text-center">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
+                                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                        </svg>
+                                    </div>
+                                    <p class="text-gray-600 font-semibold text-lg mb-1">No products found</p>
+                                    <p class="text-sm text-gray-500">Get started by creating your first product</p>
+                                    <button onclick="openCreateProductModal()" class="mt-4 inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#CE9704] to-[#B8860B] text-white rounded-lg hover:shadow-lg transition-all duration-200 text-sm font-semibold">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                        </svg>
+                                        Create First Product
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="mt-4">
-            {{ $products->links() }}
+        <!-- Pagination -->
+        @if($products->hasPages())
+        <div class="mt-6 flex justify-center">
+            <div class="bg-white rounded-lg shadow-md border border-gray-200 p-2">
+                {{ $products->links() }}
+            </div>
         </div>
+        @endif
     </main>
 </div>
 
-@include('admin.sidebar')
 
 <!-- Create Product Modal -->
-<div id="create-product-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none; pointer-events: none;">
-    <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+<div id="create-product-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none; pointer-events: none;">
+    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-[#CE9704]/20">
         <!-- Header -->
-        <div class="p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+        <div class="bg-gradient-to-r from-[#CE9704] to-[#B8860B] p-6 sticky top-0 z-10">
             <div class="flex items-center justify-between">
-                <h2 class="text-2xl font-bold text-gray-800">Create Product</h2>
-                <button onclick="closeCreateProductModal()" class="text-gray-400 hover:text-gray-600">
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Create New Product</h2>
+                    <p class="text-sm text-white/90 mt-1">Add a new product to your catalog</p>
+                </div>
+                <button onclick="closeCreateProductModal()" class="text-white hover:bg-white/20 rounded-full p-2 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -87,32 +150,42 @@
         </div>
         
         <!-- Form -->
-        <form action="{{ route('admin.products.store') }}" method="POST" id="create-product-form" enctype="multipart/form-data" class="p-6">
+        <form action="{{ route('admin.products.store') }}" method="POST" id="create-product-form" enctype="multipart/form-data" class="p-6 sm:p-8">
             @csrf
 
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-700 mb-2">
+                    Product Name <span class="text-red-500">*</span>
+                </label>
                 <input type="text" name="name" id="product-name" value="{{ old('name') }}" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] {{ $errors->has('name') ? 'border-red-500' : '' }}">
-                <div id="name-error" class="text-red-500 text-sm mt-1 {{ $errors->has('name') ? '' : 'hidden' }}">
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] transition-all {{ $errors->has('name') ? 'border-red-500' : '' }}"
+                    placeholder="Enter product name">
+                <div id="name-error" class="text-red-600 text-sm mt-1 font-medium {{ $errors->has('name') ? '' : 'hidden' }}">
                     @if($errors->has('name'))
                         {{ $errors->first('name') }}
                     @endif
                 </div>
             </div>
 
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                <textarea name="description" id="product-description" rows="3"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]">{{ old('description') }}</textarea>
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Description</label>
+                <textarea name="description" id="product-description" rows="4"
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] transition-all resize-none"
+                    placeholder="Enter product description">{{ old('description') }}</textarea>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Price *</label>
-                    <input type="number" name="price" id="product-price" step="0.01" value="{{ old('price') }}" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] {{ $errors->has('price') ? 'border-red-500' : '' }}">
-                    <div id="price-error" class="text-red-500 text-sm mt-1 {{ $errors->has('price') ? '' : 'hidden' }}">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Price <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold">$</span>
+                        <input type="number" name="price" id="product-price" step="0.01" value="{{ old('price') }}" required
+                            class="w-full pl-8 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] transition-all {{ $errors->has('price') ? 'border-red-500' : '' }}"
+                            placeholder="0.00">
+                    </div>
+                    <div id="price-error" class="text-red-600 text-sm mt-1 font-medium {{ $errors->has('price') ? '' : 'hidden' }}">
                         @if($errors->has('price'))
                             {{ $errors->first('price') }}
                         @endif
@@ -120,9 +193,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Category</label>
                     <select name="category_id" id="product-category"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]">
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] transition-all bg-white">
                         <option value="">Select Category</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
@@ -133,21 +206,30 @@
                 </div>
             </div>
 
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Image</label>
-                <input type="file" name="image" id="product-image" accept="image/*"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]">
-                <div id="image-error" class="text-red-500 text-sm mt-1 {{ $errors->has('image') ? '' : 'hidden' }}">
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Product Image</label>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#CE9704] transition-colors">
+                    <input type="file" name="image" id="product-image" accept="image/*"
+                        class="hidden">
+                    <label for="product-image" class="cursor-pointer">
+                        <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <p class="text-sm text-gray-600 font-medium">Click to upload image</p>
+                        <p class="text-xs text-gray-500 mt-1">PNG, JPG up to 2MB</p>
+                    </label>
+                </div>
+                <div id="image-error" class="text-red-600 text-sm mt-1 font-medium {{ $errors->has('image') ? '' : 'hidden' }}">
                     @if($errors->has('image'))
                         {{ $errors->first('image') }}
                     @endif
                 </div>
                 <!-- Image Preview -->
                 <div id="image-preview-container" class="mt-4 hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Preview:</label>
-                    <div class="relative inline-block">
-                        <img id="image-preview" src="" alt="Preview" class="max-w-xs max-h-64 rounded-lg border border-gray-300 shadow-sm object-contain">
-                        <button type="button" onclick="clearImagePreview()" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Preview:</label>
+                    <div class="relative inline-block border-2 border-[#CE9704] rounded-lg p-2 bg-gray-50">
+                        <img id="image-preview" src="" alt="Preview" class="max-w-xs max-h-64 rounded-lg object-contain">
+                        <button type="button" onclick="clearImagePreview()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors shadow-lg">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -156,20 +238,20 @@
                 </div>
             </div>
 
-            <div class="mb-6">
-                <label class="flex items-center">
+            <div class="mb-8">
+                <label class="flex items-center p-4 bg-gray-50 rounded-lg border-2 border-gray-200 hover:border-[#CE9704] transition-colors cursor-pointer">
                     <input type="checkbox" name="active" id="product-active" value="1" {{ old('active') ? 'checked' : 'checked' }}
-                        class="w-4 h-4 text-[#CE9704] border-gray-300 rounded focus:ring-[#CE9704]">
-                    <span class="ml-2 text-sm text-gray-700">Active</span>
+                        class="w-5 h-5 text-[#CE9704] border-gray-300 rounded focus:ring-[#CE9704]">
+                    <span class="ml-3 text-sm font-semibold text-gray-700">Product is active and visible to customers</span>
                 </label>
             </div>
 
-            <div class="flex gap-3">
-                <button type="submit" class="bg-[#CE9704] text-white px-6 py-2 rounded-lg hover:bg-[#B8860B] transition-colors">
-                    Create Product
-                </button>
-                <button type="button" onclick="closeCreateProductModal()" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+            <div class="flex flex-col sm:flex-row gap-3 sm:justify-end pt-6 border-t border-gray-200">
+                <button type="button" onclick="closeCreateProductModal()" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
                     Cancel
+                </button>
+                <button type="submit" class="px-6 py-3 bg-gradient-to-r from-[#CE9704] to-[#B8860B] text-white rounded-lg hover:shadow-lg transition-all duration-200 font-bold">
+                    Create Product
                 </button>
             </div>
         </form>
@@ -231,6 +313,7 @@ function clearImagePreview() {
     const previewContainer = document.getElementById('image-preview-container');
     const preview = document.getElementById('image-preview');
     const fileInput = document.getElementById('product-image');
+    const uploadArea = document.querySelector('label[for="product-image"]')?.closest('.border-dashed');
     
     if (previewContainer) {
         previewContainer.classList.add('hidden');
@@ -240,6 +323,9 @@ function clearImagePreview() {
     }
     if (fileInput) {
         fileInput.value = '';
+    }
+    if (uploadArea) {
+        uploadArea.classList.remove('hidden');
     }
 }
 
@@ -257,6 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle create image preview
     const imageInput = document.getElementById('product-image');
+    const imageLabel = document.querySelector('label[for="product-image"]');
     if (imageInput) {
         imageInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -286,6 +373,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     if (previewContainer) {
                         previewContainer.classList.remove('hidden');
+                    }
+                    // Hide upload area when image is selected
+                    if (imageLabel && imageLabel.closest('.border-dashed')) {
+                        imageLabel.closest('.border-dashed').classList.add('hidden');
                     }
                 };
                 reader.readAsDataURL(file);

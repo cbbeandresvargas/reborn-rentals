@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Users - Admin Panel')
 
 @section('content')
-<div class="ml-0 md:ml-64">
+<div class="ml-0 md:ml-72">
     <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
         <div class="px-6 py-4 flex justify-between items-center">
             <h1 class="text-2xl font-bold text-gray-800">Users</h1>
@@ -64,6 +64,5 @@
     </main>
 </div>
 
-@include('admin.sidebar')
 @endsection
 

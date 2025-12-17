@@ -119,7 +119,7 @@
                         <!-- Google Maps iframe (hidden by default, shown for self-pickup and no-address) -->
                         <div id="google-maps-static" class="w-full h-72 sm:h-96 md:h-[500px] lg:h-[600px] xl:h-[700px] rounded-xl overflow-hidden border-2 border-gray-300 shadow-2xl hidden">
                             <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3077.576787884259!2d-119.80605779999999!3d39.5240405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x809940b3fe48bd53%3A0x4e3afeee9f24c1bc!2s401%20Ryland%20St%20Suite%20200-A%2C%20Reno%2C%20NV%2089502%2C%20EE.%20UU.!5e0!3m2!1ses-419!2sbo!4v1761325010616!5m2!1ses-419!2sbo" 
+                                src="https://www.google.com/maps?q=39.726372,-105.055759&hl=es&z=14&output=embed&markers=39.726372,-105.055759" 
                                 width="100%" 
                                 height="100%" 
                                 style="border:0;" 
@@ -216,10 +216,8 @@
                         <div>
                             <h4 class="text-sm sm:text-base font-semibold text-gray-900 mb-2 sm:mb-3">Our Address</h4>
                             <div class="space-y-0.5 sm:space-y-1 text-xs sm:text-sm text-gray-700">
-                                <p>401 Ryland St.</p>
-                                <p>Ste 200 A</p>
-                                <p>Reno, NV 89502</p>
-                                <p>Denver, CO 80202</p>
+                                <p>39°43'34.9"N 105°03'20.7"W</p>
+                                <p>Denver, CO</p>
                                 <p>United States</p>
                             </div>
                         </div>
@@ -321,9 +319,9 @@ window.map = null;
 
 // Reborn Rentals Office coordinates
 const officeLocation = {
-    lat: 39.5240405,
-    lng: -119.80605779999999,
-    address: "401 Ryland St Suite 200-A, Reno, NV 89502, USA"
+    lat: 39.726372,
+    lng: -105.055759,
+    address: "39°43'34.9\"N 105°03'20.7\"W, Denver, CO, USA"
 };
 
 // Initialize Google Map
@@ -719,7 +717,7 @@ function toggleSelfPickup() {
     if (selfPickup.checked || noAddress.checked) {
         // Auto-fill company address when self-pickup or no-address is selected
         if (jobsiteAddress) {
-            jobsiteAddress.value = '401 Ryland St Suite 200-A, Reno, NV 89502, USA';
+            jobsiteAddress.value = '39°43\'34.9"N 105°03\'20.7"W, Denver, CO, USA';
             jobsiteAddress.required = false;
             jobsiteAddress.placeholder = 'Optional: Additional delivery instructions...';
         }
