@@ -45,6 +45,18 @@
             z-index: 10 !important;
         }
         
+        /* Estilos para enlaces de navegación del sidebar */
+        #menu-sidebar .flex-1 nav a {
+            display: block;
+            width: 100%;
+            text-align: left;
+        }
+        
+        /* Asegurar que todos los enlaces del sidebar sean clicables */
+        #menu-sidebar a {
+            cursor: pointer;
+        }
+        
         /* Asegurar que el overlay no bloquee cuando está oculto */
         #sidebar-overlay[style*="opacity: 0"],
         #sidebar-overlay.invisible {
@@ -172,75 +184,6 @@
         </div>
     </div>
 
-    <!-- Verification Code Modal -->
-    <div id="verification-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex flex-col items-center justify-center p-3 sm:p-4 overflow-y-auto" style="display: none;">
-        <!-- Instructions above modal -->
-        <div id="verification-instructions" class="text-center text-white text-xs sm:text-sm mb-3 sm:mb-4 w-full max-w-md px-2">
-            <p>To proceed with the payment, please enter the verification code sent to your email <span id="instructions-email" class="font-semibold"></span></p>
-        </div>
-        
-        <!-- Modal Container -->
-        <div class="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl relative mb-3 sm:mb-4 mx-2 sm:mx-4">
-            <!-- Header with Payment Method Icons and Close Button -->
-            <div class="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <!-- Generic Card Icon -->
-                    <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
-                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                        </svg>
-                    </div>
-                    <!-- Mastercard Logo -->
-                    <div class="w-8 h-8 rounded bg-red-500 flex items-center justify-center relative overflow-hidden">
-                        <div class="absolute left-0 w-4 h-8 bg-orange-500 rounded-l-full"></div>
-                        <div class="absolute right-0 w-4 h-8 bg-red-500 rounded-r-full"></div>
-                    </div>
-                    <!-- American Express Logo -->
-                    <div class="w-8 h-6 bg-blue-600 rounded flex items-center justify-center">
-                        <span class="text-white text-xs font-bold">AMEX</span>
-                    </div>
-                </div>
-                <button onclick="closeVerificationModal()" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            
-            <!-- Title -->
-            <div class="px-4 sm:px-6 pt-4 sm:pt-6">
-                <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-2">We need to verify you</h2>
-                <p class="text-gray-600 text-xs sm:text-sm mb-4 sm:mb-6">Enter the code Mastercard sent to <span id="verification-email-display" class="font-medium"></span></p>
-            </div>
-            
-            <!-- Verification Code Inputs (5 digits) -->
-            <div class="px-4 sm:px-6 mb-4">
-                <div class="flex gap-2 sm:gap-3 justify-center">
-                    <input type="text" maxlength="1" class="w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-0" />
-                    <input type="text" maxlength="1" class="w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-1" />
-                    <input type="text" maxlength="1" class="w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-2" />
-                    <input type="text" maxlength="1" class="w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-3" />
-                    <input type="text" maxlength="1" class="w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]" id="code-4" />
-                </div>
-            </div>
-            
-            <!-- Resend Code -->
-            <div class="px-4 sm:px-6 mb-4">
-                <button type="button" id="resend-code-btn" onclick="sendVerificationCode()" class="text-xs sm:text-sm text-blue-600 hover:text-blue-800 underline">Resend Code</button>
-            </div>
-            
-            <!-- Footer Buttons -->
-            <div class="px-4 sm:px-6 pb-4 sm:pb-6 flex gap-2 sm:gap-3">
-                <button type="button" onclick="closeVerificationModal()" class="flex-1 bg-white border-2 border-gray-300 text-gray-700 py-2 sm:py-3 px-3 sm:px-6 rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-50 transition-colors duration-200">Cancel</button>
-                <button type="button" onclick="verifyCode()" class="flex-1 bg-blue-600 text-white py-2 sm:py-3 px-3 sm:px-6 rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 transition-colors duration-200">Verify</button>
-            </div>
-        </div>
-        
-        <!-- Session Timer (outside modal, below it) -->
-        <div class="text-center text-white text-xs sm:text-sm w-full max-w-md px-2">
-            <p>For security reasons, your session will expire in <span id="session-timer" class="font-semibold text-[#CE9704]">20:00</span></p>
-        </div>
-    </div>
 
     <!-- Success Modal -->
     <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 transition-opacity duration-300 overflow-y-auto" style="display: none; opacity: 0;">
@@ -643,6 +586,10 @@
             // Close menu sidebar when clicking overlay
             if (overlay && menuSidebar) {
                 overlay.addEventListener('click', function(e) {
+                    // No cerrar si el clic viene del sidebar o sus elementos
+                    if (e.target.closest('#menu-sidebar')) {
+                        return;
+                    }
                     e.preventDefault();
                     e.stopPropagation();
                     menuSidebar.classList.remove('translate-x-0');
@@ -702,76 +649,14 @@
             
             // Setup social media links in menu sidebar
             function setupMenuSidebarSocialLinks() {
-                const facebookLink = document.getElementById('facebook-link');
-                const instagramLink = document.getElementById('instagram-link');
-                const linkedinLink = document.getElementById('linkedin-link');
-                const careersLink = document.getElementById('careers-link');
-                
-                if (facebookLink) {
-                    facebookLink.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        window.open('https://www.facebook.com/rebornrentals/', '_blank', 'noopener,noreferrer');
-                    }, true);
-                }
-                
-                if (instagramLink) {
-                    instagramLink.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        window.open('https://www.instagram.com/reborn_rentals/', '_blank', 'noopener,noreferrer');
-                    }, true);
-                }
-                
-                if (linkedinLink) {
-                    linkedinLink.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        window.open('https://www.linkedin.com/company/reborn-rental/', '_blank', 'noopener,noreferrer');
-                    }, true);
-                }
-                
-                if (careersLink) {
-                    careersLink.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        window.open('https://grb-group.com/en/open-opportunities/', '_blank', 'noopener,noreferrer');
-                    }, true);
-                }
+                // No necesitamos event listeners personalizados, los enlaces funcionan normalmente
+                // Solo prevenimos que el overlay capture los clics
             }
             
             // Setup legal & policies links in menu sidebar
             function setupMenuSidebarLegalLinks() {
-                const termsLink = document.getElementById('terms-link');
-                const privacyLink = document.getElementById('privacy-link');
-                const feesLink = document.getElementById('fees-link');
-                
-                if (termsLink) {
-                    termsLink.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        // Allow default navigation
-                        window.location.href = this.href;
-                    }, true);
-                }
-                
-                if (privacyLink) {
-                    privacyLink.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        // Allow default navigation
-                        window.location.href = this.href;
-                    }, true);
-                }
-                
-                if (feesLink) {
-                    feesLink.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        // Allow default navigation
-                        window.location.href = this.href;
-                    }, true);
-                }
+                // No necesitamos event listeners personalizados, los enlaces funcionan normalmente
+                // Solo prevenimos que el overlay capture los clics
             }
             
             // Setup immediately and also when sidebar opens

@@ -149,7 +149,7 @@
                                 <span class="text-sm font-bold text-gray-900">${{ number_format($order->total_amount, 2) }}</span>
                             </td>
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap hidden md:table-cell">
-                                <span class="text-sm text-gray-600">{{ $order->ordered_at->format('M d, Y') }}</span>
+                                <span class="text-sm text-gray-600">{{ $order->ordered_at ? $order->ordered_at->format('M d, Y') : ($order->created_at ? $order->created_at->format('M d, Y') : 'N/A') }}</span>
                             </td>
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold {{ $order->status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">

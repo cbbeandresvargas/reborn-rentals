@@ -1086,14 +1086,50 @@ function validateForm() {
 function saveFormData() {
     const checked = document.querySelector('input[name="pickup-option"]:checked');
     const pickupOption = checked ? checked.value : null;
+    const selfPickup = document.getElementById('self-pickup').checked;
+    const noAddress = document.getElementById('no-address').checked;
+    
+    // Get coordinates from selected location on map
+    let latitude = null;
+    let longitude = null;
+    let jobsiteAddress = '';
+    
+    // Si es self-pickup, guardar directamente "Self Pickup"
+    if (selfPickup) {
+        jobsiteAddress = 'Self Pickup';
+    } else if (noAddress) {
+        jobsiteAddress = 'Jobsite Lot doesn\'t have an address';
+    } else if (window.currentRouteDestination) {
+        // Si hay ubicación seleccionada en el mapa, crear link de Google Maps
+        latitude = window.currentRouteDestination.lat;
+        longitude = window.currentRouteDestination.lng;
+        const addressText = document.getElementById('jobsite-address').value || '';
+        
+        // Crear link de Google Maps con las coordenadas
+        const googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+        
+        // Guardar el link junto con la dirección de texto
+        if (addressText) {
+            jobsiteAddress = `${addressText} | ${googleMapsLink}`;
+        } else {
+            jobsiteAddress = googleMapsLink;
+        }
+    } else {
+        // Si no hay coordenadas pero hay texto en el input
+        const addressInput = document.getElementById('jobsite-address');
+        jobsiteAddress = addressInput ? addressInput.value : '';
+    }
     
     const formData = {
         startDate: document.getElementById('start-date').value,
         endDate: document.getElementById('end-date').value,
-        jobsiteAddress: document.getElementById('jobsite-address').value,
+        jobsiteAddress: jobsiteAddress,
+        latitude: latitude,
+        longitude: longitude,
         pickupOption: pickupOption,
-        selfPickupChecked: document.getElementById('self-pickup').checked,
-        noAddressChecked: document.getElementById('no-address').checked
+        selfPickupChecked: selfPickup,
+        noAddressChecked: noAddress,
+        notes: document.getElementById('jobsite-address').value || ''
     };
     
     localStorage.setItem('reborn-rentals-directions', JSON.stringify(formData));

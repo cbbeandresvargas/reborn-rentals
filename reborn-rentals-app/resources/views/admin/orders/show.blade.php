@@ -3,21 +3,41 @@
 @section('title', 'Order #' . $order->id . ' - Admin Panel')
 
 @section('content')
-<div class="ml-0 md:ml-72">
-    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40 px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-4">
-            <a href="{{ route('admin.orders.index') }}" class="text-[#CE9704] hover:text-[#B8860B] transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-            </a>
-            <h1 class="text-2xl font-bold text-gray-800">Order #{{ $order->id }}</h1>
+<div class="ml-0 md:ml-72 bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-white to-gray-50 shadow-lg border-b border-gray-200 sticky top-0 z-40 backdrop-blur-sm">
+        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('admin.orders.index') }}" class="text-[#CE9704] hover:text-[#B8860B] transition-colors transform hover:scale-110">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Order #{{ $order->id }}</h1>
+                        <p class="text-sm text-gray-500 mt-1">{{ $order->ordered_at ? $order->ordered_at->format('M d, Y \a\t h:i A') : 'N/A' }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1.5 rounded-full text-xs font-semibold {{ $order->status ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                        {{ $order->status ? 'Completed' : 'Pending' }}
+                    </span>
+                </div>
+            </div>
         </div>
     </header>
     
-    <main class="p-6">
+    <main class="p-4 sm:p-6 lg:p-8">
         @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">{{ session('success') }}</div>
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded mb-6 shadow-md">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                {{ session('success') }}
+            </div>
+        </div>
         @endif
 
         @php
@@ -31,51 +51,144 @@
                 4 => 'Apple Pay',
                 5 => 'Klarna'
             ];
+            
+            // Parse delivery address from job location
+            $deliveryAddress = $order->job->notes ?? 'N/A';
+            $googleMapsLink = null;
+            $addressText = $deliveryAddress;
+            
+            // Check if address contains Google Maps link (format: "Address | https://...")
+            if (strpos($deliveryAddress, '|') !== false) {
+                $parts = explode('|', $deliveryAddress, 2);
+                $addressText = trim($parts[0]);
+                $googleMapsLink = trim($parts[1]);
+            } elseif (strpos($deliveryAddress, 'https://www.google.com/maps') !== false) {
+                // If entire string is a link
+                $googleMapsLink = $deliveryAddress;
+                $addressText = 'View on Google Maps';
+            }
         @endphp
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Left Column -->
-            <div class="space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column (2/3 width) -->
+            <div class="lg:col-span-2 space-y-6">
                 <!-- Order Items -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-xl font-bold mb-4">Order Items</h2>
-                    <div class="space-y-3">
-                        @foreach($order->items as $item)
-                        <div class="flex items-center gap-4 py-3 {{ !$loop->last ? 'border-b border-gray-200' : '' }}">
-                            <img src="{{ $item->product->image_url ? asset($item->product->image_url) : asset('Product1.png') }}" 
-                                 alt="{{ $item->product->name }}" class="w-12 h-12 object-contain">
-                            <div class="flex-1 min-w-0">
-                                <h3 class="font-semibold text-gray-900 text-sm">{{ $item->product->name }}</h3>
-                                <p class="text-xs text-gray-500">Qty: {{ $item->quantity }} × ${{ number_format($item->unit_price, 2) }}</p>
+                <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div class="bg-gradient-to-r from-gray-50 to-white px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-[#CE9704]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            </svg>
+                            Order Items ({{ $order->items->count() }})
+                        </h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            @foreach($order->items as $item)
+                            <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors {{ !$loop->last ? 'border-b border-gray-200 pb-4' : '' }}">
+                                <div class="shrink-0">
+                                    <img src="{{ $item->product->image_url ? asset($item->product->image_url) : asset('Product1.png') }}" 
+                                         alt="{{ $item->product->name }}" 
+                                         class="w-16 h-16 object-contain bg-white rounded-lg p-2 shadow-sm">
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="font-semibold text-gray-900 text-base mb-1">{{ $item->product->name }}</h3>
+                                    <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                                        <span>Qty: <strong class="text-gray-900">{{ $item->quantity }}</strong></span>
+                                        <span>×</span>
+                                        <span>${{ number_format($item->unit_price, 2) }}</span>
+                                        @if($item->line_total != ($item->unit_price * $item->quantity))
+                                        <span class="text-xs text-gray-500">(includes rental days)</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900">${{ number_format($item->line_total, 2) }}</p>
+                                </div>
                             </div>
-                            <p class="font-semibold text-gray-900">${{ number_format($item->line_total, 2) }}</p>
+                            @endforeach
                         </div>
-                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Delivery Information -->
+                <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div class="bg-gradient-to-r from-gray-50 to-white px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-[#CE9704]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Delivery Information
+                        </h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <!-- Delivery Address -->
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Delivery Address</label>
+                                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                    <p class="text-gray-900 font-medium mb-2">{{ $addressText }}</p>
+                                    @if($googleMapsLink)
+                                    <a href="{{ $googleMapsLink }}" target="_blank" rel="noopener noreferrer" 
+                                       class="inline-flex items-center gap-2 text-[#CE9704] hover:text-[#B8860B] font-medium text-sm transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                        </svg>
+                                        Open in Google Maps
+                                    </a>
+                                    @endif
+                                </div>
+                            </div>
+                            
+                            <!-- Delivery Date -->
+                            @if($order->job && $order->job->date)
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Delivery Date</label>
+                                <p class="text-gray-900 font-medium">{{ $order->job->date->format('F d, Y') }}</p>
+                            </div>
+                            @endif
+                            
+                            <!-- Coordinates -->
+                            @if($order->job && $order->job->latitude && $order->job->longitude)
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Coordinates</label>
+                                <p class="text-gray-900 font-medium font-mono text-sm">
+                                    {{ number_format($order->job->latitude, 7) }}, {{ number_format($order->job->longitude, 7) }}
+                                </p>
+                            </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
 
                 <!-- Summary & Payment -->
-                <div class="grid grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Summary -->
-                    <div class="bg-white rounded-lg shadow p-4">
-                        <h2 class="text-lg font-bold mb-3">Summary</h2>
-                        <div class="space-y-1.5 text-sm">
-                            <div class="flex justify-between text-gray-600">
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-blue-200 p-6">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                            Summary
+                        </h2>
+                        <div class="space-y-2.5">
+                            <div class="flex justify-between text-gray-700">
                                 <span>Subtotal:</span>
-                                <span>${{ number_format($order->total_amount - $order->tax_total - ($order->discount_total ?? 0), 2) }}</span>
+                                <span class="font-semibold">${{ number_format($order->total_amount - $order->tax_total - ($order->discount_total ?? 0), 2) }}</span>
                             </div>
                             @if($order->discount_total)
-                            <div class="flex justify-between text-green-600">
+                            <div class="flex justify-between text-green-700">
                                 <span>Discount:</span>
-                                <span>-${{ number_format($order->discount_total, 2) }}</span>
+                                <span class="font-semibold">-${{ number_format($order->discount_total, 2) }}</span>
                             </div>
                             @endif
-                            <div class="flex justify-between text-gray-600">
-                                <span>Tax:</span>
-                                <span>${{ number_format($order->tax_total, 2) }}</span>
+                            <div class="flex justify-between text-gray-700">
+                                <span>Tax (2%):</span>
+                                <span class="font-semibold">${{ number_format($order->tax_total, 2) }}</span>
                             </div>
-                            <div class="border-t pt-2 mt-2">
-                                <div class="flex justify-between font-bold">
+                            <div class="border-t border-gray-300 pt-2.5 mt-2.5">
+                                <div class="flex justify-between font-bold text-lg">
                                     <span>Total:</span>
                                     <span class="text-[#CE9704]">${{ number_format($order->total_amount, 2) }}</span>
                                 </div>
@@ -84,178 +197,248 @@
                     </div>
 
                     <!-- Payment Method -->
-                    <div class="bg-white rounded-lg shadow p-4">
-                        <h2 class="text-lg font-bold mb-3">Payment</h2>
-                        <div class="space-y-1.5 text-sm">
-                            <p><strong>Method:</strong><br>{{ $paymentMethods[$order->payment_method] ?? 'Unknown' }}</p>
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg border border-green-200 p-6">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                            </svg>
+                            Payment Method
+                        </h2>
+                        <div class="space-y-2">
+                            <p class="font-semibold text-gray-900">{{ $paymentMethods[$order->payment_method] ?? 'Unknown' }}</p>
                             @if($paymentMethodDetails && count(array_filter($paymentMethodDetails)))
-                                @foreach($paymentMethodDetails as $key => $value)
-                                    @if($value !== null && $value !== '')
-                                        <p class="text-xs"><strong>{{ ucfirst(str_replace('_', ' ', $key)) }}:</strong> {{ $value }}</p>
-                                    @endif
-                                @endforeach
-                            @else
-                                <p class="text-xs text-gray-500">No additional details</p>
+                                <div class="mt-3 pt-3 border-t border-gray-300">
+                                    <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Additional Details:</p>
+                                    @foreach($paymentMethodDetails as $key => $value)
+                                        @if($value !== null && $value !== '')
+                                            <p class="text-xs text-gray-700 mb-1">
+                                                <strong>{{ ucfirst(str_replace('_', ' ', $key)) }}:</strong> {{ $value }}
+                                            </p>
+                                        @endif
+                                    @endforeach
+                                </div>
                             @endif
                         </div>
                     </div>
                 </div>
 
-                <!-- Update Form -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-lg font-bold mb-3">Update Order</h2>
-                    <form action="{{ route('admin.orders.update', $order) }}" method="POST" class="space-y-3">
+                <!-- Update Order Status -->
+                <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-[#CE9704]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Update Order Status
+                    </h2>
+                    <form action="{{ route('admin.orders.update', $order) }}" method="POST">
                         @csrf
                         @method('PUT')
-                        
-                        <!-- Toggle Switch for Order Status -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-700">Order Status</span>
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <span class="text-sm font-medium text-gray-700 block mb-1">Order Status</span>
+                                <span class="text-xs text-gray-500">Toggle to mark order as completed or pending</span>
+                            </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" name="status" value="1" class="sr-only peer" {{ $order->status ? 'checked' : '' }}
                                     onchange="this.form.submit()">
                                 <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#CE9704] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#CE9704]"></div>
-                                <span class="ml-3 text-sm font-medium {{ $order->status ? 'text-green-600' : 'text-gray-500' }}" id="status-label">
+                                <span class="ml-3 text-sm font-semibold {{ $order->status ? 'text-green-600' : 'text-gray-500' }}" id="status-label">
                                     {{ $order->status ? 'Completed' : 'Pending' }}
                                 </span>
                             </label>
                         </div>
                     </form>
                 </div>
-                
-                <script>
-                    // Update label text when switch is toggled
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const checkbox = document.querySelector('input[name="status"]');
-                        const label = document.getElementById('status-label');
-                        
-                        if (checkbox && label) {
-                            checkbox.addEventListener('change', function() {
-                                if (this.checked) {
-                                    label.textContent = 'Completed';
-                                    label.classList.remove('text-gray-500');
-                                    label.classList.add('text-green-600');
-                                } else {
-                                    label.textContent = 'Pending';
-                                    label.classList.remove('text-green-600');
-                                    label.classList.add('text-gray-500');
-                                }
-                            });
-                        }
-                    });
-                </script>
             </div>
 
-            <!-- Right Column -->
+            <!-- Right Column (1/3 width) -->
             <div class="space-y-6">
-                <!-- Customer -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-lg font-bold mb-3">Customer</h2>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                            <span class="text-gray-500">Name:</span>
-                            <p class="font-medium">{{ $order->user->name ?? 'null' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-gray-500">Email:</span>
-                            <p class="font-medium break-words">{{ $order->user->email ?? 'null' }}</p>
-                        </div>
-                        <div class="col-span-2">
-                            <span class="text-gray-500">Phone:</span>
-                            <p class="font-medium">{{ $order->user->phone_number ?? 'null' }}</p>
+                <!-- Customer Information -->
+                <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div class="bg-gradient-to-r from-gray-50 to-white px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[#CE9704]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            Customer Information
+                        </h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Name</label>
+                                <p class="text-gray-900 font-medium">{{ $order->user->name ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Email</label>
+                                <p class="text-gray-900 font-medium break-words">{{ $order->user->email ?? 'N/A' }}</p>
+                            </div>
+                            @if($order->user->phone_number)
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Phone</label>
+                                <p class="text-gray-900 font-medium">{{ $order->user->phone_number }}</p>
+                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
 
                 <!-- Foreman Details -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-lg font-bold mb-3">Foreman / Receiving Person</h2>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                            <span class="text-gray-500">First Name:</span>
-                            <p class="font-medium">{{ $foremanDetails['firstName'] ?? 'null' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-gray-500">Last Name:</span>
-                            <p class="font-medium">{{ $foremanDetails['lastName'] ?? 'null' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-gray-500">Phone:</span>
-                            <p class="font-medium">{{ $foremanDetails['phone'] ?? 'null' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-gray-500">Email:</span>
-                            <p class="font-medium break-words">{{ $foremanDetails['email'] ?? 'null' }}</p>
+                @if($foremanDetails && count(array_filter($foremanDetails)))
+                <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div class="bg-gradient-to-r from-gray-50 to-white px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[#CE9704]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            Foreman / Receiving Person
+                        </h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">First Name</label>
+                                <p class="text-gray-900 font-medium">{{ $foremanDetails['firstName'] ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Last Name</label>
+                                <p class="text-gray-900 font-medium">{{ $foremanDetails['lastName'] ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Phone</label>
+                                <p class="text-gray-900 font-medium">{{ $foremanDetails['phone'] ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Email</label>
+                                <p class="text-gray-900 font-medium break-words text-sm">{{ $foremanDetails['email'] ?? 'N/A' }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
+                @endif
 
                 <!-- Billing Details -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-lg font-bold mb-3">Billing Details</h2>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                            <span class="text-gray-500">First Name:</span>
-                            <p class="font-medium">{{ $billingDetails['firstName'] ?? 'null' }}</p>
+                @if($billingDetails && count(array_filter($billingDetails)))
+                <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div class="bg-gradient-to-r from-gray-50 to-white px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[#CE9704]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                            </svg>
+                            Billing Details
+                        </h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">First Name</label>
+                                    <p class="text-gray-900 font-medium">{{ $billingDetails['firstName'] ?? 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Last Name</label>
+                                    <p class="text-gray-900 font-medium">{{ $billingDetails['lastName'] ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Email</label>
+                                    <p class="text-gray-900 font-medium break-words text-sm">{{ $billingDetails['email'] ?? 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Phone</label>
+                                    <p class="text-gray-900 font-medium">{{ $billingDetails['phone'] ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                            @if(!empty($billingDetails['addressLine1']))
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Address</label>
+                                <p class="text-gray-900 font-medium">{{ $billingDetails['addressLine1'] }}</p>
+                                @if(!empty($billingDetails['addressLine2']))
+                                <p class="text-gray-900 font-medium">{{ $billingDetails['addressLine2'] }}</p>
+                                @endif
+                            </div>
+                            @endif
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">City</label>
+                                    <p class="text-gray-900 font-medium">{{ $billingDetails['city'] ?? 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">State</label>
+                                    <p class="text-gray-900 font-medium">{{ $billingDetails['state'] ?? 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">ZIP</label>
+                                    <p class="text-gray-900 font-medium">{{ $billingDetails['zip'] ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                            @if(!empty($billingDetails['country']))
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Country</label>
+                                <p class="text-gray-900 font-medium">{{ $billingDetails['country'] }}</p>
+                            </div>
+                            @endif
+                            @if(isset($billingDetails['isCompany']) && $billingDetails['isCompany'])
+                            <div class="pt-4 border-t border-gray-200">
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Company Information</label>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">Company Name</label>
+                                        <p class="text-gray-900 font-medium">{{ $billingDetails['companyName'] ?? 'N/A' }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">Job Title</label>
+                                        <p class="text-gray-900 font-medium">{{ $billingDetails['jobTitle'] ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
                         </div>
-                        <div>
-                            <span class="text-gray-500">Last Name:</span>
-                            <p class="font-medium">{{ $billingDetails['lastName'] ?? 'null' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-gray-500">Email:</span>
-                            <p class="font-medium break-words">{{ $billingDetails['email'] ?? 'null' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-gray-500">Phone:</span>
-                            <p class="font-medium">{{ $billingDetails['phone'] ?? 'null' }}</p>
-                        </div>
-                        <div class="col-span-2">
-                            <span class="text-gray-500">Address Line 1:</span>
-                            <p class="font-medium">{{ $billingDetails['addressLine1'] ?? 'null' }}</p>
-                        </div>
-                        @if(!empty($billingDetails['addressLine2']))
-                        <div class="col-span-2">
-                            <span class="text-gray-500">Address Line 2:</span>
-                            <p class="font-medium">{{ $billingDetails['addressLine2'] ?? 'null' }}</p>
-                        </div>
-                        @endif
-                        <div>
-                            <span class="text-gray-500">City:</span>
-                            <p class="font-medium">{{ $billingDetails['city'] ?? 'null' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-gray-500">State:</span>
-                            <p class="font-medium">{{ $billingDetails['state'] ?? 'null' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-gray-500">ZIP:</span>
-                            <p class="font-medium">{{ $billingDetails['zip'] ?? 'null' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-gray-500">Country:</span>
-                            <p class="font-medium">{{ $billingDetails['country'] ?? 'null' }}</p>
-                        </div>
-                        <div class="col-span-2">
-                            <span class="text-gray-500">Is Company:</span>
-                            <p class="font-medium">{{ isset($billingDetails['isCompany']) ? ($billingDetails['isCompany'] ? 'Yes' : 'No') : 'null' }}</p>
-                        </div>
-                        @if(isset($billingDetails['isCompany']) && $billingDetails['isCompany'])
-                        <div>
-                            <span class="text-gray-500">Company Name:</span>
-                            <p class="font-medium">{{ $billingDetails['companyName'] ?? 'null' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-gray-500">Job Title:</span>
-                            <p class="font-medium">{{ $billingDetails['jobTitle'] ?? 'null' }}</p>
-                        </div>
-                        @endif
                     </div>
                 </div>
+                @endif
+
+                <!-- Order Notes -->
+                @if($order->notes)
+                <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div class="bg-gradient-to-r from-gray-50 to-white px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[#CE9704]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            Order Notes
+                        </h2>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-700 leading-relaxed">{{ $order->notes }}</p>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </main>
 </div>
 
+<script>
+    // Update label text when switch is toggled
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkbox = document.querySelector('input[name="status"]');
+        const label = document.getElementById('status-label');
+        
+        if (checkbox && label) {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    label.textContent = 'Completed';
+                    label.classList.remove('text-gray-500');
+                    label.classList.add('text-green-600');
+                } else {
+                    label.textContent = 'Pending';
+                    label.classList.remove('text-green-600');
+                    label.classList.add('text-gray-500');
+                }
+            });
+        }
+    });
+</script>
 @endsection
-

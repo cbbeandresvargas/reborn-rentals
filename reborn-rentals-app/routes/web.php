@@ -43,8 +43,7 @@ Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 // Checkout (acciones) y Órdenes que requieren autenticación
 Route::middleware('auth')->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-    Route::post('/checkout/send-verification-code', [CheckoutController::class, 'sendVerificationCode'])->name('checkout.send-verification-code');
-    Route::post('/checkout/verify-code', [CheckoutController::class, 'verifyCode'])->name('checkout.verify-code');
+    // Payment verification routes removed - payments handled via Odoo invoices
     
     // Órdenes
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
@@ -66,6 +65,7 @@ Route::get('/fees-surcharges', [PageController::class, 'fees'])->name('fees');
 Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/site-map', [PageController::class, 'sitemap'])->name('sitemap');
 Route::get('/terms-conditions', [PageController::class, 'terms'])->name('terms');
+Route::get('/sms-policy', [PageController::class, 'sms'])->name('sms');
 Route::get('/directions', [PageController::class, 'directions'])->name('directions');
 Route::get('/blog', [PageController::class, 'blog'])->name('blog');
 Route::get('/blog/{slug}', [PageController::class, 'showPost'])->name('blog.post');

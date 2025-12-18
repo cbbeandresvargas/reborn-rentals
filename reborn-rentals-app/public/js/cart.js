@@ -1522,140 +1522,7 @@ function displayPaymentMethodSelection() {
 // Make displayPaymentMethodSelection globally accessible
 window.displayPaymentMethodSelection = displayPaymentMethodSelection;
 
-// Verification Modal Functions
-function openVerificationModal() {
-    // Get email from authenticated user
-    let email = '';
-    
-    if (typeof window.authenticatedUserEmail !== 'undefined') {
-        email = window.authenticatedUserEmail;
-    } else {
-        // Fallback: try to get from billing details if available
-        const billingDetails = localStorage.getItem('billing-details');
-        if (billingDetails) {
-            try {
-                const billing = JSON.parse(billingDetails);
-                email = billing.email || '';
-            } catch (e) {
-                console.error('Error parsing billing details:', e);
-            }
-        }
-    }
-    
-    // Format email for display (mask middle part for security)
-    let formattedEmail = email || 'your email';
-    if (email && email.includes('@')) {
-        const [localPart, domain] = email.split('@');
-        if (localPart.length > 2) {
-            const maskedLocal = localPart.substring(0, 2) + '*'.repeat(Math.min(localPart.length - 2, 4)) + localPart.substring(localPart.length - 1);
-            formattedEmail = maskedLocal + '@' + domain;
-        }
-    }
-    
-    // Update email display
-    const emailDisplay = document.getElementById('verification-email-display');
-    const instructionsEmail = document.getElementById('instructions-email');
-    
-    if (emailDisplay) emailDisplay.textContent = formattedEmail;
-    if (instructionsEmail) instructionsEmail.textContent = formattedEmail;
-    
-    // Send verification code to user's email
-    sendVerificationCode();
-    
-    // Show verification modal
-    const verificationModal = document.getElementById('verification-modal');
-    if (verificationModal) {
-        verificationModal.style.display = 'flex';
-    }
-    
-    // Start session timer
-    startSessionTimer();
-    
-    // Auto-focus first input
-    setTimeout(() => {
-        const firstInput = document.getElementById('code-0');
-        if (firstInput) {
-            firstInput.focus();
-            
-            // Add auto-advance functionality for 5 inputs
-            for (let i = 0; i < 5; i++) {
-                const input = document.getElementById(`code-${i}`);
-                if (input) {
-                    // Remove old listeners to prevent duplicates
-                    const newInput = input.cloneNode(true);
-                    input.parentNode.replaceChild(newInput, input);
-                    
-                    newInput.addEventListener('input', function(e) {
-                        const value = e.target.value.replace(/\D/g, ''); // Only numbers
-                        e.target.value = value.charAt(0); // Only first digit
-                        
-                        if (value && i < 4) {
-                            const nextInput = document.getElementById(`code-${i + 1}`);
-                            if (nextInput) nextInput.focus();
-                        }
-                        
-                        // Auto-verify when 5 digits are entered
-                        if (i === 4 && value) {
-                            setTimeout(() => verifyCode(), 300);
-                        }
-                    });
-                    
-                    newInput.addEventListener('keydown', function(e) {
-                        if (e.key === 'Backspace' && !e.target.value && i > 0) {
-                            const prevInput = document.getElementById(`code-${i - 1}`);
-                            if (prevInput) prevInput.focus();
-                        }
-                    });
-                }
-            }
-        }
-    }, 100);
-}
-
-// Send verification code to user's email (make it globally accessible)
-function sendVerificationCode() {
-    const sendButton = document.getElementById('resend-code-btn');
-    if (sendButton) {
-        sendButton.disabled = true;
-        sendButton.textContent = 'Sending...';
-    }
-    
-    fetch('/checkout/send-verification-code', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log('Verification code sent successfully');
-            if (sendButton) {
-                sendButton.disabled = false;
-                sendButton.textContent = 'Code sent! Check your email.';
-                setTimeout(() => {
-                    sendButton.textContent = 'Resend Code';
-                }, 3000);
-            }
-        } else {
-            alert('Failed to send verification code: ' + (data.message || 'Unknown error'));
-            if (sendButton) {
-                sendButton.disabled = false;
-                sendButton.textContent = 'Resend Code';
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Error sending verification code:', error);
-        alert('Failed to send verification code. Please try again.');
-        if (sendButton) {
-            sendButton.disabled = false;
-            sendButton.textContent = 'Resend Code';
-        }
-    });
-}
+// Payment verification functions removed - payments are now handled via Odoo invoices
 
 function clearCart() {
     fetch('/cart', {
@@ -1677,100 +1544,6 @@ function clearCart() {
     });
 }
 
-function verifyCode() {
-    let code = '';
-    for (let i = 0; i < 5; i++) {
-        const input = document.getElementById(`code-${i}`);
-        code += input?.value || '';
-    }
-    
-    if (code.length !== 5) {
-        alert('Please enter the 5-digit verification code.');
-        return;
-    }
-    
-    // Show loading state
-    const verifyButton = document.querySelector('#verification-modal button[type="button"]');
-    const originalButtonText = verifyButton ? verifyButton.textContent : '';
-    if (verifyButton) {
-        verifyButton.disabled = true;
-        verifyButton.textContent = 'Verifying...';
-    }
-    
-    // Verify code with backend
-    fetch('/checkout/verify-code', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({ code: code })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (verifyButton) {
-            verifyButton.disabled = false;
-            verifyButton.textContent = originalButtonText;
-        }
-        
-        if (data.success) {
-            // Code verified successfully
-            // Close verification modal
-            closeVerificationModal();
-            
-            // Show success message
-            alert('Verification successful! Completing your order...');
-            
-            // Automatically submit the checkout form
-            console.log('Payment verified, automatically submitting order...');
-            
-            // Wait a moment for modal to close, then submit
-            setTimeout(() => {
-                if (typeof submitCheckoutForm === 'function') {
-                    console.log('Calling submitCheckoutForm() automatically...');
-                    submitCheckoutForm();
-                } else {
-                    console.error('submitCheckoutForm function not found');
-                    alert('Error: Could not complete order automatically. Please try again.');
-                }
-            }, 500);
-        } else {
-            // Show error message
-            alert(data.message || 'Invalid verification code. Please try again.');
-            
-            // Clear input fields
-            for (let i = 0; i < 5; i++) {
-                const input = document.getElementById(`code-${i}`);
-                if (input) input.value = '';
-            }
-            
-            // Focus first input
-            const firstInput = document.getElementById('code-0');
-            if (firstInput) firstInput.focus();
-        }
-    })
-    .catch(error => {
-        console.error('Error verifying code:', error);
-        alert('Failed to verify code. Please try again.');
-        if (verifyButton) {
-            verifyButton.disabled = false;
-            verifyButton.textContent = originalButtonText;
-        }
-    });
-}
-
-function closeVerificationModal() {
-    const modal = document.getElementById('verification-modal');
-    const instructions = document.getElementById('verification-instructions');
-    
-    if (modal) {
-        modal.style.display = 'none';
-    }
-    if (instructions) {
-        instructions.style.display = 'none';
-    }
-}
 
 function openSuccessModal() {
     const modal = document.getElementById('success-modal');
@@ -1833,31 +1606,7 @@ function goToHomepage() {
     });
 }
 
-function startSessionTimer() {
-    let timeLeft = 20 * 60; // 20 minutes in seconds
-    
-    const timer = setInterval(() => {
-        timeLeft--;
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        
-        const timerElement = document.getElementById('session-timer');
-        if (timerElement) {
-            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-        
-        if (timeLeft <= 0) {
-            clearInterval(timer);
-            alert('La sesión ha expirado. Por favor intenta de nuevo.');
-            closeVerificationModal();
-        }
-    }, 1000);
-}
-
-// Make verification functions globally accessible
-window.openVerificationModal = openVerificationModal;
-window.closeVerificationModal = closeVerificationModal;
-window.verifyCode = verifyCode;
+// Make functions globally accessible
 window.openSuccessModal = openSuccessModal;
 window.closeSuccessModal = closeSuccessModal;
 window.goToHomepage = goToHomepage;
@@ -1896,8 +1645,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
                     
-                    // All validations passed, show verification modal
-                    openVerificationModal();
+                    // Payment verification removed - submit order directly
+                    // Order will be invoiced via Odoo with selected payment method
+                    if (typeof submitCheckoutForm === 'function') {
+                        submitCheckoutForm();
+                    } else {
+                        alert('Error: Could not complete order. Please try again.');
+                    }
                 });
             }
         }, 900);

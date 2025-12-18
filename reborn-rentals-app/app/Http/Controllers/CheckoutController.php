@@ -8,13 +8,10 @@ use App\Models\Product;
 use App\Models\JobLocation;
 use App\Models\Cupon;
 use App\Models\PaymentInfo;
-use App\Mail\VerificationCodeMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
 class CheckoutController extends Controller
@@ -49,7 +46,6 @@ class CheckoutController extends Controller
     {
         \Log::info('Checkout store method called', [
             'user_id' => Auth::id(),
-            'payment_verified' => Session::get('payment_verified'),
             'cart' => Session::get('cart', []),
             'request_data' => $request->all()
         ]);
@@ -62,14 +58,8 @@ class CheckoutController extends Controller
                 ->with('error', 'Your cart is empty');
         }
 
-        // Check if payment is verified
-        if (!Session::get('payment_verified')) {
-            \Log::warning('Checkout attempted without payment verification', [
-                'payment_verified' => Session::get('payment_verified')
-            ]);
-            return redirect()->route('checkout')
-                ->with('error', 'Please verify your payment before completing the order.');
-        }
+        // Payment verification removed - orders will be invoiced via Odoo
+        // Payment method is selected but not processed here
 
         try {
             $validated = $request->validate([
@@ -191,12 +181,13 @@ class CheckoutController extends Controller
                 }
 
                 // Crear Orden
+                // Status is set to false (pending) - admin will complete it after payment is processed in Odoo
                 $order = Order::create([
                     'user_id' => Auth::id(),
                     'job_id' => $jobLocation->id,
                     'cupon_id' => $cupon?->id,
                     'total_amount' => $totalAmount,
-                    'status' => true,
+                    'status' => false, // Pending - will be completed by admin after Odoo payment
                     'discount_total' => $discountTotal,
                     'tax_total' => $taxTotal,
                     'payment_method' => $validated['payment_method'],
@@ -246,10 +237,8 @@ class CheckoutController extends Controller
                     ]);
                 }
 
-                // Limpiar carrito y verificación
+                // Limpiar carrito
                 Session::forget('cart');
-                Session::forget('payment_verified');
-                Session::forget('payment_verified_at');
 
                 \Log::info('Order completed successfully', ['order_id' => $order->id]);
 
@@ -297,91 +286,6 @@ class CheckoutController extends Controller
         return $subtotal;
     }
 
-    /**
-     * Send verification code to user's email
-     */
-    public function sendVerificationCode(Request $request)
-    {
-        $user = Auth::user();
-        
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not authenticated'
-            ], 401);
-        }
-
-        // Generate 5-digit verification code
-        $code = str_pad((string) rand(0, 99999), 5, '0', STR_PAD_LEFT);
-        
-        // Store code in cache with 10 minute expiration
-        $cacheKey = 'verification_code_' . $user->id;
-        Cache::put($cacheKey, $code, now()->addMinutes(10));
-        
-        try {
-            // Send email
-            Mail::to($user->email)->send(new VerificationCodeMail($code, $user->name));
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Verification code sent to your email'
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Failed to send verification code: ' . $e->getMessage());
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to send verification code. Please try again.'
-            ], 500);
-        }
-    }
-
-    /**
-     * Verify the code entered by user
-     */
-    public function verifyCode(Request $request)
-    {
-        $request->validate([
-            'code' => 'required|string|size:5'
-        ]);
-
-        $user = Auth::user();
-        
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not authenticated'
-            ], 401);
-        }
-
-        $cacheKey = 'verification_code_' . $user->id;
-        $storedCode = Cache::get($cacheKey);
-        
-        if (!$storedCode) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Verification code has expired. Please request a new one.'
-            ], 400);
-        }
-
-        if ($storedCode !== $request->code) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid verification code. Please try again.'
-            ], 400);
-        }
-
-        // Code is valid, mark as verified in session
-        Session::put('payment_verified', true);
-        Session::put('payment_verified_at', now()->toDateTimeString());
-        
-        // Delete the code from cache
-        Cache::forget($cacheKey);
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Verification successful'
-        ]);
-    }
+    // Payment verification methods removed - payments are now handled via Odoo invoices
 }
 

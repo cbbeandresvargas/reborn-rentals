@@ -34,14 +34,58 @@
         </div>
         @endif
 
+        <!-- Filter Section -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 mb-6 overflow-hidden">
+            <div class="bg-gradient-to-r from-gray-50 to-white px-4 sm:px-6 lg:px-8 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg sm:text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-[#CE9704]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                        Filter Products
+                    </h2>
+                    @if(request('category_id'))
+                    <a href="{{ route('admin.products.index') }}" class="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Clear Filter
+                    </a>
+                    @endif
+                </div>
+                <form method="GET" action="{{ route('admin.products.index') }}" class="flex flex-col sm:flex-row gap-4">
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Filter by Category</label>
+                        <select name="category_id" 
+                                onchange="this.form.submit()"
+                                class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] transition-all bg-white font-medium">
+                            <option value="">All Categories</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Products Table -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             <div class="bg-gradient-to-r from-gray-50 to-white px-4 sm:px-6 lg:px-8 py-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg sm:text-xl font-bold text-gray-800">Products Catalog</h2>
-                    <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full font-medium">
-                        {{ $products->total() }} {{ $products->total() === 1 ? 'Product' : 'Products' }}
-                    </span>
+                    <div class="flex items-center gap-3">
+                        @if(request('category_id'))
+                        <span class="text-xs text-gray-600 bg-[#CE9704]/10 text-[#CE9704] px-3 py-1 rounded-full font-semibold border border-[#CE9704]/20">
+                            Filtered: {{ $categories->firstWhere('id', request('category_id'))->name ?? 'Unknown' }}
+                        </span>
+                        @endif
+                        <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full font-medium">
+                            {{ $products->total() }} {{ $products->total() === 1 ? 'Product' : 'Products' }}
+                        </span>
+                    </div>
                 </div>
             </div>
             
@@ -85,12 +129,23 @@
                                 </span>
                             </td>
                             <td class="px-4 sm:px-6 py-4">
-                                <a href="{{ route('admin.products.show', $product) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#CE9704] to-[#B8860B] text-white rounded-lg hover:shadow-lg transition-all duration-200 text-xs sm:text-sm font-semibold">
-                                    View Details
-                                    <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                </a>
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('admin.products.show', $product) }}" class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-[#CE9704] to-[#B8860B] text-white rounded-lg hover:shadow-lg transition-all duration-200 text-xs sm:text-sm font-semibold">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                        </svg>
+                                        View
+                                    </a>
+                                    <button type="button" 
+                                            onclick="openDeleteProductModal('{{ $product->id }}', '{{ addslashes($product->name) }}')"
+                                            class="inline-flex items-center px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs sm:text-sm font-semibold">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Delete
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         @empty
@@ -430,6 +485,76 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+});
+</script>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div id="delete-product-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+        <div class="p-6">
+            <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full">
+                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 text-center mb-2">Delete Product</h3>
+            <p class="text-gray-600 text-center mb-6" id="delete-product-message"></p>
+            <form id="delete-product-form" method="POST" class="space-y-3">
+                @csrf
+                @method('DELETE')
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeDeleteProductModal()" class="flex-1 bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-300 transition-all font-semibold">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 transition-all font-semibold">
+                        Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Funciones para modal de eliminación de producto
+function openDeleteProductModal(productId, productName) {
+    const modal = document.getElementById('delete-product-modal');
+    if (modal) {
+        document.getElementById('delete-product-message').textContent = 
+            `Are you sure you want to delete the product "${productName}"?\n\nThis action cannot be undone and will permanently remove the product from your catalog.`;
+        const form = document.getElementById('delete-product-form');
+        form.action = `/admin/products/${productId}`;
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+    }
+}
+
+function closeDeleteProductModal() {
+    const modal = document.getElementById('delete-product-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }
+}
+
+// Cerrar modal al hacer click fuera
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteProductModal = document.getElementById('delete-product-modal');
+    
+    if (deleteProductModal) {
+        deleteProductModal.addEventListener('click', function(e) {
+            if (e.target === deleteProductModal) {
+                closeDeleteProductModal();
+            }
+        });
+    }
+    
+    // Cerrar con tecla ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeDeleteProductModal();
+        }
+    });
 });
 </script>
 @endsection

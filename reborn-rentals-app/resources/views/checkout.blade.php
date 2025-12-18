@@ -107,15 +107,17 @@
                         <div class="text-2xl sm:text-3xl font-bold text-gray-900" id="grand-total">${{ number_format($total * 1.02, 2) }}</div>
                     </div>
                     
-                    <!-- Message about verification -->
+                    <!-- Message about invoice -->
                     <div class="text-center text-gray-600 text-sm py-4">
-                        <p>Your order will be completed automatically after payment verification.</p>
+                        <p>An invoice will be sent to you via Odoo with your selected payment method.</p>
                     </div>
                 </div>
             </div>
         </form>
     </div>
 </div>
+
+@include('components.success-modal')
 
 <script>
 // Open cart sidebar automatically when on checkout page
@@ -299,8 +301,8 @@ function updateGrandTotal() {
 function submitCheckoutForm() {
     console.log('submitCheckoutForm() called');
     
-    // Note: Payment verification is checked server-side in CheckoutController
-    // The modal should have been opened and code verified before reaching here
+    // Note: Payment processing removed - orders will be invoiced via Odoo
+    // Payment method is selected but not processed here
     
     // Get directions data
     const directionsData = localStorage.getItem('reborn-rentals-directions');
@@ -474,11 +476,6 @@ function submitCheckoutForm() {
                     localStorage.removeItem('payment-method');
                     localStorage.removeItem('payment-method-details');
                     localStorage.removeItem('applied_coupon');
-                    
-                    // Close verification modal if open
-                    if (typeof closeVerificationModal === 'function') {
-                        closeVerificationModal();
-                    }
                     
                     // Show success modal
                     if (typeof openSuccessModal === 'function') {

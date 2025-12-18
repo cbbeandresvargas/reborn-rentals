@@ -21,9 +21,9 @@ class AdminController extends Controller
             'active_products' => Product::where('active', true)->count(),
         ];
 
-        // Últimas órdenes
+        // Últimas órdenes - ordenar por ordered_at (o created_at si ordered_at es null)
         $recentOrders = Order::with(['user', 'items.product'])
-            ->latest()
+            ->orderByRaw('COALESCE(ordered_at, created_at) DESC')
             ->limit(5)
             ->get();
 

@@ -10,9 +10,16 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')->latest()->paginate(15);
+        $query = Product::with('category');
+        
+        // Filter by category
+        if ($request->has('category_id') && $request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+        
+        $products = $query->latest()->paginate(15)->withQueryString();
         $categories = Category::all();
         return view('admin.products.index', compact('products', 'categories'));
     }

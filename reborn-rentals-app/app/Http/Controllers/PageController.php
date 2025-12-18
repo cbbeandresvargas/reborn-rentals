@@ -39,6 +39,11 @@ class PageController extends Controller
         return view('terms-conditions');
     }
 
+    public function sms()
+    {
+        return view('sms-policy');
+    }
+
     public function directions()
     {
         return view('directions');
