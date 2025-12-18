@@ -19,10 +19,18 @@ return Application::configure(basePath: dirname(__DIR__))
                 || str_contains($host, 'localhost')
                 || str_starts_with($host, '127.0.0.1');
             
-            // En producción: solo funciona con subdominio admin.rebornrentals.com
-            if ($subdomain === 'admin' && !app()->environment('local')) {
-                Route::middleware(['web', 'subdomain:admin'])
-                    ->group(base_path('routes/admin.php'));
+            // En producción: funciona con subdominio admin.rebornrentals.com O con prefijo /admin
+            if (!app()->environment('local')) {
+                if ($subdomain === 'admin') {
+                    // Si hay subdominio admin, usar subdominio (sin prefijo)
+                    Route::middleware(['web', 'subdomain:admin'])
+                        ->group(base_path('routes/admin.php'));
+                } else {
+                    // Si no hay subdominio, usar prefijo /admin (para Hostinger y otros hosts)
+                    Route::middleware(['web'])
+                        ->prefix('admin')
+                        ->group(base_path('routes/admin.php'));
+                }
             }
             
             // En desarrollo local: funciona con prefijo /admin en localhost

@@ -838,8 +838,13 @@ function setupCheckoutFormListeners() {
                 return;
             }
             
-            // All validations passed, show verification modal
-            openVerificationModal();
+            // All validations passed, submit checkout form
+            if (typeof submitCheckoutForm === 'function') {
+                submitCheckoutForm();
+            } else {
+                // Fallback: redirect to checkout page
+                window.location.href = '/checkout';
+            }
         });
     }
 }
