@@ -131,6 +131,22 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-100">
                         @forelse($recentOrders as $order)
+                        @php
+                            $billingDetails = $order->billing_details_json ? json_decode($order->billing_details_json, true) : null;
+                            $customerName = 'N/A';
+                            $customerInitial = 'N';
+                            
+                            if ($billingDetails && isset($billingDetails['firstName'])) {
+                                $firstName = $billingDetails['firstName'] ?? '';
+                                $lastName = $billingDetails['lastName'] ?? '';
+                                $customerName = trim($firstName . ' ' . $lastName) ?: 'N/A';
+                                $customerInitial = strtoupper(substr($firstName ?: 'N', 0, 1));
+                            } else {
+                                // Fallback to user if billing details not available
+                                $customerName = $order->user->name ?? 'N/A';
+                                $customerInitial = strtoupper(substr($customerName, 0, 1));
+                            }
+                        @endphp
                         <tr class="hover:bg-gray-50 transition-colors duration-150">
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
@@ -140,9 +156,9 @@
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="w-8 h-8 bg-gradient-to-br from-[#CE9704] to-[#B8860B] rounded-full flex items-center justify-center text-white text-xs font-bold mr-2">
-                                        {{ strtoupper(substr($order->user->name, 0, 1)) }}
+                                        {{ $customerInitial }}
                                     </div>
-                                    <span class="text-sm font-medium text-gray-900">{{ $order->user->name }}</span>
+                                    <span class="text-sm font-medium text-gray-900">{{ $customerName }}</span>
                                 </div>
                             </td>
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap">

@@ -26,7 +26,7 @@
                     <a href="{{ route('faq') }}" class="text-white no-underline text-sm hover:text-[#CE9704] transition-colors duration-300 py-1 block w-full text-left">FAQ</a>
                     <a href="https://grb-group.com/en/" class="text-white no-underline text-sm hover:text-[#CE9704] transition-colors duration-300 py-1 block w-full text-left" target="_blank" rel="noopener noreferrer">Corporate</a>
                 </nav>
-            </div>
+        </div>
 
             <!-- Explore -->
             <div>
@@ -38,7 +38,7 @@
                     <a href="{{ route('sitemap') }}" class="text-white no-underline text-sm hover:text-[#CE9704] transition-colors duration-300 py-1 block w-full text-left">Site Map</a>
                     <a href="{{ route('blog') }}" class="text-white no-underline text-sm hover:text-[#CE9704] transition-colors duration-300 py-1 block w-full text-left">Blog</a>
                     <a href="https://grb-group.com/en/open-opportunities/" id="careers-link" class="text-white no-underline text-sm hover:text-[#CE9704] transition-colors duration-300 py-1 block w-full text-left" target="_blank" rel="noopener noreferrer">Careers</a>
-                </nav>
+                    </nav>
             </div>
 
             <!-- Legal & Policies -->
@@ -52,7 +52,7 @@
                     <a href="{{ route('privacy') }}" id="privacy-link" class="text-white no-underline text-sm hover:text-[#CE9704] transition-colors duration-300 py-1 block w-full text-left">Privacy Policy</a>
                     <a href="{{ route('fees') }}" id="fees-link" class="text-white no-underline text-sm hover:text-[#CE9704] transition-colors duration-300 py-1 block w-full text-left">Fees & Surcharges</a>
                     <a href="{{ route('sms') }}" id="sms-link" class="text-white no-underline text-sm hover:text-[#CE9704] transition-colors duration-300 py-1 block w-full text-left">SMS Policy</a>
-                </nav>
+                    </nav>
             </div>
 
         </div>

@@ -8,12 +8,12 @@
     <header class="bg-gradient-to-r from-white to-gray-50 shadow-lg border-b border-gray-200 sticky top-0 z-40 backdrop-blur-sm">
         <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4">
                     <a href="{{ route('admin.orders.index') }}" class="text-[#CE9704] hover:text-[#B8860B] transition-colors transform hover:scale-110">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                    </a>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            </a>
                     <div>
                         <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Order #{{ $order->id }}</h1>
                         <p class="text-sm text-gray-500 mt-1">{{ $order->ordered_at ? $order->ordered_at->format('M d, Y \a\t h:i A') : 'N/A' }}</p>
@@ -84,14 +84,14 @@
                     </div>
                     <div class="p-6">
                         <div class="space-y-4">
-                            @foreach($order->items as $item)
+                        @foreach($order->items as $item)
                             <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors {{ !$loop->last ? 'border-b border-gray-200 pb-4' : '' }}">
                                 <div class="shrink-0">
-                                    <img src="{{ $item->product->image_url ? asset($item->product->image_url) : asset('Product1.png') }}" 
+                            <img src="{{ $item->product->image_url ? asset($item->product->image_url) : asset('Product1.png') }}" 
                                          alt="{{ $item->product->name }}" 
                                          class="w-16 h-16 object-contain bg-white rounded-lg p-2 shadow-sm">
                                 </div>
-                                <div class="flex-1 min-w-0">
+                            <div class="flex-1 min-w-0">
                                     <h3 class="font-semibold text-gray-900 text-base mb-1">{{ $item->product->name }}</h3>
                                     <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600">
                                         <span>Qty: <strong class="text-gray-900">{{ $item->quantity }}</strong></span>
@@ -209,13 +209,13 @@
                             @if($paymentMethodDetails && count(array_filter($paymentMethodDetails)))
                                 <div class="mt-3 pt-3 border-t border-gray-300">
                                     <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Additional Details:</p>
-                                    @foreach($paymentMethodDetails as $key => $value)
-                                        @if($value !== null && $value !== '')
+                                @foreach($paymentMethodDetails as $key => $value)
+                                    @if($value !== null && $value !== '')
                                             <p class="text-xs text-gray-700 mb-1">
                                                 <strong>{{ ucfirst(str_replace('_', ' ', $key)) }}:</strong> {{ $value }}
                                             </p>
-                                        @endif
-                                    @endforeach
+                                    @endif
+                                @endforeach
                                 </div>
                             @endif
                         </div>
@@ -418,27 +418,27 @@
             </div>
         </div>
     </main>
-</div>
-
-<script>
-    // Update label text when switch is toggled
-    document.addEventListener('DOMContentLoaded', function() {
-        const checkbox = document.querySelector('input[name="status"]');
-        const label = document.getElementById('status-label');
-        
-        if (checkbox && label) {
-            checkbox.addEventListener('change', function() {
-                if (this.checked) {
-                    label.textContent = 'Completed';
-                    label.classList.remove('text-gray-500');
-                    label.classList.add('text-green-600');
-                } else {
-                    label.textContent = 'Pending';
-                    label.classList.remove('text-green-600');
-                    label.classList.add('text-gray-500');
-                }
-            });
-        }
-    });
-</script>
+                </div>
+                
+                <script>
+                    // Update label text when switch is toggled
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const checkbox = document.querySelector('input[name="status"]');
+                        const label = document.getElementById('status-label');
+                        
+                        if (checkbox && label) {
+                            checkbox.addEventListener('change', function() {
+                                if (this.checked) {
+                                    label.textContent = 'Completed';
+                                    label.classList.remove('text-gray-500');
+                                    label.classList.add('text-green-600');
+                                } else {
+                                    label.textContent = 'Pending';
+                                    label.classList.remove('text-green-600');
+                                    label.classList.add('text-gray-500');
+                                }
+                            });
+                        }
+                    });
+                </script>
 @endsection

@@ -32,7 +32,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
                         Add Coupon
-                    </button>
+            </button>
                 </div>
             </div>
         </div>
@@ -69,10 +69,10 @@
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 text-center mb-2">Validation Errors</h3>
                     <ul class="text-gray-600 text-center mb-6 space-y-1">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
                     <button onclick="closeErrorModal()" class="w-full bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 transition-all font-semibold">
                         OK
                     </button>
@@ -93,9 +93,9 @@
             </div>
             
             <div class="overflow-x-auto">
-                <table class="w-full">
+            <table class="w-full">
                     <thead class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                        <tr>
+                    <tr>
                             <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                                 <div class="flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,10 +136,10 @@
                                     Actions
                                 </div>
                             </th>
-                        </tr>
-                    </thead>
+                    </tr>
+                </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse($coupons as $coupon)
+                    @forelse($coupons as $coupon)
                         <tr class="hover:bg-gradient-to-r hover:from-gray-50 hover:to-white transition-all duration-200 group cursor-pointer" onclick="window.location.href='{{ route('admin.coupons.show', $coupon) }}'">
                             <td class="px-6 py-5">
                                 <div class="flex items-center gap-3">
@@ -150,31 +150,31 @@
                                     </div>
                                     <div>
                                         <div class="font-bold text-gray-900 text-base">{{ $coupon->code }}</div>
-                                        @if($coupon->min_order_total)
+                            @if($coupon->min_order_total)
                                         <div class="text-xs text-gray-500 mt-1 flex items-center gap-1">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
                                             Min: ${{ number_format($coupon->min_order_total, 2) }}
                                         </div>
-                                        @endif
+                            @endif
                                     </div>
                                 </div>
-                            </td>
+                        </td>
                             <td class="px-6 py-5">
                                 <div class="flex items-center gap-2">
                                     <span class="px-3 py-1.5 bg-green-100 text-green-800 rounded-full text-sm font-bold">
-                                        @if($coupon->discount_type === 'percentage')
-                                            {{ $coupon->discount_value }}%
-                                        @else
-                                            ${{ number_format($coupon->discount_value, 2) }}
-                                        @endif
+                                @if($coupon->discount_type === 'percentage')
+                                    {{ $coupon->discount_value }}%
+                                @else
+                                    ${{ number_format($coupon->discount_value, 2) }}
+                                @endif
                                     </span>
                                     <span class="text-xs text-gray-500">
                                         {{ $coupon->discount_type === 'percentage' ? 'off' : 'discount' }}
                                     </span>
-                                </div>
-                            </td>
+                            </div>
+                        </td>
                             <td class="px-6 py-5">
                                 <div class="text-sm">
                                     <div class="font-medium text-gray-900 flex items-center gap-1 mb-1">
@@ -190,7 +190,7 @@
                                         {{ $coupon->expires_at?->format('M d, Y') ?? 'No expiry' }}
                                     </div>
                                 </div>
-                            </td>
+                        </td>
                             <td class="px-6 py-5" onclick="event.stopPropagation();">
                                 <form action="{{ route('admin.coupons.update', $coupon) }}" method="POST" class="inline" id="toggle-form-{{ $coupon->id }}">
                                     @csrf
@@ -207,11 +207,11 @@
                                             onchange="this.form.submit()">
                                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#CE9704] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#CE9704]"></div>
                                         <span class="ml-3 text-sm font-medium {{ $coupon->is_active ? 'text-green-600' : 'text-gray-500' }}" id="status-label-{{ $coupon->id }}">
-                                            {{ $coupon->is_active ? 'Active' : 'Inactive' }}
-                                        </span>
+                                {{ $coupon->is_active ? 'Active' : 'Inactive' }}
+                            </span>
                                     </label>
                                 </form>
-                            </td>
+                        </td>
                             <td class="px-6 py-5">
                                 <div class="flex items-center gap-2 text-sm font-medium text-gray-600 group-hover:text-[#CE9704] transition-colors">
                                     <span>View details</span>
@@ -219,10 +219,10 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                     </svg>
                                 </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
                             <td colspan="5" class="px-6 py-16 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="p-4 bg-gray-100 rounded-full mb-4">
@@ -240,10 +240,10 @@
                                     </button>
                                 </div>
                             </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
             </div>
         </div>
 
@@ -251,7 +251,7 @@
         @if($coupons->hasPages())
         <div class="mt-6 flex justify-center">
             <div class="bg-white rounded-lg shadow-md border border-gray-200 px-4 py-3">
-                {{ $coupons->links() }}
+            {{ $coupons->links() }}
             </div>
         </div>
         @endif
@@ -308,7 +308,7 @@
                     <label class="block text-sm font-bold text-gray-700 mb-2">Discount Value <span class="text-red-500">*</span></label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold" id="discount-symbol">{{ old('discount_type') === 'fixed' ? '$' : '' }}</span>
-                        <input type="number" name="discount_value" id="coupon-discount-value" step="0.01" value="{{ old('discount_value') }}" required
+                    <input type="number" name="discount_value" id="coupon-discount-value" step="0.01" value="{{ old('discount_value') }}" required
                             class="w-full {{ old('discount_type') === 'fixed' ? 'pl-8' : 'pl-4' }} pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] transition-all {{ $errors->has('discount_value') ? 'border-red-500' : '' }}"
                             placeholder="0.00">
                     </div>
@@ -332,7 +332,7 @@
                     <label class="block text-sm font-bold text-gray-700 mb-2">Min Order Total</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold">$</span>
-                        <input type="number" name="min_order_total" id="coupon-min-order" step="0.01" value="{{ old('min_order_total') }}"
+                    <input type="number" name="min_order_total" id="coupon-min-order" step="0.01" value="{{ old('min_order_total') }}"
                             class="w-full pl-8 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] transition-all"
                             placeholder="0.00">
                     </div>

@@ -1630,11 +1630,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const billingDetails = localStorage.getItem('billing-details');
                     const paymentMethodDetails = localStorage.getItem('payment-method-details');
                     
-                    if (!foremanDetails) {
-                        alert('Por favor completa los detalles del Foreman primero.');
-                        return;
-                    }
-                    
+                    // Billing details is required (foreman can be empty, will use billing data)
                     if (!billingDetails) {
                         alert('Por favor completa los detalles de facturación primero.');
                         return;
@@ -1644,6 +1640,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         alert('Por favor completa los detalles del método de pago primero.');
                         return;
                     }
+                    
+                    // Foreman details is optional - if empty, billing details will be used
                     
                     // Payment verification removed - submit order directly
                     // Order will be invoiced via Odoo with selected payment method

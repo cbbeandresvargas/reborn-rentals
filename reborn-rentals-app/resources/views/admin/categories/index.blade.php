@@ -82,36 +82,36 @@
                     </div>
                     <div class="p-6">
                         <form action="{{ route('admin.categories.store') }}" method="POST" class="space-y-4">
-                            @csrf
+                        @csrf
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Name <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" name="name" value="{{ old('name') }}" required
+                            <input type="text" name="name" value="{{ old('name') }}" required
                                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] transition-all outline-none">
-                                @error('name')
+                            @error('name')
                                     <p class="text-red-500 text-xs mt-1.5 flex items-center gap-1">
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                         </svg>
                                         {{ $message }}
                                     </p>
-                                @enderror
-                            </div>
+                            @enderror
+                        </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-                                <textarea name="description" rows="3"
+                            <textarea name="description" rows="3"
                                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] transition-all outline-none resize-none">{{ old('description') }}</textarea>
-                            </div>
+                        </div>
                             <button type="submit" class="w-full bg-gradient-to-r from-[#CE9704] to-[#B8860B] text-white px-4 py-2.5 rounded-lg hover:from-[#B8860B] hover:to-[#CE9704] transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                                 <div class="flex items-center justify-center gap-2">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                     </svg>
-                                    Create Category
+                            Create Category
                                 </div>
-                            </button>
-                        </form>
+                        </button>
+                    </form>
                     </div>
                 </div>
             </div>
@@ -120,9 +120,9 @@
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="w-full">
+                    <table class="w-full">
                             <thead class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                                <tr>
+                            <tr>
                                     <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                                         <div class="flex items-center gap-2">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,10 +147,10 @@
                                             Actions
                                         </div>
                                     </th>
-                                </tr>
-                            </thead>
+                            </tr>
+                        </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse($categories as $category)
+                            @forelse($categories as $category)
                                 <tr class="hover:bg-gradient-to-r hover:from-gray-50 hover:to-white transition-all duration-200 group">
                                     <td class="px-6 py-5 cursor-pointer" onclick="window.location.href='{{ route('admin.categories.show', $category) }}'">
                                         <div class="flex items-center gap-3">
@@ -161,9 +161,9 @@
                                             </div>
                                             <div>
                                                 <div class="font-bold text-gray-900 text-base">{{ $category->name }}</div>
-                                                @if($category->description)
+                                    @if($category->description)
                                                 <div class="text-sm text-gray-500 mt-1">{{ Str::limit($category->description, 60) }}</div>
-                                                @endif
+                                    @endif
                                             </div>
                                         </div>
                                     </td>
@@ -174,7 +174,7 @@
                                             </span>
                                             <span class="text-xs text-gray-500">product(s)</span>
                                         </div>
-                                    </td>
+                                </td>
                                     <td class="px-6 py-5">
                                         <div class="flex items-center gap-2">
                                             <a href="{{ route('admin.categories.show', $category) }}" 
@@ -194,10 +194,10 @@
                                                 Delete
                                             </button>
                                         </div>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
                                     <td colspan="3" class="px-6 py-16 text-center">
                                         <div class="flex flex-col items-center justify-center">
                                             <div class="p-4 bg-gray-100 rounded-full mb-4">
@@ -209,10 +209,10 @@
                                             <p class="text-sm text-gray-500">Create your first category to get started.</p>
                                         </div>
                                     </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                     </div>
                 </div>
             </div>
@@ -222,7 +222,7 @@
         @if($categories->hasPages())
         <div class="mt-6 flex justify-center">
             <div class="bg-white rounded-lg shadow-md border border-gray-200 px-4 py-3">
-                {{ $categories->links() }}
+            {{ $categories->links() }}
             </div>
         </div>
         @endif

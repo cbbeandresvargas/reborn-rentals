@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\JobLocation;
 use App\Models\Cupon;
 use App\Models\PaymentInfo;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +47,7 @@ class CheckoutController extends Controller
     {
         \Log::info('Checkout store method called', [
             'user_id' => Auth::id(),
+            'is_guest' => !Auth::check(),
             'cart' => Session::get('cart', []),
             'request_data' => $request->all()
         ]);
@@ -87,6 +89,24 @@ class CheckoutController extends Controller
         try {
             return DB::transaction(function () use ($validated, $cart, $request) {
                 \Log::info('Starting order creation transaction');
+                
+                // Get or create default admin user for guest checkout
+                $userId = Auth::id();
+                if (!$userId) {
+                    // Find first admin user or create a default one
+                    $adminUser = User::where('role', 'admin')->first();
+                    if (!$adminUser) {
+                        // Create a default admin user if none exists
+                        $adminUser = User::create([
+                            'name' => 'Guest',
+                            'email' => 'guest@rebornrentals.com',
+                            'password' => bcrypt('default'),
+                            'role' => 'admin',
+                        ]);
+                    }
+                    $userId = $adminUser->id;
+                    \Log::info('Using default admin user for guest checkout', ['user_id' => $userId]);
+                }
                 
                 // Crear JobLocation
                 $jobLocation = JobLocation::create([
@@ -182,8 +202,9 @@ class CheckoutController extends Controller
 
                 // Crear Orden
                 // Status is set to false (pending) - admin will complete it after payment is processed in Odoo
+                // user_id uses default admin user for guest checkout
                 $order = Order::create([
-                    'user_id' => Auth::id(),
+                    'user_id' => $userId,
                     'job_id' => $jobLocation->id,
                     'cupon_id' => $cupon?->id,
                     'total_amount' => $totalAmount,
@@ -229,7 +250,7 @@ class CheckoutController extends Controller
                 // Guardar información de pago si existe
                 if ($request->has('card_holder_name')) {
                     PaymentInfo::create([
-                        'user_id' => Auth::id(),
+                        'user_id' => $userId,
                         'card_holder_name' => $request->card_holder_name,
                         'card_number' => substr($request->card_number, -4), // Solo últimos 4 -- Marcar con Hashing
                         'card_expiration' => $request->card_expiration,

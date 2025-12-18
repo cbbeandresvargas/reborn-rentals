@@ -82,9 +82,9 @@
                             Filtered: {{ $categories->firstWhere('id', request('category_id'))->name ?? 'Unknown' }}
                         </span>
                         @endif
-                        <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full font-medium">
-                            {{ $products->total() }} {{ $products->total() === 1 ? 'Product' : 'Products' }}
-                        </span>
+                    <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full font-medium">
+                        {{ $products->total() }} {{ $products->total() === 1 ? 'Product' : 'Products' }}
+                    </span>
                     </div>
                 </div>
             </div>
@@ -134,9 +134,9 @@
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                        </svg>
+                                    </svg>
                                         View
-                                    </a>
+                                </a>
                                     <button type="button" 
                                             onclick="openDeleteProductModal('{{ $product->id }}', '{{ addslashes($product->name) }}')"
                                             class="inline-flex items-center px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs sm:text-sm font-semibold">

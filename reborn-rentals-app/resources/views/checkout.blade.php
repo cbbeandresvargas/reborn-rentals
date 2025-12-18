@@ -350,7 +350,19 @@ function submitCheckoutForm() {
         }
     }
     
-    // Get Foreman Details
+    // Get Billing Details first
+    let billingDetails = {};
+    const billingData = localStorage.getItem('billing-details');
+    if (billingData) {
+        try {
+            billingDetails = JSON.parse(billingData);
+            console.log('Billing details found:', billingDetails);
+        } catch (e) {
+            console.error('Error parsing billing details:', e);
+        }
+    }
+    
+    // Get Foreman Details - if empty, use billing details for name and email
     let foremanDetails = {};
     const foremanData = localStorage.getItem('foreman-details');
     if (foremanData) {
@@ -362,15 +374,17 @@ function submitCheckoutForm() {
         }
     }
     
-    // Get Billing Details
-    let billingDetails = {};
-    const billingData = localStorage.getItem('billing-details');
-    if (billingData) {
-        try {
-            billingDetails = JSON.parse(billingData);
-            console.log('Billing details found:', billingDetails);
-        } catch (e) {
-            console.error('Error parsing billing details:', e);
+    // If foreman details are empty or missing name/email, use billing details
+    if (!foremanDetails || Object.keys(foremanDetails).length === 0 || 
+        (!foremanDetails.firstName && !foremanDetails.lastName && !foremanDetails.email)) {
+        if (billingDetails && Object.keys(billingDetails).length > 0) {
+            foremanDetails = {
+                firstName: billingDetails.firstName || '',
+                lastName: billingDetails.lastName || '',
+                email: billingDetails.email || '',
+                phone: foremanDetails.phone || billingDetails.phone || ''
+            };
+            console.log('Using billing details for foreman:', foremanDetails);
         }
     }
     
