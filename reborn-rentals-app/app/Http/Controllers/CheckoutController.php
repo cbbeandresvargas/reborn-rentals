@@ -52,6 +52,35 @@ class CheckoutController extends Controller
             'request_data' => $request->all()
         ]);
 
+        // Prevent duplicate submissions using session token
+        $submissionToken = $request->input('_submission_token');
+        $sessionToken = Session::get('checkout_submission_token');
+        
+        if ($submissionToken && $sessionToken && $submissionToken === $sessionToken) {
+            \Log::warning('Duplicate checkout submission detected', [
+                'token' => $submissionToken,
+                'user_id' => Auth::id()
+            ]);
+            
+            // Clear the token to prevent reuse
+            Session::forget('checkout_submission_token');
+            
+            // Return error for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This order has already been processed. Please check your orders.'
+                ], 400);
+            }
+            
+            return redirect()->route('checkout')
+                ->with('error', 'This order has already been processed. Please check your orders.');
+        }
+        
+        // Generate new token for this submission
+        $newToken = uniqid('checkout_', true);
+        Session::put('checkout_submission_token', $newToken);
+
         $cart = Session::get('cart', []);
         
         if (empty($cart)) {
@@ -260,6 +289,9 @@ class CheckoutController extends Controller
 
                 // Limpiar carrito
                 Session::forget('cart');
+                
+                // Clear submission token after successful order
+                Session::forget('checkout_submission_token');
 
                 \Log::info('Order completed successfully', ['order_id' => $order->id]);
 

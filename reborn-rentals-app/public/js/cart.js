@@ -1616,50 +1616,8 @@ window.openSuccessModal = openSuccessModal;
 window.closeSuccessModal = closeSuccessModal;
 window.goToHomepage = goToHomepage;
 
-// Setup checkout button listener
-document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.pathname.includes('checkout')) {
-        setTimeout(() => {
-            const sidebarCheckoutBtn = document.getElementById('sidebar-checkout-btn');
-            if (sidebarCheckoutBtn) {
-                sidebarCheckoutBtn.addEventListener('click', function() {
-                    // Validate terms checkbox
-                    const termsCheckbox = document.getElementById('terms-checkbox');
-                    if (!termsCheckbox || !termsCheckbox.checked) {
-                        alert('Por favor acepta los Términos y Condiciones para continuar.');
-                        return;
-                    }
-                    
-                    // Check if all required data is filled
-                    const foremanDetails = localStorage.getItem('foreman-details');
-                    const billingDetails = localStorage.getItem('billing-details');
-                    const paymentMethodDetails = localStorage.getItem('payment-method-details');
-                    
-                    // Billing details is required (foreman can be empty, will use billing data)
-                    if (!billingDetails) {
-                        alert('Por favor completa los detalles de facturación primero.');
-                        return;
-                    }
-                    
-                    if (!paymentMethodDetails) {
-                        alert('Por favor completa los detalles del método de pago primero.');
-                        return;
-                    }
-                    
-                    // Foreman details is optional - if empty, billing details will be used
-                    
-                    // Payment verification removed - submit order directly
-                    // Order will be invoiced via Odoo with selected payment method
-                    if (typeof submitCheckoutForm === 'function') {
-                        submitCheckoutForm();
-                    } else {
-                        alert('Error: Could not complete order. Please try again.');
-                    }
-                });
-            }
-        }, 900);
-    }
-});
+// Note: Checkout button listener is now handled in setupCheckoutFormListeners()
+// to avoid duplicate event listeners
 
 // Apply coupon code function
 function applyCouponCode() {

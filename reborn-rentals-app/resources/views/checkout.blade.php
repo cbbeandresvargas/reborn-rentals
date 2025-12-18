@@ -298,8 +298,28 @@ function updateGrandTotal() {
 }
 
 // Submit checkout form with all data
+let isSubmittingCheckout = false; // Flag to prevent double submission
+
 function submitCheckoutForm() {
     console.log('submitCheckoutForm() called');
+    
+    // Prevent double submission
+    if (isSubmittingCheckout) {
+        console.log('Checkout already in progress, ignoring duplicate call');
+        return;
+    }
+    
+    isSubmittingCheckout = true;
+    
+    // Disable checkout button to prevent multiple clicks
+    const checkoutBtn = document.getElementById('sidebar-checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.style.opacity = '0.5';
+        checkoutBtn.style.cursor = 'not-allowed';
+        const originalText = checkoutBtn.textContent;
+        checkoutBtn.textContent = 'Processing...';
+    }
     
     // Note: Payment processing removed - orders will be invoiced via Odoo
     // Payment method is selected but not processed here
@@ -440,6 +460,10 @@ function submitCheckoutForm() {
     }
     productDaysInput.value = JSON.stringify(productDays);
     
+    // Generate unique submission token to prevent duplicate orders
+    const submissionToken = 'checkout_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    addHiddenField(form, '_submission_token', submissionToken);
+    
     // Add all required form fields
     addHiddenField(form, 'start_date', directions.startDate);
     addHiddenField(form, 'end_date', directions.endDate);
@@ -491,6 +515,11 @@ function submitCheckoutForm() {
                     localStorage.removeItem('payment-method-details');
                     localStorage.removeItem('applied_coupon');
                     
+                    // Clear cart from session
+                    if (typeof clearCart === 'function') {
+                        clearCart();
+                    }
+                    
                     // Show success modal
                     if (typeof openSuccessModal === 'function') {
                         openSuccessModal();
@@ -499,6 +528,14 @@ function submitCheckoutForm() {
                         window.location.href = data.redirect_url || form.action.replace('/checkout', '/orders');
                     }
                 } else {
+                    // Re-enable button on error
+                    isSubmittingCheckout = false;
+                    const checkoutBtn = document.getElementById('sidebar-checkout-btn');
+                    if (checkoutBtn) {
+                        checkoutBtn.disabled = false;
+                        checkoutBtn.style.opacity = '1';
+                        checkoutBtn.style.cursor = 'pointer';
+                    }
                     throw new Error(data.message || 'Error creating order');
                 }
             });
@@ -518,6 +555,21 @@ function submitCheckoutForm() {
     .catch(error => {
         console.error('Error submitting order:', error);
         alert(error.message || 'Error creating order. Please try again.');
+        
+        // Re-enable button on error
+        isSubmittingCheckout = false;
+        const checkoutBtn = document.getElementById('sidebar-checkout-btn');
+        if (checkoutBtn) {
+            checkoutBtn.disabled = false;
+            checkoutBtn.style.opacity = '1';
+            checkoutBtn.style.cursor = 'pointer';
+        }
+    })
+    .finally(() => {
+        // Reset flag after a delay to allow for redirect
+        setTimeout(() => {
+            isSubmittingCheckout = false;
+        }, 2000);
     });
 }
 

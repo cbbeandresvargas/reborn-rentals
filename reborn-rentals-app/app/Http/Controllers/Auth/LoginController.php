@@ -24,26 +24,11 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            // Redirigir según el rol del usuario y el subdominio
+            // Redirigir según el rol del usuario
             if (Auth::user()->isAdmin()) {
-                $host = $request->getHost();
-                $parts = explode('.', $host);
-                $subdomain = count($parts) > 2 ? $parts[0] : null;
-                $isLocalhost = in_array($host, ['localhost', '127.0.0.1']) || str_contains($host, 'localhost');
-                
-                // Si estamos en el subdominio admin, redirigir al dashboard
-                if ($subdomain === 'admin') {
-                    return redirect()->intended('/');
-                }
-                
-                // Si estamos en localhost (desarrollo), redirigir a /admin
-                if (app()->environment('local') && $isLocalhost) {
-                    return redirect()->intended('/admin');
-                }
-                
-                // En producción, redirigir al subdominio admin
-                $adminUrl = 'http://admin.' . config('app.domain', 'rebornrentals.com');
-                return redirect($adminUrl);
+                // Siempre redirigir al dashboard del admin usando la ruta /admin
+                // Funciona tanto en desarrollo como en producción (Hostinger)
+                return redirect()->intended(route('admin.dashboard'));
             }
 
             // Si no es admin y está intentando acceder al subdominio admin, redirigir al dominio principal
