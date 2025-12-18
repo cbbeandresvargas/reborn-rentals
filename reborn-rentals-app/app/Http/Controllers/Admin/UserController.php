@@ -91,4 +91,27 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')
             ->with('success', 'User deleted successfully');
     }
+
+    public function updateRole(Request $request, User $user)
+    {
+        // Prevent changing your own role
+        if ($user->id === Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot change your own role'
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'role' => 'required|in:user,admin',
+        ]);
+
+        $user->update(['role' => $validated['role']]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User role updated successfully',
+            'role' => $user->role
+        ]);
+    }
 }

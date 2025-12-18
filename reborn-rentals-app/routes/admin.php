@@ -59,6 +59,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
         'destroy' => 'admin.users.destroy',
     ]);
     
+    // Update user role
+    Route::patch('/users/{user}/role', [AdminUserController::class, 'updateRole'])->name('admin.users.updateRole');
+    
     // Categories CRUD
     Route::resource('categories', AdminCategoryController::class)->except(['create', 'edit'])->names([
         'index' => 'admin.categories.index',

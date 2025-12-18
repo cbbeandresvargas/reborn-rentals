@@ -83,6 +83,15 @@
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                 <div class="flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    Admin Toggle
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
                                     Created
@@ -140,6 +149,22 @@
                                 {{ ucfirst($user->role) }}
                             </span>
                         </td>
+                        <td class="px-6 py-4" onclick="event.stopPropagation();">
+                            @if($user->id !== Auth::id())
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input 
+                                        type="checkbox" 
+                                        class="sr-only peer" 
+                                        {{ $user->role === 'admin' ? 'checked' : '' }}
+                                        onchange="confirmRoleChange({{ $user->id }}, '{{ $user->name }}', '{{ $user->role }}', this.checked)"
+                                        id="role-toggle-{{ $user->id }}"
+                                    >
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#CE9704]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-[#CE9704] peer-checked:to-[#B8860B]"></div>
+                                </label>
+                            @else
+                                <span class="text-xs text-gray-400 italic">You</span>
+                            @endif
+                        </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-600 flex items-center gap-2">
                                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +184,7 @@
                     </tr>
                     @empty
                     <tr>
-                            <td colspan="5" class="px-6 py-12 text-center">
+                            <td colspan="6" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
@@ -191,6 +216,154 @@
         @endif
     </main>
 </div>
+
+<!-- Role Change Confirmation Modal -->
+<div id="role-change-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full transform transition-all">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-900">Confirm Role Change</h3>
+                <button onclick="closeRoleModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="mb-6">
+                <p class="text-gray-700 mb-2">
+                    Are you sure you want to <span id="role-action-text" class="font-semibold"></span> <span id="role-user-name" class="font-bold text-[#CE9704]"></span>?
+                </p>
+                <p class="text-sm text-gray-500">
+                    This will change their access level and permissions in the system.
+                </p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeRoleModal()" class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium">
+                    Cancel
+                </button>
+                <button id="confirm-role-change-btn" onclick="confirmRoleChangeAction()" class="flex-1 px-4 py-2 bg-gradient-to-r from-[#CE9704] to-[#B8860B] text-white rounded-lg hover:from-[#B8860B] hover:to-[#CE9704] transition-all font-medium shadow-md">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let pendingRoleChange = {
+    userId: null,
+    newRole: null,
+    checkbox: null
+};
+
+function confirmRoleChange(userId, userName, currentRole, isChecked) {
+    const newRole = isChecked ? 'admin' : 'user';
+    const action = isChecked ? 'make <span class="text-purple-600">Admin</span>' : 'remove <span class="text-blue-600">Admin</span> privileges from';
+    
+    pendingRoleChange = {
+        userId: userId,
+        newRole: newRole,
+        checkbox: document.getElementById('role-toggle-' + userId),
+        currentRole: currentRole
+    };
+    
+    document.getElementById('role-user-name').textContent = userName;
+    document.getElementById('role-action-text').innerHTML = action;
+    
+    const modal = document.getElementById('role-change-modal');
+    modal.style.display = 'flex';
+}
+
+function closeRoleModal() {
+    const modal = document.getElementById('role-change-modal');
+    modal.style.display = 'none';
+    
+    // Revert checkbox if cancelled
+    if (pendingRoleChange.checkbox && pendingRoleChange.currentRole) {
+        pendingRoleChange.checkbox.checked = pendingRoleChange.currentRole === 'admin';
+    }
+    
+    pendingRoleChange = {
+        userId: null,
+        newRole: null,
+        checkbox: null
+    };
+}
+
+function confirmRoleChangeAction() {
+    if (!pendingRoleChange.userId || !pendingRoleChange.newRole) {
+        return;
+    }
+    
+    const btn = document.getElementById('confirm-role-change-btn');
+    btn.disabled = true;
+    btn.textContent = 'Updating...';
+    
+    fetch(`/admin/users/${pendingRoleChange.userId}/role`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            role: pendingRoleChange.newRole
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            successMsg.textContent = data.message || 'Role updated successfully';
+            document.body.appendChild(successMsg);
+            
+            setTimeout(() => {
+                successMsg.remove();
+            }, 3000);
+            
+            // Reload page to reflect changes
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        } else {
+            throw new Error(data.message || 'Error updating role');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        
+        // Revert checkbox on error
+        if (pendingRoleChange.checkbox && pendingRoleChange.currentRole) {
+            pendingRoleChange.checkbox.checked = pendingRoleChange.currentRole === 'admin';
+        }
+        
+        // Show error message
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        errorMsg.textContent = error.message || 'Error updating role. Please try again.';
+        document.body.appendChild(errorMsg);
+        
+        setTimeout(() => {
+            errorMsg.remove();
+        }, 3000);
+        
+        btn.disabled = false;
+        btn.textContent = 'Confirm';
+    })
+    .finally(() => {
+        closeRoleModal();
+    });
+}
+
+// Close modal when clicking outside
+document.getElementById('role-change-modal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeRoleModal();
+    }
+});
+</script>
 
 @endsection
 
