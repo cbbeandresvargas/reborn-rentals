@@ -125,6 +125,7 @@
                             <th class="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">User</th>
                             <th class="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount</th>
                             <th class="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">Date</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">End Date</th>
                             <th class="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                             <th class="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -167,6 +168,10 @@
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap hidden md:table-cell">
                                 <span class="text-sm text-gray-600">{{ $order->ordered_at ? $order->ordered_at->format('M d, Y') : ($order->created_at ? $order->created_at->format('M d, Y') : 'N/A') }}</span>
                             </td>
+                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap hidden md:table-cell">
+                                <span class="text-sm text-gray-600">{{ $order->job && $order->job->end_date ? $order->job->end_date->format('M d, Y') : 'N/A' }}</span>
+                            </td>
+                            
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold {{ $order->status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                     <span class="w-1.5 h-1.5 mr-1.5 rounded-full {{ $order->status ? 'bg-green-500' : 'bg-red-500' }}"></span>
@@ -184,7 +189,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-4 sm:px-6 py-12 text-center">
+                            <td colspan="7" class="px-4 sm:px-6 py-12 text-center">
                                 <div class="flex flex-col items-center">
                                     <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>

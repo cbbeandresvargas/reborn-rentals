@@ -22,7 +22,7 @@ class AdminController extends Controller
         ];
 
         // Últimas órdenes - ordenar por ordered_at (o created_at si ordered_at es null)
-        $recentOrders = Order::with(['user', 'items.product'])
+        $recentOrders = Order::with(['user', 'items.product', 'job'])
             ->orderByRaw('COALESCE(ordered_at, created_at) DESC')
             ->limit(5)
             ->get();

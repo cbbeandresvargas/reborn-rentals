@@ -141,11 +141,81 @@
                                 </div>
                             </div>
                             
-                            <!-- Delivery Date -->
-                            @if($order->job && $order->job->date)
-                            <div>
-                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Delivery Date</label>
-                                <p class="text-gray-900 font-medium">{{ $order->job->date->format('F d, Y') }}</p>
+                            <!-- Delivery Date & End Date -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                @if($order->job && $order->job->date)
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Start Date</label>
+                                    <p class="text-gray-900 font-medium">{{ $order->job->date->format('F d, Y') }}</p>
+                                </div>
+                                @endif
+                                
+                                @if($order->job && $order->job->end_date)
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">End Date</label>
+                                    <p class="text-gray-900 font-medium">{{ $order->job->end_date->format('F d, Y') }}</p>
+                                </div>
+                                @endif
+                            </div>
+                            
+                            <!-- Rental Days Counter -->
+                            @if($order->job && $order->job->date && $order->job->end_date)
+                            @php
+                                $startDate = $order->job->date;
+                                $endDate = $order->job->end_date;
+                                $today = \Carbon\Carbon::today();
+                                $totalDays = $startDate->diffInDays($endDate) + 1;
+                                
+                                // Calcular días restantes
+                                $daysRemaining = 0;
+                                if ($today->lt($startDate)) {
+                                    // La renta aún no ha comenzado
+                                    $daysRemaining = $totalDays;
+                                } elseif ($today->gte($startDate) && $today->lte($endDate)) {
+                                    // La renta está en curso
+                                    $daysRemaining = $today->diffInDays($endDate) + 1;
+                                } else {
+                                    // La renta ya terminó
+                                    $daysRemaining = 0;
+                                }
+                                
+                                $isActive = $today->gte($startDate) && $today->lte($endDate);
+                                $isUpcoming = $today->lt($startDate);
+                                $isCompleted = $today->gt($endDate);
+                            @endphp
+                            <div class="mt-4 p-4 bg-gradient-to-r {{ $isActive ? 'from-blue-50 to-cyan-50 border-blue-200' : ($isUpcoming ? 'from-amber-50 to-yellow-50 border-amber-200' : 'from-gray-50 to-slate-50 border-gray-200') }} rounded-lg border">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Rental Period</label>
+                                        <p class="text-sm text-gray-600">
+                                            <span class="font-medium">{{ $totalDays }} day{{ $totalDays != 1 ? 's' : '' }}</span> total
+                                        </p>
+                                    </div>
+                                    <div class="text-right">
+                                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Days Remaining</label>
+                                        <p class="text-2xl font-bold {{ $isActive ? 'text-blue-600' : ($isUpcoming ? 'text-amber-600' : 'text-gray-500') }}">
+                                            {{ $daysRemaining }}
+                                        </p>
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            @if($isActive)
+                                                <span class="flex items-center gap-1">
+                                                    <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                                                    Active
+                                                </span>
+                                            @elseif($isUpcoming)
+                                                <span class="flex items-center gap-1">
+                                                    <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
+                                                    Upcoming
+                                                </span>
+                                            @else
+                                                <span class="flex items-center gap-1">
+                                                    <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                                                    Completed
+                                                </span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                             @endif
                             
