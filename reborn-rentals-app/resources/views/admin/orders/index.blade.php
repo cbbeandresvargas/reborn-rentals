@@ -77,7 +77,15 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
-                                    Date
+                                    Start Date
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    End Date
                                 </div>
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -164,14 +172,21 @@
                         </td>
                             <td class="px-6 py-5 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">
-                            {{ $order->ordered_at ? $order->ordered_at->format('M d, Y') : 'N/A' }}
+                            {{ $order->job && $order->job->date ? $order->job->date->format('M d, Y') : 'N/A' }}
                                 </div>
-                            @if($order->ordered_at)
-                                <div class="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    {{ $order->ordered_at->format('h:i A') }}
+                            @if($order->job && $order->job->date)
+                                <div class="text-xs text-gray-500 mt-1">
+                                    Start Date
+                                </div>
+                            @endif
+                        </td>
+                            <td class="px-6 py-5 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">
+                            {{ $order->job && $order->job->end_date ? $order->job->end_date->format('M d, Y') : 'N/A' }}
+                                </div>
+                            @if($order->job && $order->job->end_date)
+                                <div class="text-xs text-gray-500 mt-1">
+                                    End Date
                                 </div>
                             @endif
                         </td>
@@ -200,7 +215,7 @@
                     </tr>
                     @empty
                     <tr>
-                            <td colspan="6" class="px-6 py-16 text-center">
+                            <td colspan="7" class="px-6 py-16 text-center">
                             <div class="flex flex-col items-center justify-center">
                                     <div class="p-4 bg-gray-100 rounded-full mb-4">
                                         <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -741,16 +741,16 @@
             
             // Remove all active states from tabs
             if (tab1) {
-                tab1.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
-                tab1.classList.add('bg-gray-700', 'border-gray-600');
+                tab1.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
+                tab1.classList.add('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
             }
             if (tab2) {
-                tab2.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
-                tab2.classList.add('bg-gray-700', 'border-gray-600');
+                tab2.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
+                tab2.classList.add('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
             }
             if (tab3) {
-                tab3.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
-                tab3.classList.add('bg-gray-700', 'border-gray-600');
+                tab3.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
+                tab3.classList.add('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
             }
             
             // Set active step based on current page
@@ -760,8 +760,8 @@
                     step1.classList.add('text-[#CE9704]');
                 }
                 if (tab1) {
-                    tab1.classList.remove('bg-gray-700', 'border-gray-600');
-                    tab1.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
+                    tab1.classList.remove('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
+                    tab1.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
                 }
             } else if (currentPath.includes('directions')) {
                 if (step2) {
@@ -769,8 +769,8 @@
                     step2.classList.add('text-[#CE9704]');
                 }
                 if (tab2) {
-                    tab2.classList.remove('bg-gray-700', 'border-gray-600');
-                    tab2.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
+                    tab2.classList.remove('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
+                    tab2.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
                 }
             } else if (currentPath.includes('checkout')) {
                 if (step3) {
@@ -778,8 +778,8 @@
                     step3.classList.add('text-[#CE9704]');
                 }
                 if (tab3) {
-                    tab3.classList.remove('bg-gray-700', 'border-gray-600');
-                    tab3.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
+                    tab3.classList.remove('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
+                    tab3.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
                 }
             }
         }
@@ -797,11 +797,11 @@
                     
                     // Update tab styles
                     stepTabs.forEach(t => {
-                        t.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
-                        t.classList.add('bg-gray-700', 'border-gray-600');
+                        t.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
+                        t.classList.add('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
                     });
-                    this.classList.remove('bg-gray-700', 'border-gray-600');
-                    this.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'shadow-lg');
+                    this.classList.remove('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
+                    this.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
                     
                     // Update step indicators
                     if (stepIndicator1 && stepIndicator2 && stepIndicator3) {

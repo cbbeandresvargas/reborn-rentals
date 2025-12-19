@@ -143,6 +143,7 @@ class CheckoutController extends Controller
                     'longitude' => $validated['longitude'] ?? null,
                     'notes' => $validated['jobsite_address'],
                     'date' => $validated['start_date'],
+                    'end_date' => $validated['end_date'],
                     'status' => true,
                 ]);
                 

@@ -194,8 +194,9 @@ function renderCart(cart, products, total) {
     
     if (!cartItems) return;
     
-    // Check if we're on checkout page
+    // Check if we're on checkout page or directions page
     const isCheckoutPage = window.location.pathname.includes('checkout');
+    const isDirectionsPage = window.location.pathname.includes('directions');
     
     // Convert products array to object for easy lookup
     const productsMap = {};
@@ -540,6 +541,15 @@ function renderCart(cart, products, total) {
         `;
         if (subtotalSection) subtotalSection.classList.add('hidden');
         
+        // Ocultar el scrollbar del contenedor de checkout pero mantener el scroll funcional
+        cartItems.classList.add('scrollbar-hide');
+        cartItems.classList.add('overflow-y-auto');
+        
+        // Ocultar el botón "when-where-btn" en checkout porque el formulario tiene su propio botón
+        if (proceedBtn) {
+            proceedBtn.style.display = 'none';
+        }
+        
         // Setup listeners after rendering checkout form
         setTimeout(() => {
             setupCheckoutFormListeners();
@@ -552,13 +562,22 @@ function renderCart(cart, products, total) {
                 <p class="text-white text-sm text-center">Start by adding items to your cart.</p>
             </div>
         `;
+        cartItems.classList.remove('flex-col', 'overflow-y-auto', 'scrollbar-hide');
+        cartItems.classList.add('flex', 'items-center', 'justify-center');
         if (subtotalSection) subtotalSection.classList.add('hidden');
         if (proceedBtn) {
-            proceedBtn.disabled = true;
-            proceedBtn.classList.add('cursor-not-allowed');
-            proceedBtn.style.pointerEvents = 'none';
-            proceedBtn.classList.remove('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B]');
-            proceedBtn.classList.add('bg-gray-600', 'text-gray-400');
+            // Ocultar el botón en checkout
+            if (isCheckoutPage) {
+                proceedBtn.style.display = 'none';
+            } else {
+                proceedBtn.style.display = 'block';
+                proceedBtn.disabled = true;
+                proceedBtn.classList.add('cursor-not-allowed');
+                proceedBtn.style.pointerEvents = 'none';
+                proceedBtn.classList.remove('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B]');
+                proceedBtn.classList.add('bg-gray-600', 'text-gray-400');
+                proceedBtn.textContent = 'Proceed to Payment';
+            }
         }
     } else {
         let html = '';
@@ -576,7 +595,7 @@ function renderCart(cart, products, total) {
             const disabledAttr = isCheckoutPage ? 'disabled' : '';
             
             html += `
-                <div class="bg-[#4A4A4A] rounded-lg border border-gray-600 mb-3 overflow-hidden shadow-md">
+                <div class="bg-[#4A4A4A] rounded-lg border border-gray-600 mb-3 w-full overflow-hidden shadow-md">
                     <div class="flex items-center p-3">
                         <div class="shrink-0 mr-3">
                             <div class="w-16 h-16 bg-white rounded-lg p-1 flex items-center justify-center">
@@ -612,19 +631,44 @@ function renderCart(cart, products, total) {
             `;
         }
         
+        // Asegurar que el contenedor tenga las clases correctas para mostrar items verticalmente
+        cartItems.classList.remove('items-center', 'justify-center', 'scrollbar-hide');
+        cartItems.classList.add('flex-col', 'overflow-y-auto');
+        
         cartItems.innerHTML = html;
         
         if (subtotalSection) {
             subtotalSection.classList.remove('hidden');
-            document.getElementById('subtotal-amount').textContent = '$' + total.toFixed(2);
-            document.getElementById('total-items').textContent = totalItems;
+            const subtotalAmountEl = document.getElementById('subtotal-amount');
+            const totalItemsEl = document.getElementById('total-items');
+            if (subtotalAmountEl) {
+                subtotalAmountEl.textContent = '$' + total.toFixed(2);
+            }
+            if (totalItemsEl) {
+                totalItemsEl.textContent = totalItems;
+            }
         }
         
         if (proceedBtn) {
-            proceedBtn.disabled = false;
-            proceedBtn.classList.remove('cursor-not-allowed', 'bg-gray-600', 'text-gray-400');
-            proceedBtn.classList.add('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B]');
-            proceedBtn.style.pointerEvents = 'auto';
+            // Ocultar el botón en checkout porque el formulario tiene su propio botón
+            if (isCheckoutPage) {
+                proceedBtn.style.display = 'none';
+            } else {
+                proceedBtn.style.display = 'block';
+                proceedBtn.disabled = false;
+                proceedBtn.classList.remove('cursor-not-allowed', 'bg-gray-600', 'text-gray-400');
+                proceedBtn.classList.add('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B]');
+                proceedBtn.style.pointerEvents = 'auto';
+                
+                // Cambiar el texto según la página:
+                // - Step 1 (home/products): "When, Where?"
+                // - Step 2 (directions): "Proceed to Payment"
+                if (isDirectionsPage) {
+                    proceedBtn.textContent = 'Proceed to Payment';
+                } else {
+                    proceedBtn.textContent = 'When, Where?';
+                }
+            }
         }
     }
 }

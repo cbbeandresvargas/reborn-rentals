@@ -15,6 +15,7 @@ class JobLocation extends Model
         'latitude',
         'longitude',
         'date',
+        'end_date',
         'time',
         'notes',
         'status',
@@ -24,6 +25,7 @@ class JobLocation extends Model
         'latitude' => 'decimal:7',
         'longitude' => 'decimal:7',
         'date' => 'date',
+        'end_date' => 'date',
         'status' => 'boolean',
     ];
 
