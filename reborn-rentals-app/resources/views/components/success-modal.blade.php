@@ -1,6 +1,6 @@
 <!-- Success Modal -->
-<div id="success-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 transition-opacity duration-300 overflow-y-auto" style="display: none; opacity: 0;">
-    <div class="bg-gradient-to-b from-[#333333] to-[#2a2a2a] rounded-2xl max-w-lg w-full max-h-[95vh] overflow-y-auto mx-2 sm:mx-4 relative shadow-2xl border-2 border-[#CE9704] transform transition-all duration-300 scale-95 my-4 sm:my-0" style="opacity: 0; transform: scale(0.95) translateY(20px);" id="success-modal-content">
+<div id="success-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 transition-opacity duration-300 overflow-y-auto" style="display: none;">
+    <div class="bg-gradient-to-b from-[#333333] to-[#2a2a2a] rounded-2xl max-w-lg w-full max-h-[95vh] overflow-y-auto mx-2 sm:mx-4 relative shadow-2xl border-2 border-[#CE9704] transform transition-all duration-300 my-4 sm:my-0" id="success-modal-content" style="background: linear-gradient(to bottom, #333333, #2a2a2a) !important; opacity: 1 !important;">
         <!-- Decorative Top Border -->
         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#CE9704] via-[#FFD700] to-[#CE9704] rounded-t-2xl"></div>
         

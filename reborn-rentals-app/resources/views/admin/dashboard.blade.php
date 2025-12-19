@@ -170,7 +170,7 @@
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold {{ $order->status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                     <span class="w-1.5 h-1.5 mr-1.5 rounded-full {{ $order->status ? 'bg-green-500' : 'bg-red-500' }}"></span>
-                                    {{ $order->status ? 'Active' : 'Inactive' }}
+                                    {{ $order->status ? 'Completed' : 'Pending' }}
                                 </span>
                             </td>
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">

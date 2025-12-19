@@ -814,7 +814,11 @@ function setupCheckoutFormListeners() {
             // Validate terms checkbox
             const termsCheckbox = document.getElementById('terms-checkbox');
             if (!termsCheckbox || !termsCheckbox.checked) {
-                alert('Por favor acepta los Términos y Condiciones para continuar.');
+                if (typeof toast !== 'undefined') {
+                    toast.error('Please accept the Terms and Conditions to continue.');
+                } else {
+                    alert('Please accept the Terms and Conditions to continue.');
+                }
                 return;
             }
             
@@ -823,18 +827,22 @@ function setupCheckoutFormListeners() {
             const billingDetails = localStorage.getItem('billing-details');
             const paymentMethodDetails = localStorage.getItem('payment-method-details');
             
-            if (!foremanDetails) {
-                alert('Por favor completa los detalles del Foreman primero.');
-                return;
-            }
-            
+            // Billing details is required (foreman can be empty, will use billing data)
             if (!billingDetails) {
-                alert('Por favor completa los detalles de facturación primero.');
+                if (typeof toast !== 'undefined') {
+                    toast.error('Please complete billing details first.');
+                } else {
+                    alert('Please complete billing details first.');
+                }
                 return;
             }
             
             if (!paymentMethodDetails) {
-                alert('Por favor completa los detalles del método de pago primero.');
+                if (typeof toast !== 'undefined') {
+                    toast.error('Please complete payment method details first.');
+                } else {
+                    alert('Please complete payment method details first.');
+                }
                 return;
             }
             
@@ -878,7 +886,11 @@ function handleForemanContinue() {
     const email = document.getElementById('foreman-email')?.value || '';
     
     if (!firstName || !lastName || !phone || !email) {
-        alert('Por favor completa todos los campos del foreman.');
+        if (typeof toast !== 'undefined') {
+            toast.error('Please complete all foreman fields.');
+        } else {
+            alert('Please complete all foreman fields.');
+        }
         return;
     }
     
@@ -971,7 +983,11 @@ function handleBillingContinue() {
     const isCompany = document.getElementById('billing-is-company')?.checked || false;
     
     if (!firstName || !lastName || !email || !phone) {
-        alert('Por favor completa todos los campos requeridos (marcados con *).');
+        if (typeof toast !== 'undefined') {
+            toast.error('Please complete all required fields (marked with *).');
+        } else {
+            alert('Please complete all required fields (marked with *).');
+        }
         return;
     }
     
@@ -1310,7 +1326,11 @@ function savePaymentDetails(method) {
             const cardholder = document.getElementById('payment-cardholder')?.value || '';
             
             if (!cardNumber || !expiry || !cvv || !cardholder) {
-                alert('Por favor completa todos los detalles de la tarjeta.');
+                if (typeof toast !== 'undefined') {
+                    toast.error('Please complete all card details.');
+                } else {
+                    alert('Please complete all card details.');
+                }
                 return;
             }
             
@@ -1329,7 +1349,11 @@ function savePaymentDetails(method) {
             const routingNumber = document.getElementById('payment-routing-number')?.value || '';
             
             if (!bankName || !accountNumber || !routingNumber) {
-                alert('Por favor completa todos los detalles del banco.');
+                if (typeof toast !== 'undefined') {
+                    toast.error('Please complete all bank details.');
+                } else {
+                    alert('Please complete all bank details.');
+                }
                 return;
             }
             
@@ -1347,7 +1371,11 @@ function savePaymentDetails(method) {
             const phone = document.getElementById('payment-phone')?.value || '';
             
             if (!email || !phone) {
-                alert('Por favor completa todos los campos.');
+                if (typeof toast !== 'undefined') {
+                    toast.error('Please complete all fields.');
+                } else {
+                    alert('Please complete all fields.');
+                }
                 return;
             }
             
@@ -1579,6 +1607,10 @@ function closeSuccessModal() {
         // Hide after animation
         setTimeout(() => {
             modal.style.display = 'none';
+            // Reset styles for next open
+            modal.style.opacity = '';
+            modalContent.style.opacity = '';
+            modalContent.style.transform = '';
         }, 300);
     }
 }

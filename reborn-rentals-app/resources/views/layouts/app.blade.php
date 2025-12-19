@@ -108,7 +108,13 @@
 
         /* Contact Float Button Styles */
         #contact-float-container {
-            z-index: 50;
+            z-index: 8; /* Lower than sidebar (9) and header (10) when sidebar is closed */
+        }
+        
+        /* When sidebar is open, contact button should be below it */
+        nav.sidebar-open ~ * #contact-float-container,
+        #menu-sidebar.translate-x-0 ~ * #contact-float-container {
+            z-index: 5 !important; /* Below sidebar (10) and overlay (9) */
         }
 
         #contact-panel {
@@ -272,7 +278,7 @@
     </main>
 
     <!-- Floating Contact Button -->
-    <div class="fixed bottom-6 left-6 z-50" id="contact-float-container">
+    <div class="fixed bottom-6 left-6" id="contact-float-container">
         <!-- Contact Panel (hidden by default) -->
         <div id="contact-panel" class="mb-4 bg-white rounded-lg shadow-2xl p-4 transform transition-all duration-300 ease-in-out opacity-0 invisible translate-y-4" style="min-width: 200px;">
             <div class="flex flex-col gap-3">
@@ -490,6 +496,11 @@
                     overlay.classList.remove('opacity-0', 'invisible', 'pointer-events-none');
                     overlay.classList.add('opacity-100', 'visible', 'pointer-events-auto');
                     overlay.style.zIndex = '9'; // Debajo del sidebar (10) pero por encima del header (5)
+                    // Lower contact button z-index when sidebar is open
+                    const contactContainer = document.getElementById('contact-float-container');
+                    if (contactContainer) {
+                        contactContainer.style.zIndex = '5';
+                    }
                     document.body.style.overflow = 'hidden';
                 });
             }
@@ -549,6 +560,11 @@
                     overlay.classList.remove('opacity-100', 'visible', 'pointer-events-auto');
                     overlay.classList.add('opacity-0', 'invisible', 'pointer-events-none');
                     overlay.style.zIndex = '9';
+                    // Restore contact button z-index when sidebar is closed
+                    const contactContainer = document.getElementById('contact-float-container');
+                    if (contactContainer) {
+                        contactContainer.style.zIndex = '8';
+                    }
                     document.body.style.overflow = '';
                 });
             }
@@ -604,6 +620,11 @@
                     overlay.classList.remove('opacity-100', 'visible', 'pointer-events-auto');
                     overlay.classList.add('opacity-0', 'invisible', 'pointer-events-none');
                     overlay.style.zIndex = '9';
+                    // Restore contact button z-index when sidebar is closed
+                    const contactContainer = document.getElementById('contact-float-container');
+                    if (contactContainer) {
+                        contactContainer.style.zIndex = '8';
+                    }
                     document.body.style.overflow = '';
                 });
             }
@@ -621,11 +642,16 @@
                             nav.style.zIndex = '10';
                         }
                         menuSidebar.style.zIndex = '9';
+                        // Restore contact button z-index when sidebar is closed
+                        const contactContainer = document.getElementById('contact-float-container');
+                        if (contactContainer) {
+                            contactContainer.style.zIndex = '8';
+                        }
                     }
                     if (overlay) {
                         overlay.classList.remove('opacity-100', 'visible', 'pointer-events-auto');
                         overlay.classList.add('opacity-0', 'invisible', 'pointer-events-none');
-                        overlay.style.zIndex = '40';
+                        overlay.style.zIndex = '9';
                     }
                     document.body.style.overflow = '';
                 }
@@ -955,6 +981,115 @@
             closeCallback();
             form.reset();
         }
+    </script>
+    
+    <!-- Sonner-style Toast Notifications -->
+    <style>
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+        .toast {
+            pointer-events: auto;
+            min-width: 300px;
+            max-width: 400px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .toast.success {
+            background: #10b981;
+        }
+        .toast.error {
+            background: #ef4444;
+        }
+        .toast.info {
+            background: #3b82f6;
+        }
+        .toast.warning {
+            background: #f59e0b;
+        }
+        .toast-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+    <div id="toast-container" class="toast-container"></div>
+    <script>
+        // Sonner-style toast implementation
+        (function() {
+            const container = document.getElementById('toast-container');
+            if (!container) {
+                const div = document.createElement('div');
+                div.id = 'toast-container';
+                div.className = 'toast-container';
+                document.body.appendChild(div);
+            }
+            
+            function createToast(message, type) {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                
+                const iconMap = {
+                    success: '<svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>',
+                    error: '<svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>',
+                    info: '<svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
+                    warning: '<svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>'
+                };
+                
+                toast.innerHTML = (iconMap[type] || '') + '<span>' + message + '</span>';
+                
+                const toastContainer = document.getElementById('toast-container');
+                toastContainer.appendChild(toast);
+                
+                // Trigger animation
+                setTimeout(() => toast.classList.add('show'), 10);
+                
+                // Auto remove after duration
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 4000);
+            }
+            
+            window.toast = {
+                success: (msg) => createToast(msg, 'success'),
+                error: (msg) => createToast(msg, 'error'),
+                info: (msg) => createToast(msg, 'info'),
+                warning: (msg) => createToast(msg, 'warning')
+            };
+        })();
     </script>
     
     <!-- Cart JS -->

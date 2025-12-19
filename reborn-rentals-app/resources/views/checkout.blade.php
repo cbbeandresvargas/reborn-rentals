@@ -329,8 +329,13 @@ function submitCheckoutForm() {
     console.log('Directions data:', directionsData);
     
     if (!directionsData) {
-        alert('Please provide delivery information first.');
+        if (typeof toast !== 'undefined') {
+            toast.error('Please provide delivery information first.');
+        } else {
+            alert('Please provide delivery information first.');
+        }
         console.error('No directions data found');
+        isSubmittingCheckout = false;
         return;
     }
     
@@ -338,13 +343,23 @@ function submitCheckoutForm() {
     try {
         directions = JSON.parse(directionsData);
     } catch (e) {
-        alert('Invalid delivery information. Please try again.');
+        if (typeof toast !== 'undefined') {
+            toast.error('Invalid delivery information. Please try again.');
+        } else {
+            alert('Invalid delivery information. Please try again.');
+        }
+        isSubmittingCheckout = false;
         return;
     }
     
     // Validate required fields
     if (!directions.startDate || !directions.endDate || !directions.jobsiteAddress) {
-        alert('Please complete all required delivery information.');
+        if (typeof toast !== 'undefined') {
+            toast.error('Please complete all required delivery information.');
+        } else {
+            alert('Please complete all required delivery information.');
+        }
+        isSubmittingCheckout = false;
         return;
     }
     
@@ -353,8 +368,13 @@ function submitCheckoutForm() {
     console.log('Payment method:', paymentMethod);
     
     if (!paymentMethod) {
-        alert('Please select a payment method.');
+        if (typeof toast !== 'undefined') {
+            toast.error('Please select a payment method.');
+        } else {
+            alert('Please select a payment method.');
+        }
         console.error('No payment method found');
+        isSubmittingCheckout = false;
         return;
     }
     
@@ -432,8 +452,13 @@ function submitCheckoutForm() {
     console.log('Form found:', form);
     
     if (!form) {
-        alert('Checkout form not found.');
+        if (typeof toast !== 'undefined') {
+            toast.error('Checkout form not found.');
+        } else {
+            alert('Checkout form not found.');
+        }
         console.error('Form not found in DOM');
+        isSubmittingCheckout = false;
         return;
     }
     
@@ -554,7 +579,11 @@ function submitCheckoutForm() {
     })
     .catch(error => {
         console.error('Error submitting order:', error);
-        alert(error.message || 'Error creating order. Please try again.');
+        if (typeof toast !== 'undefined') {
+            toast.error(error.message || 'Error creating order. Please try again.');
+        } else {
+            alert(error.message || 'Error creating order. Please try again.');
+        }
         
         // Re-enable button on error
         isSubmittingCheckout = false;
