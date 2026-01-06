@@ -42,23 +42,44 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    // Accessor para obtener la URL completa de la imagen
-    public function getImageUrlAttribute($value)
+    // ✅ CORRECTO: Accessor con nombre diferente
+    public function getImageAttribute()
     {
-        if (!$value) {
-            return null;
+        if (!$this->image_url) {
+            return asset('images/no-image.png'); // Imagen por defecto
         }
         
-        // Si ya empieza con "/", es una ruta relativa desde la raíz pública
-        if (str_starts_with($value, '/')) {
-            return $value;
+        // Si ya empieza con "http" es una URL completa
+        if (str_starts_with($this->image_url, 'http')) {
+            return $this->image_url;
+        }
+        
+        // Si empieza con "/", es una ruta relativa desde la raíz pública
+        if (str_starts_with($this->image_url, '/')) {
+            return asset($this->image_url);
         }
         
         // Si no, es una ruta desde storage
-        return 'storage/' . $value;
+        return asset('storage/' . $this->image_url);
     }
 
-    // Scopes para limpiar el controlador index()
+    // ✅ Accessor con timestamp para evitar caché del navegador
+    public function getImageFreshAttribute()
+    {
+        if (!$this->image_url) {
+            return asset('images/no-image.png');
+        }
+        
+        $url = str_starts_with($this->image_url, 'http') 
+            ? $this->image_url 
+            : (str_starts_with($this->image_url, '/') 
+                ? asset($this->image_url) 
+                : asset('storage/' . $this->image_url));
+        
+        return $url . '?v=' . $this->updated_at->timestamp;
+    }
+
+    // Scopes
     public function scopeSearch($q, ?string $term)
     {
         if (!$term) return $q;
