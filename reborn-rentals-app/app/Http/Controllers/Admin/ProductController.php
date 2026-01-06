@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
 {
@@ -42,7 +42,17 @@ class ProductController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image_url'] = $request->file('image')->store('products', 'public');
+            // Guardar directamente en public/products
+            $file = $request->file('image');
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            
+            // Crear carpeta si no existe
+            if (!File::exists(public_path('products'))) {
+                File::makeDirectory(public_path('products'), 0755, true);
+            }
+            
+            $file->move(public_path('products'), $filename);
+            $validated['image_url'] = 'products/' . $filename;
         }
 
         $validated['active'] = $request->has('active');
@@ -78,11 +88,22 @@ class ProductController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete old image
-            if ($product->image_url) {
-                Storage::disk('public')->delete($product->image_url);
+            // Eliminar imagen antigua si existe
+            if ($product->image_url && File::exists(public_path($product->image_url))) {
+                File::delete(public_path($product->image_url));
             }
-            $validated['image_url'] = $request->file('image')->store('products', 'public');
+            
+            // Guardar nueva imagen en public/products
+            $file = $request->file('image');
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            
+            // Crear carpeta si no existe
+            if (!File::exists(public_path('products'))) {
+                File::makeDirectory(public_path('products'), 0755, true);
+            }
+            
+            $file->move(public_path('products'), $filename);
+            $validated['image_url'] = 'products/' . $filename;
         }
 
         $validated['active'] = $request->has('active');
@@ -95,8 +116,9 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        if ($product->image_url) {
-            Storage::disk('public')->delete($product->image_url);
+        // Eliminar imagen si existe
+        if ($product->image_url && File::exists(public_path($product->image_url))) {
+            File::delete(public_path($product->image_url));
         }
         
         $product->delete();

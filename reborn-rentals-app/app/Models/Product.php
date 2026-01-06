@@ -42,41 +42,42 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    // ✅ CORRECTO: Accessor con nombre diferente
+    // ✅ Accessor que acepta AMBAS rutas
     public function getImageAttribute()
     {
         if (!$this->image_url) {
-            return asset('images/no-image.png'); // Imagen por defecto
+            return asset('images/no-image.png');
         }
         
-        // Si ya empieza con "http" es una URL completa
+        // Si ya es una URL completa (http/https)
         if (str_starts_with($this->image_url, 'http')) {
             return $this->image_url;
         }
         
-        // Si empieza con "/", es una ruta relativa desde la raíz pública
+        // Si ya empieza con "/" (ruta absoluta)
         if (str_starts_with($this->image_url, '/')) {
+            return asset(ltrim($this->image_url, '/'));
+        }
+        
+        // Detectar si la imagen existe en public/ directamente
+        if (file_exists(public_path($this->image_url))) {
             return asset($this->image_url);
         }
         
-        // Si no, es una ruta desde storage
+        // Si no existe en public/, asumir que está en storage/
         return asset('storage/' . $this->image_url);
     }
 
-    // ✅ Accessor con timestamp para evitar caché del navegador
+    // ✅ Accessor con timestamp (evita caché del navegador)
     public function getImageFreshAttribute()
     {
         if (!$this->image_url) {
             return asset('images/no-image.png');
         }
         
-        $url = str_starts_with($this->image_url, 'http') 
-            ? $this->image_url 
-            : (str_starts_with($this->image_url, '/') 
-                ? asset($this->image_url) 
-                : asset('storage/' . $this->image_url));
+        $baseUrl = $this->image; // Usa el accessor anterior
         
-        return $url . '?v=' . $this->updated_at->timestamp;
+        return $baseUrl . '?v=' . $this->updated_at->timestamp;
     }
 
     // Scopes
