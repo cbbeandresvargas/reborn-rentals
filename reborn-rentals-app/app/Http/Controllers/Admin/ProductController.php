@@ -38,6 +38,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'category_id' => 'nullable|exists:categories,id',
             'active' => 'boolean',
+            'hidden' => 'boolean',
             'image' => 'nullable|image|max:2048',
         ]);
 
@@ -56,6 +57,7 @@ class ProductController extends Controller
         }
 
         $validated['active'] = $request->has('active');
+        $validated['hidden'] = $request->has('hidden');
 
         Product::create($validated);
 
@@ -84,6 +86,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'category_id' => 'nullable|exists:categories,id',
             'active' => 'boolean',
+            'hidden' => 'boolean',
             'image' => 'nullable|image|max:2048',
         ]);
 
@@ -107,6 +110,7 @@ class ProductController extends Controller
         }
 
         $validated['active'] = $request->has('active');
+        $validated['hidden'] = $request->has('hidden');
 
         $product->update($validated);
 

@@ -15,12 +15,14 @@ class Product extends Model
         'price',
         'image_url',
         'active',
+        'hidden',
         'category_id',
     ];
 
     protected $casts = [
         'price'       => 'decimal:2',
         'active'      => 'boolean',
+        'hidden'      => 'boolean',
         'category_id' => 'integer',
     ];
 
@@ -100,5 +102,12 @@ class Product extends Model
     {
         if (is_null($active)) return $q;
         return $q->where('active', (bool) $active);
+    }
+
+    // Scope para obtener solo productos visibles para compradores
+    // Un producto es visible si está activo Y no está oculto
+    public function scopeVisible($q)
+    {
+        return $q->where('active', true)->where('hidden', false);
     }
 }

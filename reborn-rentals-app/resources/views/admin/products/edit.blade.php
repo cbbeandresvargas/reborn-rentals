@@ -65,11 +65,16 @@
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704]">
                 </div>
 
-                <div class="mb-6">
+                <div class="mb-6 space-y-3">
                     <label class="flex items-center">
                         <input type="checkbox" name="active" value="1" {{ old('active', $product->active) ? 'checked' : '' }}
                             class="w-4 h-4 text-[#CE9704] border-gray-300 rounded focus:ring-[#CE9704]">
                         <span class="ml-2 text-sm text-gray-700">Active</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="hidden" value="1" {{ old('hidden', $product->hidden) ? 'checked' : '' }}
+                            class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500">
+                        <span class="ml-2 text-sm text-gray-700">Hide from customers (product will not be visible to buyers)</span>
                     </label>
                 </div>
 

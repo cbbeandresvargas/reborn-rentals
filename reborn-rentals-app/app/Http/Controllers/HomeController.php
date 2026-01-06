@@ -10,15 +10,15 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $products = Product::where('active', true)
+        $products = Product::visible()
             ->with('category')
             ->latest()
             ->paginate(12);
         
         $categories = Category::all();
 
-        // Extract filter options from product descriptions
-        $allProducts = Product::where('active', true)->get();
+        // Extract filter options from product descriptions (solo productos visibles)
+        $allProducts = Product::visible()->get();
         $dimensions = [];
         $tonnageCapacities = [];
         $gallonCapacities = [];

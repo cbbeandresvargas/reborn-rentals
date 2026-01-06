@@ -11,7 +11,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $query = Product::with('category')
-            ->where('active', true);
+            ->visible(); // Solo productos visibles (activos y no ocultos)
 
         // Búsqueda
         if ($request->has('search')) {
@@ -75,12 +75,12 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        $product = Product::with('category')->findOrFail($id);
+        $product = Product::with('category')->visible()->findOrFail($id);
         
-        // Productos relacionados
+        // Productos relacionados (solo visibles)
         $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
-            ->where('active', true)
+            ->visible()
             ->limit(4)
             ->get();
 

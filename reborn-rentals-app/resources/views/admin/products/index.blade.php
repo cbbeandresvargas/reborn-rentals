@@ -123,10 +123,20 @@
                                 <span class="text-base sm:text-lg font-bold text-gray-900">${{ number_format($product->price, 2) }}</span>
                             </td>
                             <td class="px-4 sm:px-6 py-4">
-                                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold {{ $product->active ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200' }}">
-                                    <span class="w-2 h-2 mr-1.5 rounded-full {{ $product->active ? 'bg-green-500' : 'bg-red-500' }}"></span>
-                                    {{ $product->active ? 'Active' : 'Inactive' }}
-                                </span>
+                                <div class="flex flex-col gap-1">
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold {{ $product->active ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200' }}">
+                                        <span class="w-2 h-2 mr-1.5 rounded-full {{ $product->active ? 'bg-green-500' : 'bg-red-500' }}"></span>
+                                        {{ $product->active ? 'Active' : 'Inactive' }}
+                                    </span>
+                                    @if($product->hidden)
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-800 border border-orange-200">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                                        </svg>
+                                        Hidden
+                                    </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-4 sm:px-6 py-4">
                                 <div class="flex items-center gap-2">
@@ -293,11 +303,16 @@
                 </div>
             </div>
 
-            <div class="mb-8">
+            <div class="mb-8 space-y-3">
                 <label class="flex items-center p-4 bg-gray-50 rounded-lg border-2 border-gray-200 hover:border-[#CE9704] transition-colors cursor-pointer">
                     <input type="checkbox" name="active" id="product-active" value="1" {{ old('active') ? 'checked' : 'checked' }}
                         class="w-5 h-5 text-[#CE9704] border-gray-300 rounded focus:ring-[#CE9704]">
                     <span class="ml-3 text-sm font-semibold text-gray-700">Product is active and visible to customers</span>
+                </label>
+                <label class="flex items-center p-4 bg-orange-50 rounded-lg border-2 border-orange-200 hover:border-orange-400 transition-colors cursor-pointer">
+                    <input type="checkbox" name="hidden" id="product-hidden" value="1" {{ old('hidden') ? 'checked' : '' }}
+                        class="w-5 h-5 text-orange-500 border-gray-300 rounded focus:ring-orange-500">
+                    <span class="ml-3 text-sm font-semibold text-gray-700">Hide from customers (product will not be visible to buyers)</span>
                 </label>
             </div>
 
