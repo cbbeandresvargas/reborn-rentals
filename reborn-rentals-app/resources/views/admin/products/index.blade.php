@@ -9,7 +9,7 @@
         <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#CE9704] to-[#B8860B] bg-clip-text text-transparent">Product Managementttttt</h1>
+                    <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#CE9704] to-[#B8860B] bg-clip-text text-transparent">Product Management</h1>
                     <p class="text-sm text-gray-600 mt-1">Manage your product catalog</p>
                 </div>
                 <button onclick="openCreateProductModal()" class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-[#CE9704] to-[#B8860B] text-white rounded-lg hover:shadow-lg transition-all duration-200 font-semibold text-sm shadow-md">
