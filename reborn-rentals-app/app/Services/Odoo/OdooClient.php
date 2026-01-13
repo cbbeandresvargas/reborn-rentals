@@ -989,6 +989,12 @@ class OdooClient
             
             $this->call('account.move', 'action_post', [[$invoiceId]]);
 
+            $invoiceAfterPost = $this->call('account.move', 'read', [[$invoiceId]], [
+                'fields' => ['state'],
+            ]);
+            
+            $invoiceState = $invoiceAfterPost[0]['state'] ?? null;
+            
             Log::info('✅ [ODOO] Invoice created successfully from sale order', [
                 'invoice_id' => $invoiceId,
                 'invoice_name' => $invoice['name'] ?? null,
@@ -1244,8 +1250,7 @@ class OdooClient
             // Method 1: Use action_invoice_send (Odoo standard method)
             // This uses Odoo's email templates and includes payment link automatically
             try {
-             // 1️⃣ Asegurar que la factura esté posteada
-$this->call('account.move', 'action_post', [[$invoiceId]]);
+
 
 // 2️⃣ Crear wizard de envío
 $action = $this->call('account.move', 'action_invoice_send', [[$invoiceId]]);
