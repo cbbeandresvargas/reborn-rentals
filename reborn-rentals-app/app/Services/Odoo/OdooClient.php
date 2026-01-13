@@ -986,6 +986,8 @@ class OdooClient
                     'state' => $invoiceState,
                 ]);
             }
+            
+            $this->call('account.move', 'action_post', [[$invoiceId]]);
 
             Log::info('✅ [ODOO] Invoice created successfully from sale order', [
                 'invoice_id' => $invoiceId,
@@ -1242,22 +1244,26 @@ class OdooClient
             // Method 1: Use action_invoice_send (Odoo standard method)
             // This uses Odoo's email templates and includes payment link automatically
             try {
-                $result = $this->call('account.move', 'action_invoice_send', [[$invoiceId]]);
+             // 1️⃣ Asegurar que la factura esté posteada
+$this->call('account.move', 'action_post', [[$invoiceId]]);
 
-                // action_invoice_send may return a wizard ID or True
-                // If it returns a wizard, we need to confirm it
-                if (is_numeric($result) && $result > 0) {
-                    // It returned a wizard ID, confirm the email sending
-                    $wizardId = (int) $result;
-                    
-                    // Read wizard to get default values
-                    $wizardData = $this->call('account.move.send', 'read', [[$wizardId]], [
-                        'fields' => ['template_id', 'composition_mode'],
-                    ]);
+// 2️⃣ Crear wizard de envío
+$action = $this->call('account.move', 'action_invoice_send', [[$invoiceId]]);
 
-                    // Send the email by calling send_and_print
-                    $this->call('account.move.send', 'send_and_print', [[$wizardId]]);
-                }
+// 3️⃣ Extraer wizard ID correctamente
+$wizardId = null;
+
+if (is_array($action) && isset($action['res_id'])) {
+    $wizardId = (int) $action['res_id'];
+}
+
+if (!$wizardId) {
+    throw new \Exception('Invoice send wizard was not created');
+}
+
+// 4️⃣ Enviar email
+$this->call('account.move.send', 'send_and_print', [[$wizardId]]);
+
 
                 Log::info('✅ [ODOO] Invoice email sent successfully via action_invoice_send', [
                     'invoice_id' => $invoiceId,
