@@ -826,11 +826,23 @@ function initDirectionsPage() {
     
     // Load Google Maps API with callback (will initialize autocomplete after map loads)
     if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD_Nb12Kw5gcqefI5sJNwL45M24vxDh5wM&libraries=places,geometry&callback=initGoogleMap';
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
+        @php
+            $googleMapsApiKey = config('services.google.maps_api_key');
+        @endphp
+        
+        @if(empty($googleMapsApiKey))
+            console.error('Google Maps API key is not configured. Please set GOOGLE_MAPS_API_KEY in your .env file.');
+            const mapElement = document.getElementById('delivery-map');
+            if (mapElement) {
+                mapElement.innerHTML = '<div class="flex items-center justify-center h-full bg-gray-100 text-red-600 p-4 text-center"><div><p class="font-semibold mb-2">Google Maps Error</p><p class="text-sm">API key not configured. Please contact the administrator.</p></div></div>';
+            }
+        @else
+            const script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key={{ $googleMapsApiKey }}&libraries=places,geometry&callback=initGoogleMap';
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        @endif
     } else {
         // Google Maps already loaded, initialize immediately
         initGoogleMap();

@@ -131,16 +131,23 @@
 </div>
 
 <!-- Products -->
-<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-8 sm:mt-12 md:mt-20 mb-12 sm:mb-16 md:mb-20">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6" id="products-grid">
+<div class="max-w-7xl mx-auto px-5 sm:px-8 md:px-10 lg:px-12 xl:px-14 mt-10 sm:mt-14 md:mt-20 mb-16 sm:mb-20 md:mb-24">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 md:gap-7 lg:gap-8" id="products-grid">
         @forelse($products as $product)
-        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-2xl shadow-[#CE9704]/20 transition-shadow duration-300 cursor-move product-card flex flex-col h-full" 
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-2xl shadow-[#CE9704]/20 transition-all duration-300 cursor-grab product-card flex flex-col h-full group" 
              draggable="true" 
              data-product-id="{{ $product->id }}" 
              data-product-name="{{ $product->name }}" 
              data-product-price="{{ $product->price }}">
-            <div class="relative bg-white p-4">
-                <button class="absolute top-2 left-2 bg-[#CE9704] p-2 rounded hover:bg-[#B8860B] transition-colors duration-200 group z-0 add-to-cart-btn" 
+            <div class="relative bg-white p-5 sm:p-6">
+                <!-- Drag indicator badge -->
+                <div class="absolute top-2 right-2 bg-[#CE9704] text-white text-xs font-bold px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                    </svg>
+                    Drag
+                </div>
+                <button class="absolute top-2 left-2 bg-[#CE9704] p-2 rounded hover:bg-[#B8860B] transition-all duration-200 z-0 add-to-cart-btn hover:scale-110 hover:shadow-lg" 
                         data-product-id="{{ $product->id }}" 
                         data-product-name="{{ $product->name }}" 
                         data-product-price="{{ $product->price }}" 
@@ -152,13 +159,13 @@
                         <path d="m1 1 4 4 13 1 2 8H6l-2-8z"></path>
                     </svg>
                 </button>
-                <img src="{{ $product->image_url ? asset($product->image_url) : asset('Product1.png') }}" alt="{{ $product->name }}" class="w-full h-48 sm:h-56 md:h-64 object-contain" />
+                <img src="{{ $product->image_url ? asset($product->image_url) : asset('Product1.png') }}" alt="{{ $product->name }}" class="w-full h-48 sm:h-56 md:h-64 object-contain transition-transform duration-300 group-hover:scale-105" />
             </div>
-            <div class="bg-[#4A4A4A] px-3 sm:px-4 py-2 sm:py-3 text-center">
+            <div class="bg-[#4A4A4A] px-4 sm:px-5 py-3 sm:py-4 text-center">
                 <h3 class="text-white font-bold text-base sm:text-lg">{{ $product->name }}</h3>
             </div>
             <div class="border-t border-gray-500"></div>
-            <div class="bg-[#4A4A4A] px-3 sm:px-4 py-2 sm:py-3 space-y-2 flex-1">
+            <div class="bg-[#4A4A4A] px-4 sm:px-5 py-3 sm:py-4 space-y-2 flex-1">
                 <div class="flex justify-between items-center flex-wrap gap-1 sm:gap-0">
                     <span class="text-white text-sm sm:text-base">ID: <span class="text-[#CE9704]">{{ $product->id }}</span></span>
                     <span class="text-white font-bold text-base sm:text-lg">${{ number_format($product->price, 2) }}/day*</span>
@@ -176,7 +183,7 @@
                 </div>
                 @endif
             </div>
-            <a href="{{ route('products.show', $product->id) }}" class="block w-full bg-[#CE9704] text-white font-bold py-2 sm:py-2.5 px-3 sm:px-4 rounded text-sm sm:text-base hover:bg-[#B8860B] transition-colors duration-200 text-center mt-auto">
+            <a href="{{ route('products.show', $product->id) }}" class="block w-full bg-[#CE9704] text-white font-bold py-3 sm:py-3.5 px-4 sm:px-5 rounded text-sm sm:text-base hover:bg-[#B8860B] transition-colors duration-200 text-center mt-auto">
                 SEE SPECIFICATION
             </a>
         </div>
@@ -189,7 +196,7 @@
     </div>
 
     @if($products->hasPages())
-    <div class="mt-8">
+    <div class="mt-10 sm:mt-12 md:mt-16">
         {{ $products->links() }}
     </div>
     @endif

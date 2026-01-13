@@ -1,3 +1,18 @@
+// HTML Escape Helper Function to prevent XSS attacks
+function escapeHtml(text) {
+    if (text === null || text === undefined) {
+        return '';
+    }
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
 // Cart Management with Laravel Sessions
 document.addEventListener('DOMContentLoaded', function() {
     updateCartDisplay();
@@ -38,12 +53,49 @@ function setupDragAndDrop() {
                     })
                 );
                 dragEvent.dataTransfer.effectAllowed = 'move';
+                
+                // Crear un drag image personalizado más bonito
+                const dragImage = card.cloneNode(true);
+                dragImage.style.width = card.offsetWidth + 'px';
+                dragImage.style.opacity = '0.9';
+                dragImage.style.transform = 'rotate(5deg) scale(0.95)';
+                dragImage.style.boxShadow = '0 20px 40px rgba(206, 151, 4, 0.4)';
+                dragImage.style.border = '2px solid #CE9704';
+                dragImage.style.borderRadius = '8px';
+                dragImage.style.pointerEvents = 'none';
+                document.body.appendChild(dragImage);
+                dragImage.style.position = 'absolute';
+                dragImage.style.top = '-1000px';
+                dragEvent.dataTransfer.setDragImage(dragImage, dragImage.offsetWidth / 2, dragImage.offsetHeight / 2);
+                
+                // Remover el drag image después de un momento
+                setTimeout(() => document.body.removeChild(dragImage), 0);
             }
-            card.style.opacity = '0.5';
+            
+            // Efectos visuales mejorados en la tarjeta original
+            card.style.opacity = '0.4';
+            card.style.transform = 'scale(0.95)';
+            card.style.transition = 'all 0.2s ease';
+            card.style.filter = 'blur(2px)';
+            card.style.cursor = 'grabbing';
+            
+            // Agregar clase para estilos adicionales
+            card.classList.add('dragging');
         });
 
         card.addEventListener('dragend', function(e) {
+            // Restaurar estilos originales con animación suave
             card.style.opacity = '1';
+            card.style.transform = 'scale(1)';
+            card.style.filter = 'blur(0)';
+            card.style.cursor = 'move';
+            card.style.transition = 'all 0.3s ease';
+            card.classList.remove('dragging');
+            
+            // Remover cualquier indicador de drop
+            document.querySelectorAll('.drop-zone-active').forEach(zone => {
+                zone.classList.remove('drop-zone-active');
+            });
         });
 
         // Prevenir que el botón dentro de la tarjeta interfiera con el drag
@@ -63,23 +115,51 @@ function setupDragAndDrop() {
     const cartBtn = document.getElementById('cart-btn');
     if (cartBtn && !cartBtn.hasAttribute('data-drop-setup')) {
         cartBtn.setAttribute('data-drop-setup', 'true');
+        
         cartBtn.addEventListener('dragover', function(e) {
             e.preventDefault();
             e.stopPropagation();
             if (e.dataTransfer) {
                 e.dataTransfer.dropEffect = 'move';
             }
+            
+            // Efectos visuales mejorados
+            this.classList.add('drop-zone-active');
             this.style.backgroundColor = '#B8860B';
+            this.style.transform = 'scale(1.1)';
+            this.style.transition = 'all 0.2s ease';
+            this.style.boxShadow = '0 0 20px rgba(206, 151, 4, 0.6), 0 0 40px rgba(206, 151, 4, 0.4)';
+            this.style.border = '2px solid #FFD700';
         });
 
         cartBtn.addEventListener('dragleave', function(e) {
-            this.style.backgroundColor = '#CE9704';
+            // Solo restaurar si realmente salimos del botón (no solo pasamos sobre un hijo)
+            if (!this.contains(e.relatedTarget)) {
+                this.classList.remove('drop-zone-active');
+                this.style.backgroundColor = '#CE9704';
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = '';
+                this.style.border = '';
+            }
         });
 
         cartBtn.addEventListener('drop', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            this.style.backgroundColor = '#CE9704';
+            
+            // Efecto de "éxito" antes de restaurar
+            this.style.backgroundColor = '#10b981';
+            this.style.transform = 'scale(1.15)';
+            this.style.boxShadow = '0 0 30px rgba(16, 185, 129, 0.8)';
+            
+            // Restaurar después de un momento
+            setTimeout(() => {
+                this.classList.remove('drop-zone-active');
+                this.style.backgroundColor = '#CE9704';
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = '';
+                this.style.border = '';
+            }, 300);
 
             try {
                 const dragEvent = e;
@@ -100,23 +180,82 @@ function setupDragAndDrop() {
     const cartSidebar = document.getElementById('cart-sidebar');
     if (cartSidebar && !cartSidebar.hasAttribute('data-drop-setup')) {
         cartSidebar.setAttribute('data-drop-setup', 'true');
+        
         cartSidebar.addEventListener('dragover', function(e) {
             e.preventDefault();
             e.stopPropagation();
             if (e.dataTransfer) {
                 e.dataTransfer.dropEffect = 'move';
             }
+            
+            // Efectos visuales mejorados
+            this.classList.add('drop-zone-active');
             this.style.backgroundColor = '#3A3A3A';
+            this.style.transition = 'all 0.2s ease';
+            this.style.borderLeft = '4px solid #CE9704';
+            this.style.boxShadow = 'inset 0 0 30px rgba(206, 151, 4, 0.3)';
+            
+            // Agregar indicador visual
+            let dropIndicator = this.querySelector('.drop-indicator');
+            if (!dropIndicator) {
+                dropIndicator = document.createElement('div');
+                dropIndicator.className = 'drop-indicator';
+                dropIndicator.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #CE9704; font-weight: bold; font-size: 18px;">
+                        <svg style="width: 48px; height: 48px; margin: 0 auto 10px; display: block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Drop here to add to cart
+                    </div>
+                `;
+                dropIndicator.style.position = 'absolute';
+                dropIndicator.style.top = '50%';
+                dropIndicator.style.left = '50%';
+                dropIndicator.style.transform = 'translate(-50%, -50%)';
+                dropIndicator.style.zIndex = '1000';
+                dropIndicator.style.pointerEvents = 'none';
+                dropIndicator.style.animation = 'pulse 1.5s ease-in-out infinite';
+                this.style.position = 'relative';
+                this.appendChild(dropIndicator);
+            }
+            dropIndicator.style.display = 'block';
         });
 
         cartSidebar.addEventListener('dragleave', function(e) {
-            this.style.backgroundColor = '#2F2F2F';
+            // Solo restaurar si realmente salimos del sidebar
+            if (!this.contains(e.relatedTarget)) {
+                this.classList.remove('drop-zone-active');
+                this.style.backgroundColor = '#2F2F2F';
+                this.style.borderLeft = '';
+                this.style.boxShadow = '';
+                
+                const dropIndicator = this.querySelector('.drop-indicator');
+                if (dropIndicator) {
+                    dropIndicator.style.display = 'none';
+                }
+            }
         });
 
         cartSidebar.addEventListener('drop', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            
+            // Efecto de "éxito"
             this.style.backgroundColor = '#2F2F2F';
+            this.style.borderLeft = '4px solid #10b981';
+            this.style.boxShadow = 'inset 0 0 30px rgba(16, 185, 129, 0.3)';
+            
+            const dropIndicator = this.querySelector('.drop-indicator');
+            if (dropIndicator) {
+                dropIndicator.style.display = 'none';
+            }
+            
+            // Restaurar después de un momento
+            setTimeout(() => {
+                this.classList.remove('drop-zone-active');
+                this.style.borderLeft = '';
+                this.style.boxShadow = '';
+            }, 300);
 
             try {
                 const dragEvent = e;
@@ -594,36 +733,43 @@ function renderCart(cart, products, total) {
             const disableClass = isCheckoutPage ? 'opacity-50 cursor-not-allowed' : '';
             const disabledAttr = isCheckoutPage ? 'disabled' : '';
             
+            // Escape all user-provided data to prevent XSS
+            const escapedName = escapeHtml(product.name);
+            const escapedDescription = product.description ? escapeHtml(product.description) : '';
+            const escapedImageUrl = product.image_url ? escapeHtml(product.image_url) : '/Product1.png';
+            // Ensure productId is a number (it comes from the loop, but parse to be safe)
+            const safeProductId = parseInt(productId);
+            
             html += `
                 <div class="bg-[#4A4A4A] rounded-lg border border-gray-600 mb-3 w-full overflow-hidden shadow-md">
                     <div class="flex items-center p-3">
                         <div class="shrink-0 mr-3">
                             <div class="w-16 h-16 bg-white rounded-lg p-1 flex items-center justify-center">
-                                <img src="${(product.image_url ? product.image_url : '/Product1.png')}" alt="${product.name}" class="w-full h-full object-contain" />
+                                <img src="${escapedImageUrl}" alt="${escapedName}" class="w-full h-full object-contain" />
                             </div>
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex justify-between items-start mb-2">
-                                <h4 class="text-white font-bold text-base uppercase leading-tight pr-2 truncate">${product.name}</h4>
-                                ${!isCheckoutPage ? `<button onclick="removeFromCart(${product.id})" class="text-gray-400 hover:text-red-400 p-1 transition-colors">
+                                <h4 class="text-white font-bold text-base uppercase leading-tight pr-2 truncate">${escapedName}</h4>
+                                ${!isCheckoutPage ? `<button onclick="removeFromCart(${safeProductId})" class="text-gray-400 hover:text-red-400 p-1 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
                                 </button>` : ''}
                             </div>
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-[#CE9704] font-semibold text-xs">ID: ${product.id}</span>
-                                <span class="text-white font-bold text-base">$${product.price}/day*</span>
+                                <span class="text-[#CE9704] font-semibold text-xs">ID: ${safeProductId}</span>
+                                <span class="text-white font-bold text-base">$${parseFloat(product.price).toFixed(2)}/day*</span>
                             </div>
                             <div class="flex items-center justify-end mb-2">
                                 <div class="flex items-center bg-gray-600 rounded-md">
-                                    <button onclick="updateQuantity(${product.id}, -1)" ${disabledAttr} class="bg-gray-600 text-white px-2 py-1 rounded-l-md text-xs hover:bg-gray-500 ${disableClass}" ${disabledAttr ? 'style="pointer-events: none;"' : ''}>−</button>
+                                    <button onclick="updateQuantity(${safeProductId}, -1)" ${disabledAttr} class="bg-gray-600 text-white px-2 py-1 rounded-l-md text-xs hover:bg-gray-500 ${disableClass}" ${disabledAttr ? 'style="pointer-events: none;"' : ''}>−</button>
                                     <span class="text-white mx-2 font-bold text-sm min-w-[16px] text-center">${quantity}</span>
-                                    <button onclick="updateQuantity(${product.id}, 1)" ${disabledAttr} class="bg-gray-600 text-white px-2 py-1 rounded-r-md text-xs hover:bg-gray-500 ${disableClass}" ${disabledAttr ? 'style="pointer-events: none;"' : ''}>+</button>
+                                    <button onclick="updateQuantity(${safeProductId}, 1)" ${disabledAttr} class="bg-gray-600 text-white px-2 py-1 rounded-r-md text-xs hover:bg-gray-500 ${disableClass}" ${disabledAttr ? 'style="pointer-events: none;"' : ''}>+</button>
                                 </div>
                             </div>
-                            ${product.description ? `<div class="bg-gray-800 p-2 rounded text-xs">
-                                <div class="text-white">${product.description}</div>
+                            ${escapedDescription ? `<div class="bg-gray-800 p-2 rounded text-xs">
+                                <div class="text-white">${escapedDescription}</div>
                             </div>` : ''}
                         </div>
                     </div>
@@ -950,21 +1096,27 @@ function displayForemanSummary(data) {
     const container = document.getElementById('foreman-details-container');
     if (!container) return;
     
+    // Escape all user input to prevent XSS
+    const escapedFirstName = escapeHtml(data.firstName || '');
+    const escapedLastName = escapeHtml(data.lastName || '');
+    const escapedPhone = escapeHtml(data.phone || '');
+    const escapedEmail = escapeHtml(data.email || '');
+    
     container.innerHTML = `
         <label class="block text-white text-sm mb-4">Foreman Details / Receiving person</label>
         <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-4">
             <div class="space-y-3">
                 <div>
                     <p class="text-white text-xs opacity-75 mb-1">Full Name</p>
-                    <p class="text-white font-semibold text-sm">${data.firstName} ${data.lastName}</p>
+                    <p class="text-white font-semibold text-sm">${escapedFirstName} ${escapedLastName}</p>
                 </div>
                 <div class="border-t border-white border-opacity-20 pt-3">
                     <p class="text-white text-xs opacity-75 mb-1">Phone Number</p>
-                    <p class="text-white font-semibold text-sm">${data.phone}</p>
+                    <p class="text-white font-semibold text-sm">${escapedPhone}</p>
                 </div>
                 <div class="border-t border-white border-opacity-20 pt-3">
                     <p class="text-white text-xs opacity-75 mb-1">Email</p>
-                    <p class="text-white font-semibold text-sm">${data.email}</p>
+                    <p class="text-white font-semibold text-sm">${escapedEmail}</p>
                 </div>
             </div>
         </div>
@@ -983,23 +1135,29 @@ function renderForemanForm(savedData) {
     const container = document.getElementById('foreman-details-container');
     if (!container) return;
     
+    // Escape all user input to prevent XSS
+    const escapedFirstName = escapeHtml(savedData.firstName || '');
+    const escapedLastName = escapeHtml(savedData.lastName || '');
+    const escapedPhone = escapeHtml(savedData.phone || '');
+    const escapedEmail = escapeHtml(savedData.email || '');
+    
     container.innerHTML = `
         <label class="block text-white text-sm mb-4">Foreman Details / Receiving person</label>
         <div class="mb-3">
             <label class="block text-white text-xs mb-1.5">First Name</label>
-            <input type="text" id="foreman-first-name" value="${savedData.firstName || ''}" placeholder="Enter first name" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+            <input type="text" id="foreman-first-name" value="${escapedFirstName}" placeholder="Enter first name" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
         </div>
         <div class="mb-3">
             <label class="block text-white text-xs mb-1.5">Last Name</label>
-            <input type="text" id="foreman-last-name" value="${savedData.lastName || ''}" placeholder="Enter last name" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+            <input type="text" id="foreman-last-name" value="${escapedLastName}" placeholder="Enter last name" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
         </div>
         <div class="mb-3">
             <label class="block text-white text-xs mb-1.5">Phone Number</label>
-            <input type="tel" id="foreman-phone" value="${savedData.phone || ''}" placeholder="Enter phone number" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+            <input type="tel" id="foreman-phone" value="${escapedPhone}" placeholder="Enter phone number" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
         </div>
         <div class="mb-4">
             <label class="block text-white text-xs mb-1.5">Email</label>
-            <input type="email" id="foreman-email" value="${savedData.email || ''}" placeholder="Enter email" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+            <input type="email" id="foreman-email" value="${escapedEmail}" placeholder="Enter email" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
         </div>
         <button id="foreman-continue-btn" class="w-full bg-[#000000] text-white py-2 rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors duration-200">
             Continue
@@ -1059,6 +1217,20 @@ function displayBillingSummary(data) {
     const container = document.getElementById('billing-details-container');
     if (!container) return;
     
+    // Escape all user input to prevent XSS
+    const escapedFirstName = escapeHtml(data.firstName || '');
+    const escapedLastName = escapeHtml(data.lastName || '');
+    const escapedEmail = escapeHtml(data.email || '');
+    const escapedPhone = escapeHtml(data.phone || '');
+    const escapedAddressLine1 = escapeHtml(data.addressLine1 || '');
+    const escapedAddressLine2 = escapeHtml(data.addressLine2 || '');
+    const escapedCity = escapeHtml(data.city || '');
+    const escapedState = escapeHtml(data.state || '');
+    const escapedZip = escapeHtml(data.zip || '');
+    const escapedCountry = escapeHtml(data.country || '');
+    const escapedCompanyName = escapeHtml(data.companyName || '');
+    const escapedJobTitle = escapeHtml(data.jobTitle || '');
+    
     container.innerHTML = `
         <div class="flex items-center justify-between mb-4">
             <label class="block text-white text-sm">Billing Details</label>
@@ -1070,28 +1242,28 @@ function displayBillingSummary(data) {
             <div class="space-y-3">
                 <div>
                     <p class="text-white text-xs opacity-75 mb-1">Full Name</p>
-                    <p class="text-white font-semibold text-sm">${data.firstName} ${data.lastName}</p>
+                    <p class="text-white font-semibold text-sm">${escapedFirstName} ${escapedLastName}</p>
                 </div>
                 <div class="border-t border-white border-opacity-20 pt-3">
                     <p class="text-white text-xs opacity-75 mb-1">Contact</p>
-                    <p class="text-white font-semibold text-sm">${data.email}</p>
-                    <p class="text-white font-semibold text-sm">${data.phone}</p>
+                    <p class="text-white font-semibold text-sm">${escapedEmail}</p>
+                    <p class="text-white font-semibold text-sm">${escapedPhone}</p>
                 </div>
-                ${data.addressLine1 ? `
+                ${escapedAddressLine1 ? `
                 <div class="border-t border-white border-opacity-20 pt-3">
                     <p class="text-white text-xs opacity-75 mb-1">Address</p>
-                    <p class="text-white font-semibold text-sm">${data.addressLine1}</p>
-                    ${data.addressLine2 ? `<p class="text-white font-semibold text-sm">${data.addressLine2}</p>` : ''}
-                    <p class="text-white font-semibold text-sm">${data.city}${data.state ? ', ' + data.state : ''} ${data.zip}</p>
-                    <p class="text-white font-semibold text-sm">${data.country}</p>
+                    <p class="text-white font-semibold text-sm">${escapedAddressLine1}</p>
+                    ${escapedAddressLine2 ? `<p class="text-white font-semibold text-sm">${escapedAddressLine2}</p>` : ''}
+                    <p class="text-white font-semibold text-sm">${escapedCity}${escapedState ? ', ' + escapedState : ''} ${escapedZip}</p>
+                    <p class="text-white font-semibold text-sm">${escapedCountry}</p>
                 </div>
                 ` : ''}
                 <div class="border-t border-white border-opacity-20 pt-3">
                     <p class="text-white text-xs opacity-75 mb-1">Assigned to Company</p>
                     <p class="text-white font-semibold text-sm">${data.isCompany ? 'Yes' : 'No'}</p>
-                    ${data.isCompany && data.companyName ? `
-                        <p class="text-white font-semibold text-sm mt-1">${data.companyName}</p>
-                        ${data.jobTitle ? `<p class="text-white font-semibold text-sm">${data.jobTitle}</p>` : ''}
+                    ${data.isCompany && escapedCompanyName ? `
+                        <p class="text-white font-semibold text-sm mt-1">${escapedCompanyName}</p>
+                        ${escapedJobTitle ? `<p class="text-white font-semibold text-sm">${escapedJobTitle}</p>` : ''}
                     ` : ''}
                 </div>
             </div>
@@ -1110,6 +1282,20 @@ function renderBillingForm(savedData) {
     const container = document.getElementById('billing-details-container');
     if (!container) return;
     
+    // Escape all user input to prevent XSS
+    const escapedFirstName = escapeHtml(savedData.firstName || '');
+    const escapedLastName = escapeHtml(savedData.lastName || '');
+    const escapedEmail = escapeHtml(savedData.email || '');
+    const escapedPhone = escapeHtml(savedData.phone || '');
+    const escapedAddressLine1 = escapeHtml(savedData.addressLine1 || '');
+    const escapedAddressLine2 = escapeHtml(savedData.addressLine2 || '');
+    const escapedCity = escapeHtml(savedData.city || '');
+    const escapedState = escapeHtml(savedData.state || '');
+    const escapedZip = escapeHtml(savedData.zip || '');
+    const escapedCountry = escapeHtml(savedData.country || '');
+    const escapedCompanyName = escapeHtml(savedData.companyName || '');
+    const escapedJobTitle = escapeHtml(savedData.jobTitle || '');
+    
     const isCompanyChecked = savedData.isCompany ? 'checked' : '';
     const companyFieldsClass = savedData.isCompany ? '' : 'hidden';
     
@@ -1122,37 +1308,37 @@ function renderBillingForm(savedData) {
         </div>
         <div class="grid grid-cols-2 gap-3 mb-3">
             <div>
-                <input type="text" id="billing-first-name" value="${savedData.firstName || ''}" placeholder="First Name*" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+                <input type="text" id="billing-first-name" value="${escapedFirstName}" placeholder="First Name*" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
             </div>
             <div>
-                <input type="text" id="billing-last-name" value="${savedData.lastName || ''}" placeholder="Last Name*" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+                <input type="text" id="billing-last-name" value="${escapedLastName}" placeholder="Last Name*" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
             </div>
         </div>
         <div class="grid grid-cols-2 gap-3 mb-3">
             <div>
-                <input type="email" id="billing-email" value="${savedData.email || ''}" placeholder="Email*" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+                <input type="email" id="billing-email" value="${escapedEmail}" placeholder="Email*" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
             </div>
             <div>
-                <input type="tel" id="billing-phone" value="${savedData.phone || ''}" placeholder="Phone number*" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+                <input type="tel" id="billing-phone" value="${escapedPhone}" placeholder="Phone number*" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
             </div>
         </div>
         <div class="mb-3">
-            <input type="text" id="billing-address-line-1" value="${savedData.addressLine1 || ''}" placeholder="Address line 1" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+            <input type="text" id="billing-address-line-1" value="${escapedAddressLine1}" placeholder="Address line 1" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
         </div>
         <div class="mb-3">
-            <input type="text" id="billing-address-line-2" value="${savedData.addressLine2 || ''}" placeholder="Address line 2" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+            <input type="text" id="billing-address-line-2" value="${escapedAddressLine2}" placeholder="Address line 2" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
         </div>
         <div class="mb-3">
-            <input type="text" id="billing-city" value="${savedData.city || ''}" placeholder="City" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+            <input type="text" id="billing-city" value="${escapedCity}" placeholder="City" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
         </div>
         <div class="mb-3">
-            <input type="text" id="billing-state" value="${savedData.state || ''}" placeholder="State / Province" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+            <input type="text" id="billing-state" value="${escapedState}" placeholder="State / Province" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
         </div>
         <div class="mb-3">
-            <input type="text" id="billing-zip" value="${savedData.zip || ''}" placeholder="Zip / Postal Code" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+            <input type="text" id="billing-zip" value="${escapedZip}" placeholder="Zip / Postal Code" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
         </div>
         <div class="mb-4">
-            <input type="text" id="billing-country" value="${savedData.country || ''}" placeholder="Country" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+            <input type="text" id="billing-country" value="${escapedCountry}" placeholder="Country" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
         </div>
         <div class="flex items-center mb-4">
             <input type="checkbox" id="billing-is-company" ${isCompanyChecked} class="w-4 h-4 bg-white border-gray-300 rounded text-[#CE9704] focus:ring-[#CE9704]"/>
@@ -1160,10 +1346,10 @@ function renderBillingForm(savedData) {
         </div>
         <div id="company-fields" class="${companyFieldsClass} mb-4">
             <div class="mb-3">
-                <input type="text" id="billing-company-name" value="${savedData.companyName || ''}" placeholder="Company Name" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+                <input type="text" id="billing-company-name" value="${escapedCompanyName}" placeholder="Company Name" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
             </div>
             <div class="mb-4">
-                <input type="text" id="billing-job-title" value="${savedData.jobTitle || ''}" placeholder="Job Title" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
+                <input type="text" id="billing-job-title" value="${escapedJobTitle}" placeholder="Job Title" class="w-full px-3 py-1.5 bg-white border-none rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
             </div>
         </div>
         <button id="billing-continue-btn" class="w-full bg-[#000000] text-white py-2 rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors duration-200">
@@ -1271,6 +1457,14 @@ function openPaymentMethodModal(method) {
     
     if (!modal || !formContainer || !modalTitle) return;
     
+    // Validate and escape method parameter to prevent XSS
+    const allowedMethods = ['credit-debit', 'direct-debit', 'google-pay', 'apple-pay', 'klarna'];
+    if (!allowedMethods.includes(method)) {
+        console.error('Invalid payment method:', method);
+        return;
+    }
+    const escapedMethod = escapeHtml(method);
+    
     let formHTML = '';
     let title = '';
     
@@ -1343,7 +1537,7 @@ function openPaymentMethodModal(method) {
                     </div>
                     <div class="flex gap-3 pt-4">
                         <button onclick="closePaymentMethodModal()" class="flex-1 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors">Cancel</button>
-                        <button onclick="savePaymentDetails('${method}')" class="flex-1 bg-[#CE9704] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#B8860B] transition-colors">Save</button>
+                        <button onclick="savePaymentDetails('${escapedMethod}')" class="flex-1 bg-[#CE9704] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#B8860B] transition-colors">Save</button>
                     </div>
                 </div>
             `;
@@ -1445,6 +1639,13 @@ function displayPaymentMethodDetails(paymentDetails) {
     const paymentContainer = document.getElementById('payment-method-container');
     if (!paymentContainer) return;
     
+    // Validate payment method to prevent XSS
+    const allowedMethods = ['credit-debit', 'direct-debit', 'google-pay', 'apple-pay', 'klarna'];
+    if (!paymentDetails || !paymentDetails.method || !allowedMethods.includes(paymentDetails.method)) {
+        console.error('Invalid payment details or method');
+        return;
+    }
+    
     const methodLabels = {
         'credit-debit': 'Credit/Debit Card',
         'direct-debit': 'Direct Debit/ ACH Wire Transfer',
@@ -1453,31 +1654,43 @@ function displayPaymentMethodDetails(paymentDetails) {
         'klarna': 'Klarna'
     };
     
+    // Escape all payment details to prevent XSS
     let infoHTML = '';
     switch(paymentDetails.method) {
         case 'credit-debit':
+            const escapedMaskedCard = escapeHtml(paymentDetails.maskedCard || '**** **** **** ****');
+            const escapedCardholder = escapeHtml(paymentDetails.cardholder || '');
+            const escapedExpiry = escapeHtml(paymentDetails.expiry || '');
             infoHTML = `
-                <p class="text-white font-semibold text-sm">${paymentDetails.maskedCard || '**** **** **** ****'}</p>
-                <p class="text-white font-semibold text-sm">${paymentDetails.cardholder || ''}</p>
-                <p class="text-white font-semibold text-sm">Expires: ${paymentDetails.expiry || ''}</p>
+                <p class="text-white font-semibold text-sm">${escapedMaskedCard}</p>
+                <p class="text-white font-semibold text-sm">${escapedCardholder}</p>
+                <p class="text-white font-semibold text-sm">Expires: ${escapedExpiry}</p>
             `;
             break;
         case 'direct-debit':
+            const escapedBankName = escapeHtml(paymentDetails.bankName || '');
+            const escapedAccountNumber = escapeHtml(paymentDetails.accountNumber || '');
+            const escapedRoutingNumber = escapeHtml(paymentDetails.routingNumber || '');
             infoHTML = `
-                <p class="text-white font-semibold text-sm">${paymentDetails.bankName || ''}</p>
-                <p class="text-white font-semibold text-sm">Account: ****${paymentDetails.accountNumber || ''}</p>
-                <p class="text-white font-semibold text-sm">Routing: ${paymentDetails.routingNumber || ''}</p>
+                <p class="text-white font-semibold text-sm">${escapedBankName}</p>
+                <p class="text-white font-semibold text-sm">Account: ****${escapedAccountNumber}</p>
+                <p class="text-white font-semibold text-sm">Routing: ${escapedRoutingNumber}</p>
             `;
             break;
         case 'google-pay':
         case 'apple-pay':
         case 'klarna':
+            const escapedEmail = escapeHtml(paymentDetails.email || '');
+            const escapedPhone = escapeHtml(paymentDetails.phone || '');
             infoHTML = `
-                <p class="text-white font-semibold text-sm">${paymentDetails.email || ''}</p>
-                <p class="text-white font-semibold text-sm">${paymentDetails.phone || ''}</p>
+                <p class="text-white font-semibold text-sm">${escapedEmail}</p>
+                <p class="text-white font-semibold text-sm">${escapedPhone}</p>
             `;
             break;
     }
+    
+    // Escape method label
+    const escapedMethodLabel = escapeHtml(methodLabels[paymentDetails.method] || paymentDetails.method || '');
     
     const detailsHTML = `
         <label class="block text-white text-sm mb-4">Payment Method</label>
@@ -1485,7 +1698,7 @@ function displayPaymentMethodDetails(paymentDetails) {
             <div class="space-y-3">
                 <div>
                     <p class="text-white text-xs opacity-75 mb-1">Method</p>
-                    <p class="text-white font-semibold text-sm">${methodLabels[paymentDetails.method] || paymentDetails.method}</p>
+                    <p class="text-white font-semibold text-sm">${escapedMethodLabel}</p>
                 </div>
                 <div class="border-t border-white border-opacity-20 pt-3">
                     <p class="text-white text-xs opacity-75 mb-1">Details</p>

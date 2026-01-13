@@ -37,6 +37,45 @@
             display: none;
         }
         
+        /* Drag and Drop Animations */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+        
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(206, 151, 4, 0.6), 0 0 40px rgba(206, 151, 4, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(206, 151, 4, 0.8), 0 0 60px rgba(206, 151, 4, 0.6);
+            }
+        }
+        
+        .product-card.dragging {
+            cursor: grabbing !important;
+            z-index: 1000;
+        }
+        
+        .drop-zone-active {
+            animation: glow 1.5s ease-in-out infinite;
+        }
+        
+        /* Smooth transitions for drag and drop */
+        [draggable="true"] {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        [draggable="true"]:hover {
+            transform: translateY(-2px);
+        }
+        
         /* Asegurar que los elementos del navbar sean clicables */
         nav a,
         nav button {
@@ -724,6 +763,9 @@
             const tab1 = document.getElementById('step-tab-1');
             const tab2 = document.getElementById('step-tab-2');
             const tab3 = document.getElementById('step-tab-3');
+            const tabMobile1 = document.getElementById('step-tab-mobile-1');
+            const tabMobile2 = document.getElementById('step-tab-mobile-2');
+            const tabMobile3 = document.getElementById('step-tab-mobile-3');
             
             // Remove all active states from indicators
             if (step1) {
@@ -739,7 +781,7 @@
                 step3.classList.add('text-white');
             }
             
-            // Remove all active states from tabs
+            // Remove all active states from desktop tabs
             if (tab1) {
                 tab1.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
                 tab1.classList.add('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
@@ -753,6 +795,20 @@
                 tab3.classList.add('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
             }
             
+            // Remove all active states from mobile tabs
+            if (tabMobile1) {
+                tabMobile1.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
+                tabMobile1.classList.add('bg-gray-700/80', 'border-gray-600/50', 'text-gray-300');
+            }
+            if (tabMobile2) {
+                tabMobile2.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
+                tabMobile2.classList.add('bg-gray-700/80', 'border-gray-600/50', 'text-gray-300');
+            }
+            if (tabMobile3) {
+                tabMobile3.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
+                tabMobile3.classList.add('bg-gray-700/80', 'border-gray-600/50', 'text-gray-300');
+            }
+            
             // Set active step based on current page
             if (currentPath === '/' || currentPath.includes('home') || currentPath.includes('products')) {
                 if (step1) {
@@ -763,6 +819,10 @@
                     tab1.classList.remove('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
                     tab1.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
                 }
+                if (tabMobile1) {
+                    tabMobile1.classList.remove('bg-gray-700/80', 'border-gray-600/50', 'text-gray-300');
+                    tabMobile1.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
+                }
             } else if (currentPath.includes('directions')) {
                 if (step2) {
                     step2.classList.remove('text-white');
@@ -772,6 +832,10 @@
                     tab2.classList.remove('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
                     tab2.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
                 }
+                if (tabMobile2) {
+                    tabMobile2.classList.remove('bg-gray-700/80', 'border-gray-600/50', 'text-gray-300');
+                    tabMobile2.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
+                }
             } else if (currentPath.includes('checkout')) {
                 if (step3) {
                     step3.classList.remove('text-white');
@@ -780,6 +844,10 @@
                 if (tab3) {
                     tab3.classList.remove('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
                     tab3.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
+                }
+                if (tabMobile3) {
+                    tabMobile3.classList.remove('bg-gray-700/80', 'border-gray-600/50', 'text-gray-300');
+                    tabMobile3.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
                 }
             }
         }
@@ -795,12 +863,21 @@
                 tab.addEventListener('click', function() {
                     const step = parseInt(this.getAttribute('data-step'));
                     
-                    // Update tab styles
+                    // Update tab styles (both desktop and mobile)
                     stepTabs.forEach(t => {
+                        // Remove active styles
                         t.classList.remove('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
-                        t.classList.add('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
+                        // Add inactive styles (check if mobile or desktop)
+                        if (t.id && t.id.includes('mobile')) {
+                            t.classList.remove('bg-gray-700/80', 'border-gray-600/50');
+                            t.classList.add('bg-gray-700/80', 'border-gray-600/50', 'text-gray-300');
+                        } else {
+                            t.classList.remove('bg-gray-700/80', 'border-gray-600/50');
+                            t.classList.add('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
+                        }
                     });
-                    this.classList.remove('bg-gray-800/80', 'border-gray-700/50', 'text-gray-300');
+                    // Set active tab
+                    this.classList.remove('bg-gray-800/80', 'bg-gray-700/80', 'border-gray-700/50', 'border-gray-600/50', 'text-gray-300');
                     this.classList.add('bg-gradient-to-br', 'from-[#CE9704]', 'to-[#B8860B]', 'border-[#CE9704]', 'text-white');
                     
                     // Update step indicators
