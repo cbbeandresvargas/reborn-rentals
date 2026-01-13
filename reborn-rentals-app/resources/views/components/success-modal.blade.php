@@ -44,7 +44,7 @@
             
             <!-- Details Message -->
             <div class="text-center text-gray-300 mb-8 space-y-3 leading-relaxed">
-                <p class="text-base md:text-lg">An invoice will be sent to you via Odoo with your selected payment method.</p>
+                <p class="text-base md:text-lg">Your rental request has been submitted. An invoice will be sent to you via Odoo after processing.</p>
                 <p class="text-base md:text-lg font-medium text-white">Thank you for choosing RebornRental as your Rental Partner.</p>
             </div>
             

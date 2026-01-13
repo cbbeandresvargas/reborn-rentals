@@ -42,7 +42,7 @@
                 </div>
             </div>
             
-            <!-- Total Revenue -->
+            <!-- Subtotal Estimate -->
             <div class="group relative bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
                 <div class="relative p-5 sm:p-6">
@@ -54,8 +54,9 @@
                         </div>
                     </div>
                     <div>
-                        <p class="text-white/80 text-xs sm:text-sm font-medium mb-1">Total Revenue</p>
+                        <p class="text-white/80 text-xs sm:text-sm font-medium mb-1">Subtotal Estimate</p>
                         <p class="text-2xl sm:text-3xl font-bold text-white">${{ number_format($stats['total_revenue'], 2) }}</p>
+                        <p class="text-white/70 text-xs mt-1">Final totals in Odoo</p>
                     </div>
                 </div>
             </div>
@@ -107,7 +108,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Recent Orders</h2>
-                        <p class="text-sm text-gray-500 mt-1">Latest transactions overview</p>
+                        <p class="text-sm text-gray-500 mt-1">Latest rental requests overview</p>
                     </div>
                     <a href="{{ route('admin.orders.index') }}" class="hidden sm:flex items-center px-4 py-2 bg-gradient-to-r from-[#CE9704] to-[#B8860B] text-white rounded-lg hover:shadow-lg transition-all duration-200 text-sm font-medium">
                         View All
@@ -173,9 +174,26 @@
                             </td>
                             
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold {{ $order->status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    <span class="w-1.5 h-1.5 mr-1.5 rounded-full {{ $order->status ? 'bg-green-500' : 'bg-red-500' }}"></span>
-                                    {{ $order->status ? 'Completed' : 'Pending' }}
+                                @php
+                                    $statusClass = match($order->status) {
+                                        'completed' => 'bg-green-100 text-green-800',
+                                        'pending_odoo' => 'bg-yellow-100 text-yellow-800',
+                                        default => 'bg-gray-100 text-gray-800'
+                                    };
+                                    $statusDot = match($order->status) {
+                                        'completed' => 'bg-green-500',
+                                        'pending_odoo' => 'bg-yellow-500',
+                                        default => 'bg-gray-500'
+                                    };
+                                    $statusText = match($order->status) {
+                                        'completed' => 'Completed',
+                                        'pending_odoo' => 'Pending Odoo',
+                                        default => ucfirst($order->status ?? 'Pending')
+                                    };
+                                @endphp
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold {{ $statusClass }}">
+                                    <span class="w-1.5 h-1.5 mr-1.5 rounded-full {{ $statusDot }}"></span>
+                                    {{ $statusText }}
                                 </span>
                             </td>
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">

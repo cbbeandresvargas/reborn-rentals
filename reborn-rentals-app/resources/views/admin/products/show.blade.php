@@ -71,6 +71,25 @@
                         </div>
 
                         <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Odoo Product ID</label>
+                            @if($product->odoo_product_id)
+                                <p class="text-gray-900">
+                                    <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                        {{ $product->odoo_product_id }}
+                                    </span>
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">Product is mapped to Odoo</p>
+                            @else
+                                <p class="text-gray-900">
+                                    <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                        Not Mapped
+                                    </span>
+                                </p>
+                                <p class="text-xs text-red-500 mt-1">⚠️ This product needs to be mapped to Odoo before orders can be synced</p>
+                            @endif
+                        </div>
+
+                        <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Status</label>
                             <div class="flex flex-col gap-2">
                                 <span class="px-3 py-1 text-sm rounded-full {{ $product->active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
@@ -165,6 +184,22 @@
                         @endforeach
                     </select>
                 </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Odoo Product ID
+                    <span class="text-xs text-gray-500">(Required for Odoo integration)</span>
+                </label>
+                <input type="number" name="odoo_product_id" id="edit-product-odoo-product-id" value="{{ old('odoo_product_id', $product->odoo_product_id) }}" min="1"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704]"
+                    placeholder="Enter Odoo product ID">
+                <p class="text-xs text-gray-500 mt-1">
+                    The ID of the corresponding product in Odoo. This is required to sync orders to Odoo.
+                </p>
+                @error('odoo_product_id')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             @if($product->image_url)

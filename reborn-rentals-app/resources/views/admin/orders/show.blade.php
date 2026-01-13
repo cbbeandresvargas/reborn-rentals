@@ -20,8 +20,20 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span class="px-3 py-1.5 rounded-full text-xs font-semibold {{ $order->status ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                        {{ $order->status ? 'Completed' : 'Pending' }}
+                    @php
+                        $statusClass = match($order->status) {
+                            'completed' => 'bg-green-100 text-green-800',
+                            'pending_odoo' => 'bg-yellow-100 text-yellow-800',
+                            default => 'bg-gray-100 text-gray-800'
+                        };
+                        $statusText = match($order->status) {
+                            'completed' => 'Completed',
+                            'pending_odoo' => 'Pending Odoo',
+                            default => ucfirst($order->status ?? 'Pending')
+                        };
+                    @endphp
+                    <span class="px-3 py-1.5 rounded-full text-xs font-semibold {{ $statusClass }}">
+                        {{ $statusText }}
                     </span>
                 </div>
             </div>
@@ -43,14 +55,6 @@
         @php
             $foremanDetails = $order->foreman_details_json ? json_decode($order->foreman_details_json, true) : null;
             $billingDetails = $order->billing_details_json ? json_decode($order->billing_details_json, true) : null;
-            $paymentMethodDetails = $order->payment_method_details_json ? json_decode($order->payment_method_details_json, true) : null;
-            $paymentMethods = [
-                1 => 'Credit/Debit Card',
-                2 => 'Direct Debit',
-                3 => 'Google Pay',
-                4 => 'Apple Pay',
-                5 => 'Klarna'
-            ];
             
             // Parse delivery address from job location
             $deliveryAddress = $order->job->notes ?? 'N/A';
@@ -232,62 +236,38 @@
                     </div>
                 </div>
 
-                <!-- Summary & Payment -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Summary -->
-                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-blue-200 p-6">
-                        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                            </svg>
-                            Summary
-                        </h2>
-                        <div class="space-y-2.5">
-                            <div class="flex justify-between text-gray-700">
-                                <span>Subtotal:</span>
-                                <span class="font-semibold">${{ number_format($order->total_amount - $order->tax_total - ($order->discount_total ?? 0), 2) }}</span>
-                            </div>
-                            @if($order->discount_total)
-                            <div class="flex justify-between text-green-700">
-                                <span>Discount:</span>
-                                <span class="font-semibold">-${{ number_format($order->discount_total, 2) }}</span>
-                            </div>
-                            @endif
-                            <div class="flex justify-between text-gray-700">
-                                <span>Tax (2%):</span>
-                                <span class="font-semibold">${{ number_format($order->tax_total, 2) }}</span>
-                            </div>
-                            <div class="border-t border-gray-300 pt-2.5 mt-2.5">
-                                <div class="flex justify-between font-bold text-lg">
-                                    <span>Total:</span>
-                                    <span class="text-[#CE9704]">${{ number_format($order->total_amount, 2) }}</span>
-                                </div>
+                <!-- Summary -->
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-blue-200 p-6">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        Summary (Estimate Only)
+                    </h2>
+                    <div class="space-y-2.5">
+                        <div class="flex justify-between text-gray-700">
+                            <span>Subtotal:</span>
+                            <span class="font-semibold">${{ number_format($order->subtotal ?? $order->total_amount, 2) }}</span>
+                        </div>
+                        @if($order->cupon)
+                        <div class="flex justify-between text-blue-700">
+                            <span>Coupon Applied:</span>
+                            <span class="font-semibold text-sm">{{ $order->cupon->code }}</span>
+                        </div>
+                        <div class="text-xs text-gray-500 italic">
+                            (Discount calculated in Odoo)
+                        </div>
+                        @endif
+                        <div class="border-t border-gray-300 pt-2.5 mt-2.5">
+                            <div class="flex justify-between font-bold text-lg">
+                                <span>Total Estimate:</span>
+                                <span class="text-[#CE9704]">${{ number_format($order->total_amount, 2) }}</span>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Payment Method -->
-                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg border border-green-200 p-6">
-                        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                            </svg>
-                            Payment Method
-                        </h2>
-                        <div class="space-y-2">
-                            <p class="font-semibold text-gray-900">{{ $paymentMethods[$order->payment_method] ?? 'Unknown' }}</p>
-                            @if($paymentMethodDetails && count(array_filter($paymentMethodDetails)))
-                                <div class="mt-3 pt-3 border-t border-gray-300">
-                                    <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Additional Details:</p>
-                                @foreach($paymentMethodDetails as $key => $value)
-                                    @if($value !== null && $value !== '')
-                                            <p class="text-xs text-gray-700 mb-1">
-                                                <strong>{{ ucfirst(str_replace('_', ' ', $key)) }}:</strong> {{ $value }}
-                                            </p>
-                                    @endif
-                                @endforeach
-                                </div>
-                            @endif
+                        <div class="mt-3 pt-3 border-t border-gray-200">
+                            <p class="text-xs text-gray-600 italic">
+                                <strong>Note:</strong> This is a subtotal estimate only. Final totals, taxes, and discounts are calculated and applied in Odoo.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -306,16 +286,12 @@
                         <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                             <div>
                                 <span class="text-sm font-medium text-gray-700 block mb-1">Order Status</span>
-                                <span class="text-xs text-gray-500">Toggle to mark order as completed or pending</span>
+                                <span class="text-xs text-gray-500">Update order status</span>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" name="status" value="1" class="sr-only peer" {{ $order->status ? 'checked' : '' }}
-                                    onchange="this.form.submit()">
-                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#CE9704] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#CE9704]"></div>
-                                <span class="ml-3 text-sm font-semibold {{ $order->status ? 'text-green-600' : 'text-gray-500' }}" id="status-label">
-                                    {{ $order->status ? 'Completed' : 'Pending' }}
-                                </span>
-                            </label>
+                            <select name="status" onchange="this.form.submit()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] text-sm font-semibold">
+                                <option value="pending_odoo" {{ $order->status === 'pending_odoo' ? 'selected' : '' }}>Pending Odoo</option>
+                                <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Completed</option>
+                            </select>
                         </div>
                     </form>
                 </div>
@@ -490,25 +466,4 @@
     </main>
                 </div>
                 
-                <script>
-                    // Update label text when switch is toggled
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const checkbox = document.querySelector('input[name="status"]');
-                        const label = document.getElementById('status-label');
-                        
-                        if (checkbox && label) {
-                            checkbox.addEventListener('change', function() {
-                                if (this.checked) {
-                                    label.textContent = 'Completed';
-                                    label.classList.remove('text-gray-500');
-                                    label.classList.add('text-green-600');
-                                } else {
-                                    label.textContent = 'Pending';
-                                    label.classList.remove('text-green-600');
-                                    label.classList.add('text-gray-500');
-                                }
-                            });
-                        }
-                    });
-                </script>
 @endsection

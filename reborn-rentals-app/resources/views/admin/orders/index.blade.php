@@ -16,7 +16,7 @@
                     </div>
                     <div>
                         <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Orders</h1>
-                        <p class="text-sm text-gray-500 mt-1">Manage and track all customer orders</p>
+                        <p class="text-sm text-gray-500 mt-1">Manage and track all rental requests</p>
                     </div>
                 </div>
                 <div class="hidden sm:flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-200">
@@ -191,19 +191,28 @@
                             @endif
                         </td>
                             <td class="px-6 py-5 whitespace-nowrap">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold {{ $order->status ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-yellow-100 text-yellow-800 border border-yellow-200' }}">
-                                    @if($order->status)
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    @else
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                                    </svg>
-                                    @endif
-                                {{ $order->status ? 'Completed' : 'Pending' }}
-                            </span>
-                        </td>
+                                @php
+                                    $statusClass = match($order->status) {
+                                        'completed' => 'bg-green-100 text-green-800 border border-green-200',
+                                        'pending_odoo' => 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+                                        default => 'bg-gray-100 text-gray-800 border border-gray-200'
+                                    };
+                                    $statusIcon = match($order->status) {
+                                        'completed' => '<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>',
+                                        'pending_odoo' => '<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>',
+                                        default => '<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>'
+                                    };
+                                    $statusText = match($order->status) {
+                                        'completed' => 'Completed',
+                                        'pending_odoo' => 'Pending Odoo',
+                                        default => ucfirst($order->status ?? 'Pending')
+                                    };
+                                @endphp
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold {{ $statusClass }}">
+                                    {!! $statusIcon !!}
+                                    {{ $statusText }}
+                                </span>
+                            </td>
                             <td class="px-6 py-5 whitespace-nowrap">
                                 <div class="flex items-center gap-2 text-sm font-medium text-gray-600 group-hover:text-[#CE9704] transition-colors">
                                     <span>View details</span>

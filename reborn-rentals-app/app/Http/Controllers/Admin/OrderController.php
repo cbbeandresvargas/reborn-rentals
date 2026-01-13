@@ -26,11 +26,9 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'status' => 'boolean',
+            'status' => 'required|string|in:pending_odoo,completed',
             'notes' => 'nullable|string',
         ]);
-
-        $validated['status'] = $request->has('status');
 
         $order->update($validated);
 

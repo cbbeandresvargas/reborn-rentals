@@ -39,4 +39,21 @@ return [
         'maps_api_key' => env('GOOGLE_MAPS_API_KEY'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Odoo Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for Odoo ERP integration.
+    | All credentials are stored in environment variables for security.
+    |
+    */
+
+    'odoo' => [
+        'url' => env('ODOO_URL'),
+        'database' => env('ODOO_DB'),
+        'username' => env('ODOO_USER'),
+        'api_key' => env('ODOO_API_KEY'),
+    ],
+
 ];

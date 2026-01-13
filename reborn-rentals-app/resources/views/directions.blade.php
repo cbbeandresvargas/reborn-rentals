@@ -874,7 +874,7 @@ function initDirectionsPage() {
         };
     }
     
-    // Event listener para el botón "Proceed to Payment"
+    // Event listener para el botón "Continue to Checkout"
     const whenWhereBtn = document.getElementById('when-where-btn');
     if (whenWhereBtn) {
         whenWhereBtn.addEventListener('click', function(e) {

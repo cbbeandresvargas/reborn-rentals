@@ -4,12 +4,12 @@
 
 @section('content')
 <!-- Step 3: Checkout Summary -->
-<div class="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 mt-4 sm:mt-8 md:mt-12 lg:mt-20 mb-8 sm:mb-12 md:mb-16 lg:mb-20">
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden p-3 sm:p-4 md:p-6 lg:p-8">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 mt-4 sm:mt-8 md:mt-12 lg:mt-20 mb-8 sm:mb-12 md:mb-16 lg:mb-20">
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden p-4 sm:p-6 md:p-8 lg:p-10">
         <!-- Header -->
         <div class="mb-6 sm:mb-8">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Checkout Summary</h1>
-            <p class="text-sm sm:text-base text-gray-600">Review your rental items and complete your order</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Rental Request Summary</h1>
+            <p class="text-sm sm:text-base text-gray-600">Review your rental items and submit your request</p>
         </div>
         
         @if(session('error'))
@@ -20,6 +20,32 @@
         
         <form method="POST" action="{{ route('checkout.store') }}">
             @csrf
+            
+            <!-- Payment Notice - At the top of form -->
+            <div class="mb-6 p-4 sm:p-6 bg-yellow-50 border-2 border-yellow-400 rounded-lg">
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-yellow-600 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <div class="flex-1">
+                        <h4 class="text-yellow-900 font-bold text-base sm:text-lg mb-3">Important Payment Information</h4>
+                        <ul class="text-yellow-800 text-sm sm:text-base space-y-2">
+                            <li class="flex items-start">
+                                <span class="mr-2 font-bold">•</span>
+                                <span><strong>No payment is collected on this website.</strong> This website only collects rental requests.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="mr-2 font-bold">•</span>
+                                <span><strong>Payment details will be sent to you by email via invoice</strong> after your request is processed.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="mr-2 font-bold">•</span>
+                                <span><strong>Taxes will be calculated separately</strong> and included in your final invoice.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
             
             <!-- Checkout Content -->
             <div>
@@ -76,40 +102,29 @@
                 </div>
 
                 <!-- Applied Discount (hidden by default, shown when coupon is applied) -->
-                <div id="applied-discount" class="p-6 border-b border-gray-200 hidden">
-                    <div class="flex items-center justify-between bg-green-50 p-3 rounded-lg">
+                <!-- Note: Discounts are calculated and applied in Odoo, not here -->
+                <div id="applied-discount" class="p-4 sm:p-6 border-b border-gray-200 hidden">
+                    <div class="flex items-center justify-between bg-blue-50 p-3 rounded-lg">
                         <div>
-                            <span class="text-green-800 font-semibold" id="discount-name">BIGPANS101</span>
-                            <span class="text-green-600 ml-2" id="discount-type">-20% OFF</span>
+                            <span class="text-blue-800 font-semibold" id="discount-name">BIGPANS101</span>
+                            <span class="text-blue-600 ml-2 text-sm" id="discount-type">(Will be applied in Odoo)</span>
                         </div>
-                        <span class="text-green-800 font-bold" id="discount-amount">-$0.00</span>
-                    </div>
-                </div>
-
-                <!-- Sales Tax Section -->
-                <div class="p-4 sm:p-6 border-b border-gray-200">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-                        <div>
-                            <h3 class="text-base sm:text-lg font-semibold text-gray-900">Sales Tax</h3>
-                            <p class="text-xs sm:text-sm text-gray-600">Based on your location</p>
-                        </div>
-                        <div class="text-left sm:text-right">
-                            <span class="text-[#CE9704] font-semibold text-sm sm:text-base">2% Tax</span>
-                            <div class="text-base sm:text-lg font-bold text-gray-900" id="sales-tax">${{ number_format($total * 0.02, 2) }}</div>
-                        </div>
+                        <span class="text-blue-800 font-bold text-sm">Applied</span>
                     </div>
                 </div>
 
                 <!-- Total Section -->
                 <div class="p-4 sm:p-6 bg-gray-50">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-2 sm:gap-0">
-                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Total:</h3>
-                        <div class="text-2xl sm:text-3xl font-bold text-gray-900" id="grand-total">${{ number_format($total * 1.02, 2) }}</div>
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Subtotal:</h3>
+                        <div class="text-2xl sm:text-3xl font-bold text-gray-900" id="grand-total">${{ number_format($total, 2) }}</div>
                     </div>
                     
                     <!-- Message about invoice -->
-                    <div class="text-center text-gray-600 text-sm py-4">
-                        <p>An invoice will be sent to you via Odoo with your selected payment method.</p>
+                    <div class="text-center text-gray-600 text-sm sm:text-base py-4 border-t border-gray-200 mt-4">
+                        <p class="mb-2 font-semibold">This is a subtotal estimate only.</p>
+                        <p class="mb-2">Final totals, taxes, and discounts will be calculated in Odoo.</p>
+                        <p>An invoice with final amounts will be sent to you via email after your request is processed.</p>
                     </div>
                 </div>
             </div>
@@ -185,8 +200,7 @@ if (directionsData) {
 console.log('%c💰 RESUMEN DE TOTALES:', 'color: #CE9704; font-weight: bold; font-size: 14px;');
 console.log(`
 Subtotal: ${{ number_format($total, 2) }}
-Impuesto (2%): ${{ number_format($total * 0.02, 2) }}
-TOTAL A PAGAR: ${{ number_format($total * 1.02, 2) }}
+Nota: Impuestos y pagos se manejan en Odoo
 ---`);
 
 console.log('%c====================================', 'color: #CE9704; font-weight: bold; font-size: 14px;');
@@ -218,14 +232,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 600);
 });
 
-// Función para ajustar días
+// Función para ajustar días (mínimo 30 días)
 function adjustDays(productId, change) {
     const daysElement = document.getElementById('days-' + productId);
     const itemTotalElement = document.getElementById('item-total-' + productId);
     
     if (daysElement && itemTotalElement) {
         let currentDays = parseInt(daysElement.textContent.replace(' Days', ''));
-        const newDays = Math.max(1, currentDays + change);
+        const newDays = Math.max(30, currentDays + change); // Mínimo 30 días
         daysElement.textContent = newDays + ' Days';
         
         // Get product data
@@ -260,38 +274,17 @@ function updateGrandTotal() {
         }
     });
     
-    // Check if there's an applied coupon - only if coupon input is disabled (meaning it was applied in this session)
-    let discountAmount = 0;
-    const couponInput = document.getElementById('sidebar-coupon-code');
-    const applyCouponBtn = document.getElementById('sidebar-apply-coupon');
+    // Note: Coupon codes can be entered but discounts are NOT calculated here
+    // All discount calculations and applications are handled in Odoo
+    // The coupon code will be sent to backend for reference only
     
-    // Only apply discount if coupon input is disabled (meaning a coupon was successfully applied)
-    if (couponInput && couponInput.disabled && applyCouponBtn && applyCouponBtn.textContent === 'Applied') {
-        const appliedCoupon = localStorage.getItem('applied_coupon');
-        if (appliedCoupon) {
-            try {
-                const coupon = JSON.parse(appliedCoupon);
-                discountAmount = parseFloat(coupon.discount_amount) || 0;
-            } catch (e) {
-                console.error('Error parsing applied coupon:', e);
-            }
-        }
-    }
-    
-    // Calculate subtotal after discount
-    const subtotalAfterDiscount = subtotal - discountAmount;
-    
-    // Calculate sales tax (2% on subtotal after discount)
-    const salesTax = subtotalAfterDiscount * 0.02;
-    const grandTotal = subtotalAfterDiscount + salesTax;
+    // Calculate subtotal only - no discounts or taxes
+    // Note: This is an estimate only. Final totals, taxes, and discounts are calculated in Odoo.
+    const grandTotal = subtotal; // No discount applied - handled in Odoo
     
     // Update UI
-    const salesTaxElement = document.getElementById('sales-tax');
     const grandTotalElement = document.getElementById('grand-total');
     
-    if (salesTaxElement) {
-        salesTaxElement.textContent = '$' + salesTax.toFixed(2);
-    }
     if (grandTotalElement) {
         grandTotalElement.textContent = '$' + grandTotal.toFixed(2);
     }
@@ -313,18 +306,47 @@ function submitCheckoutForm() {
     
     // Disable checkout button to prevent multiple clicks
     const checkoutBtn = document.getElementById('sidebar-checkout-btn');
+    // Store original text in a way that's accessible throughout the function
+    const originalText = checkoutBtn ? (checkoutBtn.textContent || 'Submit Rental Request') : 'Submit Rental Request';
+    
+    // Helper function to restore button state
+    const restoreButton = function() {
+        const btn = document.getElementById('sidebar-checkout-btn');
+        if (btn) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            btn.textContent = originalText;
+        }
+    };
+    
     if (checkoutBtn) {
         checkoutBtn.disabled = true;
         checkoutBtn.style.opacity = '0.5';
         checkoutBtn.style.cursor = 'not-allowed';
-        const originalText = checkoutBtn.textContent;
         checkoutBtn.textContent = 'Processing...';
     }
     
-    // Note: Payment processing removed - orders will be invoiced via Odoo
-    // Payment method is selected but not processed here
+    // ====================================================================
+    // VALIDATION: Only validate directions, billing, and cart data
+    // Payment data is NOT required - payments are handled in Odoo
+    // ====================================================================
     
-    // Get directions data
+    // 1. VALIDATE CART DATA - Ensure cart is not empty
+    const productElements = document.querySelectorAll('[data-product-id]');
+    if (!productElements || productElements.length === 0) {
+        if (typeof toast !== 'undefined') {
+            toast.error('Your cart is empty. Please add items to your cart first.');
+        } else {
+            alert('Your cart is empty. Please add items to your cart first.');
+        }
+        console.error('Cart is empty');
+        isSubmittingCheckout = false;
+        restoreButton();
+        return;
+    }
+    
+    // 2. VALIDATE DIRECTIONS DATA
     const directionsData = localStorage.getItem('reborn-rentals-directions');
     console.log('Directions data:', directionsData);
     
@@ -336,6 +358,7 @@ function submitCheckoutForm() {
         }
         console.error('No directions data found');
         isSubmittingCheckout = false;
+        restoreButton();
         return;
     }
     
@@ -349,10 +372,11 @@ function submitCheckoutForm() {
             alert('Invalid delivery information. Please try again.');
         }
         isSubmittingCheckout = false;
+        restoreButton();
         return;
     }
     
-    // Validate required fields
+    // Validate required direction fields
     if (!directions.startDate || !directions.endDate || !directions.jobsiteAddress) {
         if (typeof toast !== 'undefined') {
             toast.error('Please complete all required delivery information.');
@@ -360,25 +384,56 @@ function submitCheckoutForm() {
             alert('Please complete all required delivery information.');
         }
         isSubmittingCheckout = false;
+        restoreButton();
         return;
     }
     
-    // Get payment method
-    const paymentMethod = localStorage.getItem('payment-method');
-    console.log('Payment method:', paymentMethod);
-    
-    if (!paymentMethod) {
+    // 3. VALIDATE BILLING DATA
+    const billingData = localStorage.getItem('billing-details');
+    if (!billingData) {
         if (typeof toast !== 'undefined') {
-            toast.error('Please select a payment method.');
+            toast.error('Please complete billing details first.');
         } else {
-            alert('Please select a payment method.');
+            alert('Please complete billing details first.');
         }
-        console.error('No payment method found');
+        console.error('No billing details found');
         isSubmittingCheckout = false;
+        restoreButton();
         return;
     }
     
-    // Get coupon code if applied
+    let billingDetails;
+    try {
+        billingDetails = JSON.parse(billingData);
+        console.log('Billing details found:', billingDetails);
+        
+        // Validate required billing fields
+        if (!billingDetails.firstName || !billingDetails.lastName || !billingDetails.email) {
+            if (typeof toast !== 'undefined') {
+                toast.error('Please complete all required billing information (First Name, Last Name, Email).');
+            } else {
+                alert('Please complete all required billing information (First Name, Last Name, Email).');
+            }
+            isSubmittingCheckout = false;
+            restoreButton();
+            return;
+        }
+    } catch (e) {
+        if (typeof toast !== 'undefined') {
+            toast.error('Invalid billing information. Please try again.');
+        } else {
+            alert('Invalid billing information. Please try again.');
+        }
+        console.error('Error parsing billing details:', e);
+        isSubmittingCheckout = false;
+        restoreButton();
+        return;
+    }
+    
+    // Note: Payment data is NOT validated - payments are handled in Odoo
+    // This website only collects rental requests
+    
+    // Get coupon code if applied (optional)
     let couponCode = '';
     const appliedCoupon = localStorage.getItem('applied_coupon');
     if (appliedCoupon) {
@@ -387,18 +442,6 @@ function submitCheckoutForm() {
             couponCode = coupon.code || '';
         } catch (e) {
             console.error('Error parsing coupon:', e);
-        }
-    }
-    
-    // Get Billing Details first
-    let billingDetails = {};
-    const billingData = localStorage.getItem('billing-details');
-    if (billingData) {
-        try {
-            billingDetails = JSON.parse(billingData);
-            console.log('Billing details found:', billingDetails);
-        } catch (e) {
-            console.error('Error parsing billing details:', e);
         }
     }
     
@@ -428,18 +471,6 @@ function submitCheckoutForm() {
         }
     }
     
-    // Get Payment Method Details
-    let paymentMethodDetails = {};
-    const paymentDetailsData = localStorage.getItem('payment-method-details');
-    if (paymentDetailsData) {
-        try {
-            paymentMethodDetails = JSON.parse(paymentDetailsData);
-            console.log('Payment method details found:', paymentMethodDetails);
-        } catch (e) {
-            console.error('Error parsing payment method details:', e);
-        }
-    }
-    
     // Get rental days for each product and calculate totals
     // Try multiple selectors to find the form
     let form = document.querySelector('form[action*="checkout"]');
@@ -459,17 +490,18 @@ function submitCheckoutForm() {
         }
         console.error('Form not found in DOM');
         isSubmittingCheckout = false;
+        restoreButton();
         return;
     }
     
-    // Collect all product days data
+    // Collect all product days data (minimum 30 days)
     const productDays = {};
     document.querySelectorAll('[data-product-id]').forEach(element => {
         const productId = element.getAttribute('data-product-id');
         const daysElement = document.getElementById('days-' + productId);
         if (daysElement) {
             const days = parseInt(daysElement.textContent.replace(' Days', ''));
-            productDays[productId] = days || 30;
+            productDays[productId] = Math.max(30, days || 30); // Ensure minimum 30 days
         }
     });
     console.log('Product days:', productDays);
@@ -497,16 +529,12 @@ function submitCheckoutForm() {
     addHiddenField(form, 'longitude', directions.longitude || '');
     addHiddenField(form, 'notes', directions.notes || '');
     addHiddenField(form, 'cupon_code', couponCode);
-    addHiddenField(form, 'payment_method', getPaymentMethodId(paymentMethod));
     
     // Add Foreman Details as JSON
     addHiddenField(form, 'foreman_details', JSON.stringify(foremanDetails));
     
     // Add Billing Details as JSON
     addHiddenField(form, 'billing_details', JSON.stringify(billingDetails));
-    
-    // Add Payment Method Details as JSON
-    addHiddenField(form, 'payment_method_details', JSON.stringify(paymentMethodDetails));
     
     console.log('Form data prepared, submitting via AJAX...');
     console.log('Form action:', form.action);
@@ -523,76 +551,102 @@ function submitCheckoutForm() {
             'X-Requested-With': 'XMLHttpRequest',
         }
     })
-    .then(response => {
+    .then(async response => {
         console.log('Response status:', response.status);
+        console.log('Response headers:', {
+            'content-type': response.headers.get('content-type'),
+            'location': response.headers.get('location'),
+        });
         
-        // Check if response is JSON (success) or redirect
-        if (response.headers.get('content-type')?.includes('application/json')) {
-            return response.json().then(data => {
-                if (data.success) {
-                    console.log('Order created successfully, opening success modal...');
-                    
-                    // Clear all localStorage data
-                    localStorage.removeItem('reborn-rentals-directions');
-                    localStorage.removeItem('foreman-details');
-                    localStorage.removeItem('billing-details');
-                    localStorage.removeItem('payment-method');
-                    localStorage.removeItem('payment-method-details');
-                    localStorage.removeItem('applied_coupon');
-                    
-                    // Clear cart from session
-                    if (typeof clearCart === 'function') {
-                        clearCart();
-                    }
-                    
-                    // Show success modal
-                    if (typeof openSuccessModal === 'function') {
-                        openSuccessModal();
-                    } else {
-                        // Fallback: redirect to order page
-                        window.location.href = data.redirect_url || form.action.replace('/checkout', '/orders');
-                    }
-                } else {
-                    // Re-enable button on error
-                    isSubmittingCheckout = false;
-                    const checkoutBtn = document.getElementById('sidebar-checkout-btn');
-                    if (checkoutBtn) {
-                        checkoutBtn.disabled = false;
-                        checkoutBtn.style.opacity = '1';
-                        checkoutBtn.style.cursor = 'pointer';
-                    }
-                    throw new Error(data.message || 'Error creating order');
-                }
-            });
-        } else if (response.redirected || response.ok) {
-            // Handle redirect response (fallback)
-            console.log('Order created successfully, redirecting...');
-            window.location.href = response.url || form.action.replace('/checkout', '/orders');
+        // Try to parse as JSON first
+        const contentType = response.headers.get('content-type') || '';
+        let data;
+        
+        if (contentType.includes('application/json')) {
+            try {
+                data = await response.json();
+                console.log('Response data (JSON):', data);
+            } catch (e) {
+                console.error('Error parsing JSON response:', e);
+                throw new Error('Invalid response from server');
+            }
         } else {
-            // Handle errors
-            return response.json().then(data => {
-                throw new Error(data.message || 'Error creating order');
-            }).catch(() => {
-                throw new Error('Error creating order. Please try again.');
+            // If not JSON, try to get text to see what we got
+            const text = await response.text();
+            console.error('Non-JSON response received:', text.substring(0, 200));
+            throw new Error('Server returned non-JSON response. Please check server logs.');
+        }
+        
+        // Handle response data
+        if (data.success) {
+            console.log('✅ Order created successfully!', {
+                order_id: data.order_id,
+                redirect_url: data.redirect_url,
             });
+            
+            // Clear all localStorage data
+            localStorage.removeItem('reborn-rentals-directions');
+            localStorage.removeItem('foreman-details');
+            localStorage.removeItem('billing-details');
+            localStorage.removeItem('applied_coupon');
+            
+            // Clear cart from session
+            if (typeof clearCart === 'function') {
+                clearCart();
+            }
+            
+            // Show success modal
+            if (typeof openSuccessModal === 'function') {
+                openSuccessModal();
+                // Redirect after showing modal
+                setTimeout(() => {
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        window.location.href = form.action.replace('/checkout', '/orders/' + data.order_id);
+                    }
+                }, 2000);
+            } else {
+                // Fallback: redirect to order page
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else if (data.order_id) {
+                    window.location.href = '/orders/' + data.order_id;
+                } else {
+                    window.location.href = form.action.replace('/checkout', '/orders');
+                }
+            }
+        } else {
+            // Re-enable button on error
+            isSubmittingCheckout = false;
+            restoreButton();
+            
+            const errorMessage = data.message || data.error || 'Error creating order. Please try again.';
+            console.error('Order creation failed:', errorMessage);
+            throw new Error(errorMessage);
         }
     })
     .catch(error => {
-        console.error('Error submitting order:', error);
-        if (typeof toast !== 'undefined') {
-            toast.error(error.message || 'Error creating order. Please try again.');
-        } else {
-            alert(error.message || 'Error creating order. Please try again.');
-        }
+        console.error('❌ Error submitting order:', error);
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+        });
         
         // Re-enable button on error
         isSubmittingCheckout = false;
-        const checkoutBtn = document.getElementById('sidebar-checkout-btn');
-        if (checkoutBtn) {
-            checkoutBtn.disabled = false;
-            checkoutBtn.style.opacity = '1';
-            checkoutBtn.style.cursor = 'pointer';
+        restoreButton();
+        
+        // Show error message
+        const errorMessage = error.message || 'Error creating order. Please try again.';
+        if (typeof toast !== 'undefined') {
+            toast.error(errorMessage);
+        } else {
+            alert(errorMessage);
         }
+        
+        // Log error for debugging
+        console.error('Full error object:', error);
     })
     .finally(() => {
         // Reset flag after a delay to allow for redirect
@@ -614,17 +668,6 @@ function addHiddenField(form, name, value) {
     field.value = value;
 }
 
-// Map payment method string to ID
-function getPaymentMethodId(method) {
-    const methodMap = {
-        'credit-debit': 1,
-        'direct-debit': 2,
-        'google-pay': 3,
-        'apple-pay': 4,
-        'klarna': 5
-    };
-    return methodMap[method] || 1;
-}
 
 // Make functions globally accessible
 window.submitCheckoutForm = submitCheckoutForm;

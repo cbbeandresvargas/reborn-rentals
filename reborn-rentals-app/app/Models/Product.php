@@ -17,6 +17,7 @@ class Product extends Model
         'active',
         'hidden',
         'category_id',
+        'odoo_product_id',
     ];
 
     protected $casts = [
@@ -24,6 +25,7 @@ class Product extends Model
         'active'      => 'boolean',
         'hidden'      => 'boolean',
         'category_id' => 'integer',
+        'odoo_product_id' => 'integer',
     ];
 
     // Relaciones

@@ -52,6 +52,22 @@
                     </div>
                 </div>
 
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Odoo Product ID
+                        <span class="text-xs text-gray-500">(Required for Odoo integration)</span>
+                    </label>
+                    <input type="number" name="odoo_product_id" value="{{ old('odoo_product_id', $product->odoo_product_id) }}" min="1"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704]"
+                        placeholder="Enter Odoo product ID">
+                    <p class="text-xs text-gray-500 mt-1">
+                        The ID of the corresponding product in Odoo. This is required to sync orders to Odoo.
+                    </p>
+                    @error('odoo_product_id')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 @if($product->image_url)
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Current Image</label>

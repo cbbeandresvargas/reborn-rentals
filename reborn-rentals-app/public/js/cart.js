@@ -345,12 +345,12 @@ function renderCart(cart, products, total) {
         });
     }
     
-    // On checkout page, render payment form
+    // On checkout page, render checkout form
     if (isCheckoutPage) {
         cartItems.innerHTML = `
             <div class="text-white">
-                <!-- Title: Payment Details -->
-                <h3 class="text-2xl font-bold text-[#CE9704] mb-6">Payment Details</h3>
+                <!-- Title: Checkout Details -->
+                <h3 class="text-2xl font-bold text-[#CE9704] mb-6">Checkout Details</h3>
                 
                 <!-- Apply Coupon Code -->
                 <div class="mb-6">
@@ -585,75 +585,31 @@ function renderCart(cart, products, total) {
                 <!-- Divider -->
                 <div class="border-t border-gray-500 my-6"></div>
                 
-                <!-- Payment Method -->
-                <div id="payment-method-container">
-                    <label class="block text-white text-sm mb-4">Payment Method</label>
-                    
-                    <div class="space-y-3">
-                        <!-- Credit/Debit Card -->
-                        <div class="flex items-center">
-                            <input 
-                                type="radio" 
-                                id="payment-credit-debit"
-                                name="payment-method"
-                                value="credit-debit"
-                                class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
-                            />
-                            <label for="payment-credit-debit" class="ml-3 text-white text-sm">Credit/Debit Card</label>
-                        </div>
-                        
-                        <!-- Direct Debit/ACH Wire Transfer -->
-                        <div class="flex items-center">
-                            <input 
-                                type="radio" 
-                                id="payment-direct-debit"
-                                name="payment-method"
-                                value="direct-debit"
-                                class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
-                            />
-                            <label for="payment-direct-debit" class="ml-3 text-white text-sm">Direct Debit/ ACH Wire Transfer</label>
-                        </div>
-                        
-                        <!-- Google Pay -->
-                        <div class="flex items-center">
-                            <input 
-                                type="radio" 
-                                id="payment-google-pay"
-                                name="payment-method"
-                                value="google-pay"
-                                class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
-                            />
-                            <label for="payment-google-pay" class="ml-3 text-white text-sm">Google Pay</label>
-                        </div>
-                        
-                        <!-- Apple Pay -->
-                        <div class="flex items-center">
-                            <input 
-                                type="radio" 
-                                id="payment-apple-pay"
-                                name="payment-method"
-                                value="apple-pay"
-                                class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
-                            />
-                            <label for="payment-apple-pay" class="ml-3 text-white text-sm">Apple Pay</label>
-                        </div>
-                        
-                        <!-- Klarna -->
-                        <div class="flex items-center">
-                            <input 
-                                type="radio" 
-                                id="payment-klarna"
-                                name="payment-method"
-                                value="klarna"
-                                class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
-                            />
-                            <label for="payment-klarna" class="ml-3 text-white text-sm">Klarna</label>
+                <!-- Payment Notice - Prominent Warning -->
+                <div class="mb-6 p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg">
+                    <div class="flex items-start mb-3">
+                        <svg class="w-6 h-6 text-yellow-600 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <div class="flex-1">
+                            <h4 class="text-yellow-900 font-bold text-sm mb-2">Important Payment Information</h4>
+                            <ul class="text-yellow-800 text-xs space-y-1.5">
+                                <li class="flex items-start">
+                                    <span class="mr-2">•</span>
+                                    <span><strong>No payment is collected on this website.</strong></span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="mr-2">•</span>
+                                    <span>Payment details will be sent to you by email via invoice after your request is processed.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="mr-2">•</span>
+                                    <span>Taxes will be calculated separately and included in your invoice.</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Divider -->
-                <div class="border-t border-gray-500 my-6"></div>
                 
                 <!-- Terms and Conditions -->
                 <div class="mb-6">
@@ -673,7 +629,7 @@ function renderCart(cart, products, total) {
                         id="sidebar-checkout-btn"
                         class="w-full bg-[#CE9704] text-white py-3 px-6 rounded-lg font-bold text-lg hover:bg-[#B8860B] transition-colors duration-200"
                     >
-                        Checkout
+                        Submit Rental Request
                     </button>
                 </div>
             </div>
@@ -715,7 +671,7 @@ function renderCart(cart, products, total) {
                 proceedBtn.style.pointerEvents = 'none';
                 proceedBtn.classList.remove('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B]');
                 proceedBtn.classList.add('bg-gray-600', 'text-gray-400');
-                proceedBtn.textContent = 'Proceed to Payment';
+                proceedBtn.textContent = 'Continue to Checkout';
             }
         }
     } else {
@@ -808,9 +764,9 @@ function renderCart(cart, products, total) {
                 
                 // Cambiar el texto según la página:
                 // - Step 1 (home/products): "When, Where?"
-                // - Step 2 (directions): "Proceed to Payment"
+                // - Step 2 (directions): "Continue to Checkout"
                 if (isDirectionsPage) {
-                    proceedBtn.textContent = 'Proceed to Payment';
+                    proceedBtn.textContent = 'Continue to Checkout';
                 } else {
                     proceedBtn.textContent = 'When, Where?';
                 }
@@ -966,20 +922,6 @@ function setupCheckoutFormListeners() {
         });
     }
     
-    // Setup payment method radio buttons
-    const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
-    paymentMethodRadios.forEach(radio => {
-        // Remove existing listeners
-        const newRadio = radio.cloneNode(true);
-        radio.parentNode.replaceChild(newRadio, radio);
-        
-        newRadio.addEventListener('change', function() {
-            if (this.checked) {
-                localStorage.setItem('payment-method', this.value);
-                openPaymentMethodModal(this.value);
-            }
-        });
-    });
     
     // Setup apply coupon button
     const applyCouponBtn = document.getElementById('sidebar-apply-coupon');
@@ -1015,7 +957,6 @@ function setupCheckoutFormListeners() {
             // Check if all required data is filled
             const foremanDetails = localStorage.getItem('foreman-details');
             const billingDetails = localStorage.getItem('billing-details');
-            const paymentMethodDetails = localStorage.getItem('payment-method-details');
             
             // Billing details is required (foreman can be empty, will use billing data)
             if (!billingDetails) {
@@ -1023,15 +964,6 @@ function setupCheckoutFormListeners() {
                     toast.error('Please complete billing details first.');
                 } else {
                     alert('Please complete billing details first.');
-                }
-                return;
-            }
-            
-            if (!paymentMethodDetails) {
-                if (typeof toast !== 'undefined') {
-                    toast.error('Please complete payment method details first.');
-                } else {
-                    alert('Please complete payment method details first.');
                 }
                 return;
             }
@@ -1402,417 +1334,10 @@ function loadSavedCheckoutData() {
         }
     }
     
-    // Load saved payment method if exists
-    const savedPaymentMethod = localStorage.getItem('payment-method');
-    const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
-    
-    if (savedPaymentMethod && paymentMethodRadios.length > 0) {
-        paymentMethodRadios.forEach(radio => {
-            if (radio.value === savedPaymentMethod) {
-                radio.checked = true;
-            }
-        });
-    }
-    
-    // Add event listeners to payment method radio buttons
-    paymentMethodRadios.forEach(radio => {
-        radio.addEventListener('change', function(e) {
-            if (this.checked) {
-                localStorage.setItem('payment-method', this.value);
-                openPaymentMethodModal(this.value);
-            }
-        });
-    });
-    
-    // Check if payment method details exist and display them
-    const savedPaymentDetails = localStorage.getItem('payment-method-details');
-    if (savedPaymentDetails) {
-        try {
-            const paymentDetails = JSON.parse(savedPaymentDetails);
-            setTimeout(() => {
-                displayPaymentMethodDetails(paymentDetails);
-            }, 900);
-        } catch (e) {
-            console.error('Error parsing payment details:', e);
-        }
-    }
 }
 
-// Function to close payment method modal
-function closePaymentMethodModal() {
-    const modal = document.getElementById('payment-method-modal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-// Make closePaymentMethodModal globally accessible
-window.closePaymentMethodModal = closePaymentMethodModal;
-
-// Function to open payment method modal
-function openPaymentMethodModal(method) {
-    const modal = document.getElementById('payment-method-modal');
-    const formContainer = document.getElementById('payment-method-form-container');
-    const modalTitle = document.getElementById('payment-modal-title');
-    
-    if (!modal || !formContainer || !modalTitle) return;
-    
-    // Validate and escape method parameter to prevent XSS
-    const allowedMethods = ['credit-debit', 'direct-debit', 'google-pay', 'apple-pay', 'klarna'];
-    if (!allowedMethods.includes(method)) {
-        console.error('Invalid payment method:', method);
-        return;
-    }
-    const escapedMethod = escapeHtml(method);
-    
-    let formHTML = '';
-    let title = '';
-    
-    switch(method) {
-        case 'credit-debit':
-            title = 'Credit/Debit Card Details';
-            formHTML = `
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
-                        <input type="text" id="payment-card-number" placeholder="1234 5678 9012 3456" maxlength="19" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
-                            <input type="text" id="payment-expiry" placeholder="MM/YY" maxlength="5" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
-                            <input type="text" id="payment-cvv" placeholder="123" maxlength="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
-                        <input type="text" id="payment-cardholder" placeholder="John Doe" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button onclick="closePaymentMethodModal()" class="flex-1 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors">Cancel</button>
-                        <button onclick="savePaymentDetails('credit-debit')" class="flex-1 bg-[#CE9704] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#B8860B] transition-colors">Save</button>
-                    </div>
-                </div>
-            `;
-            break;
-        case 'direct-debit':
-            title = 'Direct Debit / ACH Wire Transfer';
-            formHTML = `
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
-                        <input type="text" id="payment-bank-name" placeholder="Enter bank name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
-                        <input type="text" id="payment-account-number" placeholder="Enter account number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Routing Number</label>
-                        <input type="text" id="payment-routing-number" placeholder="Enter routing number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button onclick="closePaymentMethodModal()" class="flex-1 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors">Cancel</button>
-                        <button onclick="savePaymentDetails('direct-debit')" class="flex-1 bg-[#CE9704] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#B8860B] transition-colors">Save</button>
-                    </div>
-                </div>
-            `;
-            break;
-        case 'google-pay':
-        case 'apple-pay':
-        case 'klarna':
-            title = method === 'google-pay' ? 'Google Pay' : method === 'apple-pay' ? 'Apple Pay' : 'Klarna';
-            formHTML = `
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input type="email" id="payment-email" placeholder="your.email@example.com" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                        <input type="tel" id="payment-phone" placeholder="+1 (555) 000-0000" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704]"/>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button onclick="closePaymentMethodModal()" class="flex-1 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors">Cancel</button>
-                        <button onclick="savePaymentDetails('${escapedMethod}')" class="flex-1 bg-[#CE9704] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#B8860B] transition-colors">Save</button>
-                    </div>
-                </div>
-            `;
-            break;
-    }
-    
-    modalTitle.textContent = title;
-    formContainer.innerHTML = formHTML;
-    modal.style.display = 'flex';
-}
-
-// Make openPaymentMethodModal globally accessible
-window.openPaymentMethodModal = openPaymentMethodModal;
-
-// Function to save payment details
-function savePaymentDetails(method) {
-    let paymentDetails = { method };
-    
-    switch(method) {
-        case 'credit-debit':
-            const cardNumber = document.getElementById('payment-card-number')?.value || '';
-            const expiry = document.getElementById('payment-expiry')?.value || '';
-            const cvv = document.getElementById('payment-cvv')?.value || '';
-            const cardholder = document.getElementById('payment-cardholder')?.value || '';
-            
-            if (!cardNumber || !expiry || !cvv || !cardholder) {
-                if (typeof toast !== 'undefined') {
-                    toast.error('Please complete all card details.');
-                } else {
-                    alert('Please complete all card details.');
-                }
-                return;
-            }
-            
-            paymentDetails = {
-                method,
-                cardNumber: cardNumber.replace(/\s/g, ''),
-                expiry,
-                cvv,
-                cardholder,
-                maskedCard: '**** **** **** ' + cardNumber.slice(-4).replace(/\s/g, '')
-            };
-            break;
-        case 'direct-debit':
-            const bankName = document.getElementById('payment-bank-name')?.value || '';
-            const accountNumber = document.getElementById('payment-account-number')?.value || '';
-            const routingNumber = document.getElementById('payment-routing-number')?.value || '';
-            
-            if (!bankName || !accountNumber || !routingNumber) {
-                if (typeof toast !== 'undefined') {
-                    toast.error('Please complete all bank details.');
-                } else {
-                    alert('Please complete all bank details.');
-                }
-                return;
-            }
-            
-            paymentDetails = {
-                method,
-                bankName,
-                accountNumber: accountNumber.slice(-4),
-                routingNumber
-            };
-            break;
-        case 'google-pay':
-        case 'apple-pay':
-        case 'klarna':
-            const email = document.getElementById('payment-email')?.value || '';
-            const phone = document.getElementById('payment-phone')?.value || '';
-            
-            if (!email || !phone) {
-                if (typeof toast !== 'undefined') {
-                    toast.error('Please complete all fields.');
-                } else {
-                    alert('Please complete all fields.');
-                }
-                return;
-            }
-            
-            paymentDetails = {
-                method,
-                email,
-                phone
-            };
-            break;
-    }
-    
-    localStorage.setItem('payment-method-details', JSON.stringify(paymentDetails));
-    localStorage.setItem('payment-method', method);
-    closePaymentMethodModal();
-    displayPaymentMethodDetails(paymentDetails);
-}
-
-// Make savePaymentDetails globally accessible
-window.savePaymentDetails = savePaymentDetails;
-
-// Function to display payment method details
-function displayPaymentMethodDetails(paymentDetails) {
-    const paymentContainer = document.getElementById('payment-method-container');
-    if (!paymentContainer) return;
-    
-    // Validate payment method to prevent XSS
-    const allowedMethods = ['credit-debit', 'direct-debit', 'google-pay', 'apple-pay', 'klarna'];
-    if (!paymentDetails || !paymentDetails.method || !allowedMethods.includes(paymentDetails.method)) {
-        console.error('Invalid payment details or method');
-        return;
-    }
-    
-    const methodLabels = {
-        'credit-debit': 'Credit/Debit Card',
-        'direct-debit': 'Direct Debit/ ACH Wire Transfer',
-        'google-pay': 'Google Pay',
-        'apple-pay': 'Apple Pay',
-        'klarna': 'Klarna'
-    };
-    
-    // Escape all payment details to prevent XSS
-    let infoHTML = '';
-    switch(paymentDetails.method) {
-        case 'credit-debit':
-            const escapedMaskedCard = escapeHtml(paymentDetails.maskedCard || '**** **** **** ****');
-            const escapedCardholder = escapeHtml(paymentDetails.cardholder || '');
-            const escapedExpiry = escapeHtml(paymentDetails.expiry || '');
-            infoHTML = `
-                <p class="text-white font-semibold text-sm">${escapedMaskedCard}</p>
-                <p class="text-white font-semibold text-sm">${escapedCardholder}</p>
-                <p class="text-white font-semibold text-sm">Expires: ${escapedExpiry}</p>
-            `;
-            break;
-        case 'direct-debit':
-            const escapedBankName = escapeHtml(paymentDetails.bankName || '');
-            const escapedAccountNumber = escapeHtml(paymentDetails.accountNumber || '');
-            const escapedRoutingNumber = escapeHtml(paymentDetails.routingNumber || '');
-            infoHTML = `
-                <p class="text-white font-semibold text-sm">${escapedBankName}</p>
-                <p class="text-white font-semibold text-sm">Account: ****${escapedAccountNumber}</p>
-                <p class="text-white font-semibold text-sm">Routing: ${escapedRoutingNumber}</p>
-            `;
-            break;
-        case 'google-pay':
-        case 'apple-pay':
-        case 'klarna':
-            const escapedEmail = escapeHtml(paymentDetails.email || '');
-            const escapedPhone = escapeHtml(paymentDetails.phone || '');
-            infoHTML = `
-                <p class="text-white font-semibold text-sm">${escapedEmail}</p>
-                <p class="text-white font-semibold text-sm">${escapedPhone}</p>
-            `;
-            break;
-    }
-    
-    // Escape method label
-    const escapedMethodLabel = escapeHtml(methodLabels[paymentDetails.method] || paymentDetails.method || '');
-    
-    const detailsHTML = `
-        <label class="block text-white text-sm mb-4">Payment Method</label>
-        <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-4">
-            <div class="space-y-3">
-                <div>
-                    <p class="text-white text-xs opacity-75 mb-1">Method</p>
-                    <p class="text-white font-semibold text-sm">${escapedMethodLabel}</p>
-                </div>
-                <div class="border-t border-white border-opacity-20 pt-3">
-                    <p class="text-white text-xs opacity-75 mb-1">Details</p>
-                    ${infoHTML}
-                </div>
-            </div>
-        </div>
-        <button id="edit-payment-btn" class="w-full bg-[#CE9704] text-white py-2 rounded-lg font-medium text-sm hover:bg-[#B8860B] transition-colors duration-200">
-            Edit Details
-        </button>
-    `;
-    
-    paymentContainer.innerHTML = detailsHTML;
-    
-    // Add edit button listener - go back to payment method selection
-    const editBtn = document.getElementById('edit-payment-btn');
-    if (editBtn) {
-        editBtn.addEventListener('click', function() {
-            displayPaymentMethodSelection();
-        });
-    }
-}
-
-// Make displayPaymentMethodDetails globally accessible
-window.displayPaymentMethodDetails = displayPaymentMethodDetails;
-
-// Function to display payment method selection (initial state)
-function displayPaymentMethodSelection() {
-    const paymentContainer = document.getElementById('payment-method-container');
-    if (!paymentContainer) return;
-    
-    const selectionHTML = `
-        <label class="block text-white text-sm mb-4">Payment Method</label>
-        <div class="space-y-3">
-            <!-- Credit/Debit Card -->
-            <div class="flex items-center">
-                <input 
-                    type="radio" 
-                    id="payment-credit-debit"
-                    name="payment-method"
-                    value="credit-debit"
-                    class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
-                />
-                <label for="payment-credit-debit" class="ml-3 text-white text-sm">Credit/Debit Card</label>
-            </div>
-            
-            <!-- Direct Debit/ACH Wire Transfer -->
-            <div class="flex items-center">
-                <input 
-                    type="radio" 
-                    id="payment-direct-debit"
-                    name="payment-method"
-                    value="direct-debit"
-                    class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
-                />
-                <label for="payment-direct-debit" class="ml-3 text-white text-sm">Direct Debit/ ACH Wire Transfer</label>
-            </div>
-            
-            <!-- Google Pay -->
-            <div class="flex items-center">
-                <input 
-                    type="radio" 
-                    id="payment-google-pay"
-                    name="payment-method"
-                    value="google-pay"
-                    class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
-                />
-                <label for="payment-google-pay" class="ml-3 text-white text-sm">Google Pay</label>
-            </div>
-            
-            <!-- Apple Pay -->
-            <div class="flex items-center">
-                <input 
-                    type="radio" 
-                    id="payment-apple-pay"
-                    name="payment-method"
-                    value="apple-pay"
-                    class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
-                />
-                <label for="payment-apple-pay" class="ml-3 text-white text-sm">Apple Pay</label>
-            </div>
-            
-            <!-- Klarna -->
-            <div class="flex items-center">
-                <input 
-                    type="radio" 
-                    id="payment-klarna"
-                    name="payment-method"
-                    value="klarna"
-                    class="w-4 h-4 bg-white border-gray-300 text-[#CE9704] focus:ring-[#CE9704]"
-                />
-                <label for="payment-klarna" class="ml-3 text-white text-sm">Klarna</label>
-            </div>
-        </div>
-    `;
-    
-    paymentContainer.innerHTML = selectionHTML;
-    
-    // Add event listeners to payment method radio buttons
-    const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
-    paymentMethodRadios.forEach(radio => {
-        radio.addEventListener('change', function(e) {
-            if (this.checked) {
-                localStorage.setItem('payment-method', this.value);
-                openPaymentMethodModal(this.value);
-            }
-        });
-    });
-}
-
-// Make displayPaymentMethodSelection globally accessible
-window.displayPaymentMethodSelection = displayPaymentMethodSelection;
-
-// Payment verification functions removed - payments are now handled via Odoo invoices
+// Payment processing removed - payments and taxes are handled in Odoo
+// This website only collects rental requests
 
 function clearCart() {
     fetch('/cart', {
@@ -1877,8 +1402,6 @@ function goToHomepage() {
     localStorage.removeItem('reborn-rentals-directions');
     localStorage.removeItem('foreman-details');
     localStorage.removeItem('billing-details');
-    localStorage.removeItem('payment-method');
-    localStorage.removeItem('payment-method-details');
     
     // Clear cart and wait for it to complete before redirecting
     fetch('/cart', {
@@ -1939,8 +1462,8 @@ function applyCouponCode() {
             // Extract number from text (remove $ and commas)
             const totalText = grandTotalElement.textContent.replace('$', '').replace(/,/g, '');
             cartTotal = parseFloat(totalText) || 0;
-            // Remove tax (2%)
-            cartTotal = cartTotal / 1.02;
+            // Note: No tax calculations - this is a subtotal estimate only
+            // Final totals and taxes are calculated in Odoo
         }
     }
     
