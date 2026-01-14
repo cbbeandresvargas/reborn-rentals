@@ -40,6 +40,7 @@ Route::delete('/cart/remove-coupon', [CartController::class, 'removeCoupon'])->n
 // Checkout
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/checkout/calculate-fees', [CheckoutController::class, 'calculateFees'])->name('checkout.calculateFees');
 // Payment verification routes removed - payments handled via Odoo invoices
 
 // Órdenes que requieren autenticación
