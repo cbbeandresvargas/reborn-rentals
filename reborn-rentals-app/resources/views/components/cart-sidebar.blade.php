@@ -83,23 +83,7 @@
 
             <!-- CART ITEMS -->
             <div class="flex-1 cart-items flex flex-col overflow-y-auto text-center min-h-0 -mx-3 sm:mx-0 px-3 sm:px-0">
-                <div class="py-6 sm:py-8">
-                    <!-- Empty Cart Icon -->
-                    <div class="mb-4 sm:mb-6 flex justify-center">
-                        <svg class="w-16 h-16 sm:w-20 sm:h-20 text-gray-500/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                        </svg>
-                    </div>
-                    <p class="text-white font-semibold text-base sm:text-lg mb-2">
-                        Your cart is empty.
-                    </p>
-                    <p class="text-gray-400 text-sm sm:text-base mb-1">
-                        Looks like you haven't made your choice yet.
-                    </p>
-                    <p class="text-gray-400 text-sm sm:text-base">
-                        Start by adding items to your cart.
-                    </p>
-                </div>
+                <!-- Contenido renderizado dinámicamente por JavaScript -->
             </div>
 
             <!-- SUBTOTAL -->

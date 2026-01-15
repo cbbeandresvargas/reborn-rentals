@@ -27,6 +27,17 @@
     </script>
     
     <style>
+        /* Hide scrollbar for entire page but keep functionality */
+        html, body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none;
+        }
+        
         /* Hide scrollbar but keep functionality */
         .scrollbar-hide {
             -ms-overflow-style: none;

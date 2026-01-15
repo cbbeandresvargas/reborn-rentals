@@ -671,7 +671,6 @@ function renderCart(cart, products, total) {
                 proceedBtn.style.pointerEvents = 'none';
                 proceedBtn.classList.remove('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B]');
                 proceedBtn.classList.add('bg-gray-600', 'text-gray-400');
-                proceedBtn.textContent = 'Continue to Checkout';
             }
         }
     } else {
@@ -761,15 +760,6 @@ function renderCart(cart, products, total) {
                 proceedBtn.classList.remove('cursor-not-allowed', 'bg-gray-600', 'text-gray-400');
                 proceedBtn.classList.add('bg-[#CE9704]', 'text-white', 'hover:bg-[#B8860B]');
                 proceedBtn.style.pointerEvents = 'auto';
-                
-                // Cambiar el texto según la página:
-                // - Step 1 (home/products): "When, Where?"
-                // - Step 2 (directions): "Continue to Checkout"
-                if (isDirectionsPage) {
-                    proceedBtn.textContent = 'Continue to Checkout';
-                } else {
-                    proceedBtn.textContent = 'When, Where?';
-                }
             }
         }
     }
