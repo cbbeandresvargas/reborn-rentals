@@ -54,6 +54,18 @@
                 <p class="text-gray-600 text-xs sm:text-sm leading-relaxed">
                     Choose start and end dates for your rental period. Weekend deliveries are available. Tap a start date and then an end date to set your delivery period. You can select weekends too. The selected range will be highlighted.
                 </p>
+                
+                <!-- Stock Availability Loader -->
+                <div id="stock-validation-loader" class="hidden mt-3 sm:mt-4 flex items-center gap-2 text-sm text-gray-600">
+                    <svg class="animate-spin h-5 w-5 text-[#CE9704]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Checking product availability...</span>
+                </div>
+                
+                <!-- Stock Availability Results -->
+                <div id="stock-availability-results" class="hidden mt-3 sm:mt-4"></div>
             </div>
             
             <!-- Jobsite Address Section -->
@@ -874,6 +886,34 @@ function initDirectionsPage() {
         };
     }
     
+    // Add event listeners to date inputs for stock checking
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
+    
+    if (startDateInput) {
+        startDateInput.addEventListener('change', function() {
+            // Small delay to allow end date to be set if user is selecting both
+            setTimeout(() => {
+                checkStockAvailability();
+            }, 300);
+        });
+        startDateInput.addEventListener('input', function() {
+            // Small delay to allow end date to be set if user is selecting both
+            setTimeout(() => {
+                checkStockAvailability();
+            }, 300);
+        });
+    }
+    
+    if (endDateInput) {
+        endDateInput.addEventListener('change', function() {
+            checkStockAvailability();
+        });
+        endDateInput.addEventListener('input', function() {
+            checkStockAvailability();
+        });
+    }
+    
     // Event listener para el botón "Continue to Checkout"
     const whenWhereBtn = document.getElementById('when-where-btn');
     if (whenWhereBtn) {
@@ -1040,6 +1080,192 @@ window.selectAddressSuggestion = function(address, lat, lng) {
 };
 
 // Google Maps is now integrated, no need for iframe message handling
+
+// Check stock availability when dates are selected
+function checkStockAvailability() {
+    const startDate = document.getElementById('start-date');
+    const endDate = document.getElementById('end-date');
+    const loader = document.getElementById('stock-validation-loader');
+    const resultsDiv = document.getElementById('stock-availability-results');
+    
+    // Check if both dates are selected
+    if (!startDate || !endDate || !startDate.value || !endDate.value) {
+        if (loader) loader.classList.add('hidden');
+        if (resultsDiv) resultsDiv.classList.add('hidden');
+        return;
+    }
+    
+    // Validate dates
+    if (new Date(startDate.value) >= new Date(endDate.value)) {
+        if (loader) loader.classList.add('hidden');
+        if (resultsDiv) resultsDiv.classList.add('hidden');
+        return;
+    }
+    
+    // Show loader
+    if (loader) loader.classList.remove('hidden');
+    if (resultsDiv) {
+        resultsDiv.classList.add('hidden');
+        resultsDiv.innerHTML = '';
+    }
+    
+    // Get cart from session/localStorage or fetch from server
+    fetch('/cart', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(cartData => {
+        if (!cartData.cart || Object.keys(cartData.cart).length === 0) {
+            if (loader) loader.classList.add('hidden');
+            return;
+        }
+        
+        // Check stock for each product in cart
+        const productIds = Object.keys(cartData.cart);
+        const stockChecks = productIds.map(productId => {
+            const quantity = cartData.cart[productId];
+            return fetch(`/stock/check?product_id=${productId}&start_date=${startDate.value}&end_date=${endDate.value}&quantity=${quantity}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => ({
+                productId: productId,
+                productName: cartData.products?.find(p => p.id == productId)?.name || `Product #${productId}`,
+                quantity: quantity,
+                ...data
+            }))
+            .catch(error => {
+                console.error('Error checking stock for product:', productId, error);
+                return {
+                    productId: productId,
+                    productName: cartData.products?.find(p => p.id == productId)?.name || `Product #${productId}`,
+                    quantity: quantity,
+                    allowed: true, // Allow on error to not block user
+                    error: true
+                };
+            });
+        });
+        
+        // Wait for all stock checks to complete
+        return Promise.all(stockChecks);
+    })
+    .then(results => {
+        // Hide loader
+        if (loader) loader.classList.add('hidden');
+        
+        // Display results
+        displayStockAvailabilityResults(results);
+    })
+    .catch(error => {
+        console.error('Error checking stock availability:', error);
+        if (loader) loader.classList.add('hidden');
+    });
+}
+
+// Display stock availability results
+function displayStockAvailabilityResults(results) {
+    const resultsDiv = document.getElementById('stock-availability-results');
+    if (!resultsDiv) return;
+    
+    const unavailableProducts = results.filter(r => !r.allowed && !r.error);
+    const availableProducts = results.filter(r => r.allowed && !r.error);
+    const errorProducts = results.filter(r => r.error);
+    
+    if (unavailableProducts.length === 0 && errorProducts.length === 0) {
+        // All products available
+        resultsDiv.innerHTML = `
+            <div class="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-sm sm:text-base font-semibold text-green-800">All products are available for the selected dates</span>
+                </div>
+            </div>
+        `;
+        resultsDiv.classList.remove('hidden');
+        return;
+    }
+    
+    // Build results HTML
+    let html = '';
+    
+    if (unavailableProducts.length > 0) {
+        html += `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 mb-3">
+                <div class="flex items-start gap-2 mb-2">
+                    <svg class="w-5 h-5 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div class="flex-1">
+                        <h4 class="text-sm sm:text-base font-semibold text-red-800 mb-2">Some products are not available:</h4>
+                        <ul class="space-y-2">
+        `;
+        
+        unavailableProducts.forEach(product => {
+            html += `
+                <li class="text-sm text-red-700">
+                    <span class="font-medium">${escapeHtml(product.productName)}</span> - 
+                    Requested: ${product.quantity} units, Available: ${product.available_stock || 0} units
+                    ${product.message ? `<br><span class="text-xs text-red-600 italic">${escapeHtml(product.message)}</span>` : ''}
+                </li>
+            `;
+        });
+        
+        html += `
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    if (availableProducts.length > 0 && unavailableProducts.length > 0) {
+        html += `
+            <div class="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-sm sm:text-base font-semibold text-green-800">${availableProducts.length} product(s) available</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    if (html) {
+        resultsDiv.innerHTML = html;
+        resultsDiv.classList.remove('hidden');
+        
+        // Show notifications for unavailable products
+        if (unavailableProducts.length > 0 && typeof window.showStockNotification === 'function') {
+            unavailableProducts.forEach(product => {
+                window.showStockNotification(
+                    'error',
+                    `${product.productName} - Not Available`,
+                    product.message || 'This product is not available for rent during the selected dates.',
+                    product.reservation_periods || null,
+                    null
+                );
+            });
+        }
+    }
+}
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
 // Form validation
 function validateForm() {

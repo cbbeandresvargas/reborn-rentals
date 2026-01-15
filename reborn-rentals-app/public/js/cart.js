@@ -719,7 +719,7 @@ function renderCart(cart, products, total) {
                             <div class="flex items-center justify-end mb-2">
                                 <div class="flex items-center bg-gray-600 rounded-md">
                                     <button onclick="updateQuantity(${safeProductId}, -1)" ${disabledAttr} class="bg-gray-600 text-white px-2 py-1 rounded-l-md text-xs hover:bg-gray-500 ${disableClass}" ${disabledAttr ? 'style="pointer-events: none;"' : ''}>−</button>
-                                    <span class="text-white mx-2 font-bold text-sm min-w-[16px] text-center">${quantity}</span>
+                                    <span id="quantity-${safeProductId}" class="quantity-display text-white mx-2 font-bold text-sm min-w-[16px] text-center">${quantity}</span>
                                     <button onclick="updateQuantity(${safeProductId}, 1)" ${disabledAttr} class="bg-gray-600 text-white px-2 py-1 rounded-r-md text-xs hover:bg-gray-500 ${disableClass}" ${disabledAttr ? 'style="pointer-events: none;"' : ''}>+</button>
                                 </div>
                             </div>
@@ -766,6 +766,141 @@ function renderCart(cart, products, total) {
 }
 
 function updateQuantity(productId, change) {
+    const quantitySpan = document.getElementById(`quantity-${productId}`);
+    if (!quantitySpan) {
+        console.error('Quantity span not found for product:', productId);
+        return;
+    }
+    
+    const currentQuantity = parseInt(quantitySpan.textContent.trim()) || 0;
+    const newQuantity = Math.max(0, currentQuantity + change);
+    
+    // If decreasing quantity, no need to check stock
+    if (change < 0) {
+        updateQuantityDirectly(productId, change, currentQuantity, newQuantity);
+        return;
+    }
+    
+    // If increasing quantity, check stock availability first
+    if (change > 0) {
+        // Get dates from localStorage (if available)
+        const directionsData = localStorage.getItem('reborn-rentals-directions');
+        if (directionsData) {
+            try {
+                const directions = JSON.parse(directionsData);
+                if (directions.startDate && directions.endDate) {
+                    // Check stock before updating
+                    checkStockBeforeQuantityUpdate(productId, newQuantity, directions.startDate, directions.endDate, change, currentQuantity);
+                    return;
+                }
+            } catch (e) {
+                console.error('Error parsing directions data:', e);
+            }
+        }
+        
+        // If no dates available, proceed without stock check (dates might be set later)
+        updateQuantityDirectly(productId, change, currentQuantity, newQuantity);
+    } else {
+        // Quantity is 0, just update directly
+        updateQuantityDirectly(productId, change, currentQuantity, newQuantity);
+    }
+}
+
+// Check stock before updating quantity
+function checkStockBeforeQuantityUpdate(productId, requestedQuantity, startDate, endDate, change, currentQuantity) {
+    // Show loading state on buttons
+    const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+    if (productCard) {
+        const buttons = productCard.querySelectorAll('button[onclick*="updateQuantity"]');
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+        });
+    }
+    
+    fetch(`/stock/check?product_id=${productId}&start_date=${startDate}&end_date=${endDate}&quantity=${requestedQuantity}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Re-enable buttons
+        if (productCard) {
+            const buttons = productCard.querySelectorAll('button[onclick*="updateQuantity"]');
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            });
+        }
+        
+        if (data.allowed) {
+            // Stock available, proceed with update
+            updateQuantityDirectly(productId, change, currentQuantity, currentQuantity + change);
+        } else {
+            // Stock not available, show error
+            const availableStock = data.available_stock || 0;
+            const message = data.message || 'Not enough stock available';
+            
+            // Show notification
+            if (typeof window.showStockNotification === 'function') {
+                window.showStockNotification(
+                    'error',
+                    'Stock Not Available',
+                    `Cannot increase quantity. Available: ${availableStock} units. ${message}`,
+                    data.reservation_periods || null,
+                    null
+                );
+            } else if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(`Not enough stock available. Available: ${availableStock} units.`);
+            } else {
+                alert(`Not enough stock available. Available: ${availableStock} units.`);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error checking stock:', error);
+        
+        // Re-enable buttons
+        if (productCard) {
+            const buttons = productCard.querySelectorAll('button[onclick*="updateQuantity"]');
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            });
+        }
+        
+        // On error, allow the update (don't block user if stock check fails)
+        updateQuantityDirectly(productId, change, currentQuantity, currentQuantity + change);
+    });
+}
+
+// Direct quantity update (optimistic update + server sync)
+function updateQuantityDirectly(productId, change, currentQuantity, newQuantity) {
+    const quantitySpan = document.getElementById(`quantity-${productId}`);
+    if (!quantitySpan) return;
+    
+    // Optimistic update: Update UI immediately for better UX
+    quantitySpan.textContent = newQuantity;
+    
+    // Update subtotal immediately if possible
+    updateSubtotalOptimistic(productId, change);
+    
+    // If quantity becomes 0, disable buttons while waiting for server
+    if (newQuantity === 0) {
+        const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+        if (productCard) {
+            const buttons = productCard.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+            });
+        }
+    }
+    
+    // Update server in background
     fetch(`/cart/${productId}`, {
         method: 'PUT',
         headers: {
@@ -780,10 +915,78 @@ function updateQuantity(productId, change) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // Only fully refresh if quantity became 0 (item removed) or if we need to sync totals
+            if (newQuantity <= 0) {
+                updateCartDisplay();
+            } else {
+                // Just update the badge count, keep optimistic UI update
+                updateCartBadgeFromServer();
+            }
+        } else {
+            // If server rejected, revert by refreshing display
             updateCartDisplay();
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error updating quantity:', error);
+        // Revert optimistic update on error
+        updateCartDisplay();
+    });
+}
+
+// Optimistic subtotal update (quick calculation without server call)
+function updateSubtotalOptimistic(productId, change) {
+    const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+    if (!productCard) return;
+    
+    const priceText = productCard.querySelector('.text-white.font-bold.text-base')?.textContent;
+    if (!priceText) return;
+    
+    // Extract price from text like "$10.00/day*"
+    const priceMatch = priceText.match(/\$([\d.]+)/);
+    if (!priceMatch) return;
+    
+    const unitPrice = parseFloat(priceMatch[1]);
+    const quantitySpan = document.getElementById(`quantity-${productId}`);
+    if (!quantitySpan) return;
+    
+    const newQuantity = parseInt(quantitySpan.textContent.trim()) || 0;
+    const itemTotal = unitPrice * newQuantity;
+    
+    // Update item total if it exists
+    const itemTotalEl = productCard.querySelector('.item-total');
+    if (itemTotalEl) {
+        itemTotalEl.textContent = '$' + itemTotal.toFixed(2);
+    }
+    
+    // Update grand total (approximate, will be synced with server)
+    const grandTotalEl = document.getElementById('grand-total');
+    if (grandTotalEl) {
+        const currentTotal = parseFloat(grandTotalEl.textContent.replace(/[^0-9.]/g, '')) || 0;
+        const changeAmount = unitPrice * change;
+        const newTotal = Math.max(0, currentTotal + changeAmount);
+        grandTotalEl.textContent = '$' + newTotal.toFixed(2);
+    }
+}
+
+// Quick badge update from server (lighter than full cart refresh)
+function updateCartBadgeFromServer() {
+    fetch('/cart', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.cart_count !== undefined) {
+            updateCartBadge(data.cart_count);
+        }
+    })
+    .catch(error => {
+        // Silently fail, badge will update on next full refresh
+    });
 }
 
 function removeFromCart(productId) {

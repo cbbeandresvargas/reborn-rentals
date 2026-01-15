@@ -36,20 +36,33 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Price *</label>
                         <input type="number" name="price" step="0.01" value="{{ old('price', $product->price) }}" required
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704]">
+                        @error('price')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                        <select name="category_id"
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Stock *</label>
+                        <input type="number" name="stock" value="{{ old('stock', $product->stock ?? 0) }}" min="0" required
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704]">
-                            <option value="">Select Category</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ (old('category_id', $product->category_id) == $category->id) ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Total available units for rent</p>
+                        @error('stock')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <select name="category_id"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704]">
+                        <option value="">Select Category</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ (old('category_id', $product->category_id) == $category->id) ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="mb-4">

@@ -94,23 +94,25 @@ class DeliveryCalculator
         $result['is_inside_loop'] = $isInside;
 
         if ($isInside) {
-            // Rule 1: $500 per service
-            $feePerService = $this->flatRateInside;
-            $result['delivery_fee'] = $feePerService;
-            $result['pickup_fee'] = $feePerService; 
+            // Rule 1: $500 total for delivery + pickup combined
+            $totalFee = $this->flatRateInside;
+            // Split equally between delivery and pickup for display purposes
+            $result['delivery_fee'] = round($totalFee / 2, 2);
+            $result['pickup_fee'] = round($totalFee / 2, 2);
             $result['calculation_method'] = 'flat_rate_inside_loop';
         } else {
-            // Rule 2: Outside Loop => Rate per mile * Miles
+            // Rule 2: Outside Loop => Rate per mile * Miles (total for delivery + pickup combined)
             $miles = $this->getDistanceMiles($this->shopLat, $this->shopLon, $lat, $lon);
             $result['distance_miles'] = round($miles, 2);
             
-            $feePerService = $miles * $this->ratePerMile;
+            $totalFee = $miles * $this->ratePerMile;
             
             // Round to 2 decimals
-            $feePerService = round($feePerService, 2);
-
-            $result['delivery_fee'] = $feePerService;
-            $result['pickup_fee'] = $feePerService;
+            $totalFee = round($totalFee, 2);
+            
+            // Split equally between delivery and pickup for display purposes
+            $result['delivery_fee'] = round($totalFee / 2, 2);
+            $result['pickup_fee'] = round($totalFee / 2, 2);
             $result['calculation_method'] = 'distance_based_outside_loop';
         }
 

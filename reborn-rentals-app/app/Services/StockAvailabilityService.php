@@ -31,7 +31,7 @@ class StockAvailabilityService
              return [
                 'allowed' => false,
                 'available_stock' => 0,
-                'message' => 'El producto no tiene stock definido o es 0.'
+                'message' => 'This product has no stock available or stock is set to 0.'
             ];
         }
 
@@ -44,14 +44,12 @@ class StockAvailabilityService
         $conflictingItems = OrderItem::where('product_id', $productId)
             ->whereHas('order.job', function ($query) use ($start, $end) {
                 $query->where('date', '<=', $end) // Job starts before or on request end
-                      ->where('end_date', '>=', $start) // Job ends after or on request start
-                      ->where('status', true); // Only active jobs/orders? Assuming job status implies active
+                      ->where('end_date', '>=', $start); // Job ends after or on request start
+                      // Note: JobLocation.status is boolean, but we check order status separately
             })
-            // Also ensure order is not cancelled? Order status check might be needed.
+            // Ensure order is not cancelled
             ->whereHas('order', function($q) {
-                // Assuming we track active orders. If order is cancelled, it shouldn't count.
-                // Checking Order model status.
-                 $q->where('status', '!=', 'cancelled'); // Hipotético, ajustaré según schema
+                $q->where('status', '!=', 'cancelled'); // Only count non-cancelled orders
             })
             ->with(['order.job'])
             ->get();
@@ -91,13 +89,14 @@ class StockAvailabilityService
             return [
                 'allowed' => true,
                 'available_stock' => $minAvailable,
-                'message' => 'Stock suficiente.'
+                'message' => 'Product is available for the selected dates.'
             ];
         } else {
+            $bottleneckFormatted = $bottleneckDate ? Carbon::parse($bottleneckDate)->format('M d, Y') : 'selected dates';
             return [
                 'allowed' => false,
                 'available_stock' => $minAvailable,
-                'message' => "No hay suficiente stock. Disponible: {$minAvailable} el día {$bottleneckDate}."
+                'message' => "Insufficient stock. Available: {$minAvailable} unit(s) on {$bottleneckFormatted}."
             ];
         }
     }

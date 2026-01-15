@@ -49,6 +49,36 @@
             
             <!-- Checkout Content -->
             <div>
+                <!-- Rental Period Section -->
+                <div class="p-4 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg mb-4">
+                    <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-4">Rental Period</h2>
+                    <div id="rental-period-info" class="space-y-2">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-[#CE9704]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span class="text-sm font-medium text-gray-700">Start Date:</span>
+                                <span class="text-base font-semibold text-gray-900" id="display-start-date">Loading...</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-[#CE9704]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span class="text-sm font-medium text-gray-700">End Date:</span>
+                                <span class="text-base font-semibold text-gray-900" id="display-end-date">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 pt-2 border-t border-gray-200">
+                            <svg class="w-5 h-5 text-[#CE9704]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-sm font-medium text-gray-700">Total Rental Period:</span>
+                            <span class="text-lg font-bold text-[#CE9704]" id="display-rental-days">Calculating...</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Items Section -->
                 <div class="p-4 sm:p-6 border-b border-gray-200">
                     <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Items: {{ count($cart) }}</h2>
@@ -113,11 +143,37 @@
                     </div>
                 </div>
 
+                <!-- Delivery Fees Section -->
+                <div id="delivery-fees-section" class="p-4 sm:p-6 border-b border-gray-200 hidden">
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Delivery & Pickup Fees</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700 text-sm sm:text-base">Delivery & Pickup (Combined):</span>
+                            <span class="text-gray-900 font-bold text-base sm:text-lg" id="total-delivery-fees">$0.00</span>
+                        </div>
+                        <div id="delivery-distance-info" class="text-xs sm:text-sm text-gray-500 italic hidden"></div>
+                    </div>
+                </div>
+
                 <!-- Total Section -->
                 <div class="p-4 sm:p-6 bg-gray-50">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-2 sm:gap-0">
-                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Subtotal:</h3>
-                        <div class="text-2xl sm:text-3xl font-bold text-gray-900" id="grand-total">${{ number_format($total, 2) }}</div>
+                    <div class="space-y-3 sm:space-y-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-900">Subtotal:</h3>
+                            <div class="text-xl sm:text-2xl font-bold text-gray-900" id="subtotal-amount">${{ number_format($total, 2) }}</div>
+                        </div>
+                        
+                        <div id="delivery-fees-total-row" class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 hidden">
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-900">Delivery & Pickup Fees:</h3>
+                            <div class="text-xl sm:text-2xl font-bold text-gray-900" id="delivery-fees-total-display">$0.00</div>
+                        </div>
+                        
+                        <div class="border-t border-gray-300 pt-3 sm:pt-4">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+                                <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Total:</h3>
+                                <div class="text-2xl sm:text-3xl font-bold text-[#CE9704]" id="grand-total">${{ number_format($total, 2) }}</div>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- Message about invoice -->
@@ -206,8 +262,189 @@ Nota: Impuestos y pagos se manejan en Odoo
 console.log('%c====================================', 'color: #CE9704; font-weight: bold; font-size: 14px;');
 console.log('');
 
+// Display rental period information
+function displayRentalPeriod() {
+    const directionsData = localStorage.getItem('reborn-rentals-directions');
+    if (directionsData) {
+        try {
+            const directions = JSON.parse(directionsData);
+            const startDateEl = document.getElementById('display-start-date');
+            const endDateEl = document.getElementById('display-end-date');
+            const rentalDaysEl = document.getElementById('display-rental-days');
+            
+            if (directions.startDate && directions.endDate) {
+                // Format dates
+                const startDate = new Date(directions.startDate);
+                const endDate = new Date(directions.endDate);
+                
+                // Format to readable date
+                const startFormatted = startDate.toLocaleDateString('en-US', { 
+                    weekday: 'short', 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                const endFormatted = endDate.toLocaleDateString('en-US', { 
+                    weekday: 'short', 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                // Calculate days difference
+                const timeDiff = endDate.getTime() - startDate.getTime();
+                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1; // +1 to include both start and end days
+                
+                if (startDateEl) startDateEl.textContent = startFormatted;
+                if (endDateEl) endDateEl.textContent = endFormatted;
+                if (rentalDaysEl) {
+                    rentalDaysEl.textContent = `${daysDiff} day${daysDiff !== 1 ? 's' : ''}`;
+                }
+            } else {
+                if (startDateEl) startDateEl.textContent = 'Not selected';
+                if (endDateEl) endDateEl.textContent = 'Not selected';
+                if (rentalDaysEl) rentalDaysEl.textContent = 'N/A';
+            }
+        } catch (e) {
+            console.error('Error parsing directions data:', e);
+            const startDateEl = document.getElementById('display-start-date');
+            const endDateEl = document.getElementById('display-end-date');
+            const rentalDaysEl = document.getElementById('display-rental-days');
+            if (startDateEl) startDateEl.textContent = 'Error loading';
+            if (endDateEl) endDateEl.textContent = 'Error loading';
+            if (rentalDaysEl) rentalDaysEl.textContent = 'N/A';
+        }
+    } else {
+        const startDateEl = document.getElementById('display-start-date');
+        const endDateEl = document.getElementById('display-end-date');
+        const rentalDaysEl = document.getElementById('display-rental-days');
+        if (startDateEl) startDateEl.textContent = 'Not available';
+        if (endDateEl) endDateEl.textContent = 'Not available';
+        if (rentalDaysEl) rentalDaysEl.textContent = 'N/A';
+    }
+}
+
+// Calculate and display delivery fees
+function calculateAndDisplayDeliveryFees() {
+    const directionsData = localStorage.getItem('reborn-rentals-directions');
+    if (!directionsData) {
+        hideDeliveryFees();
+        return;
+    }
+    
+    try {
+        const directions = JSON.parse(directionsData);
+        const lat = directions.latitude;
+        const lon = directions.longitude;
+        const selfPickup = directions.selfPickupChecked || false;
+        
+        if (!lat || !lon) {
+            hideDeliveryFees();
+            return;
+        }
+        
+        // Calculate fees via AJAX
+        fetch('/checkout/calculate-fees', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                latitude: lat,
+                longitude: lon,
+                is_self_pickup: selfPickup
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.fees) {
+                displayDeliveryFees(data.fees);
+                updateGrandTotalWithFees(data.fees.total_fees);
+            } else {
+                hideDeliveryFees();
+            }
+        })
+        .catch(error => {
+            console.error('Error calculating delivery fees:', error);
+            hideDeliveryFees();
+        });
+    } catch (e) {
+        console.error('Error parsing directions data:', e);
+        hideDeliveryFees();
+    }
+}
+
+// Display delivery fees
+function displayDeliveryFees(fees) {
+    const deliverySection = document.getElementById('delivery-fees-section');
+    const totalDeliveryFees = document.getElementById('total-delivery-fees');
+    const deliveryFeesTotalRow = document.getElementById('delivery-fees-total-row');
+    const deliveryFeesTotalDisplay = document.getElementById('delivery-fees-total-display');
+    const distanceInfo = document.getElementById('delivery-distance-info');
+    
+    if (deliverySection) {
+        deliverySection.classList.remove('hidden');
+    }
+    
+    // Display total fees (delivery + pickup combined)
+    if (totalDeliveryFees) {
+        totalDeliveryFees.textContent = '$' + parseFloat(fees.total_fees || 0).toFixed(2);
+    }
+    
+    if (deliveryFeesTotalRow) {
+        deliveryFeesTotalRow.classList.remove('hidden');
+    }
+    
+    if (deliveryFeesTotalDisplay) {
+        deliveryFeesTotalDisplay.textContent = '$' + parseFloat(fees.total_fees || 0).toFixed(2);
+    }
+    
+    // Show distance info if available
+    if (distanceInfo && fees.distance_miles > 0) {
+        distanceInfo.textContent = `Distance: ${fees.distance_miles.toFixed(1)} miles (${fees.calculation_method === 'flat_rate_inside_loop' ? 'Metropolitan Area' : 'Outside Metropolitan Area'})`;
+        distanceInfo.classList.remove('hidden');
+    } else if (distanceInfo) {
+        distanceInfo.classList.add('hidden');
+    }
+}
+
+// Hide delivery fees section
+function hideDeliveryFees() {
+    const deliverySection = document.getElementById('delivery-fees-section');
+    const deliveryFeesTotalRow = document.getElementById('delivery-fees-total-row');
+    
+    if (deliverySection) {
+        deliverySection.classList.add('hidden');
+    }
+    
+    if (deliveryFeesTotalRow) {
+        deliveryFeesTotalRow.classList.add('hidden');
+    }
+    
+    // Reset total to subtotal only
+    updateGrandTotal();
+}
+
+// Update grand total including delivery fees
+function updateGrandTotalWithFees(deliveryFees) {
+    // Store delivery fees globally
+    currentDeliveryFees = parseFloat(deliveryFees) || 0;
+    
+    // Recalculate grand total (which will include the fees)
+    updateGrandTotal();
+}
+
 // Calculate initial total correctly when page loads (with 30 days)
 document.addEventListener('DOMContentLoaded', function() {
+    // Display rental period information
+    displayRentalPeriod();
+    
+    // Calculate and display delivery fees
+    calculateAndDisplayDeliveryFees();
+    
     // Wait for sidebar to be rendered before checking coupon status
     setTimeout(function() {
         // Clear any old coupon from localStorage on page load
@@ -259,7 +496,11 @@ function adjustDays(productId, change) {
 }
 
 // Update grand total after day changes
+// Store delivery fees globally
+let currentDeliveryFees = 0;
+
 function updateGrandTotal() {
+    // First calculate subtotal
     let subtotal = 0;
     
     // Sum all item totals
@@ -274,13 +515,19 @@ function updateGrandTotal() {
         }
     });
     
+    // Update subtotal display
+    const subtotalElement = document.getElementById('subtotal-amount');
+    if (subtotalElement) {
+        subtotalElement.textContent = '$' + subtotal.toFixed(2);
+    }
+    
     // Note: Coupon codes can be entered but discounts are NOT calculated here
     // All discount calculations and applications are handled in Odoo
     // The coupon code will be sent to backend for reference only
     
-    // Calculate subtotal only - no discounts or taxes
+    // Calculate grand total: subtotal + delivery fees
     // Note: This is an estimate only. Final totals, taxes, and discounts are calculated in Odoo.
-    const grandTotal = subtotal; // No discount applied - handled in Odoo
+    const grandTotal = subtotal + currentDeliveryFees;
     
     // Update UI
     const grandTotalElement = document.getElementById('grand-total');
@@ -529,6 +776,10 @@ function submitCheckoutForm() {
     addHiddenField(form, 'longitude', directions.longitude || '');
     addHiddenField(form, 'notes', directions.notes || '');
     addHiddenField(form, 'cupon_code', couponCode);
+    
+    // Add self-pickup flag
+    const selfPickup = directions.selfPickupChecked || false;
+    addHiddenField(form, 'is_self_pickup', selfPickup ? '1' : '0');
     
     // Add Foreman Details as JSON
     addHiddenField(form, 'foreman_details', JSON.stringify(foremanDetails));

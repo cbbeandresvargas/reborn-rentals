@@ -9,6 +9,7 @@ use App\Models\JobLocation;
 use App\Models\Cupon;
 use App\Models\User;
 use App\Services\Delivery\DeliveryCalculator;
+use App\Services\StockAvailabilityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,10 +20,12 @@ use Carbon\Carbon;
 class CheckoutController extends Controller
 {
     protected $deliveryCalculator;
+    protected $stockService;
 
-    public function __construct(DeliveryCalculator $deliveryCalculator)
+    public function __construct(DeliveryCalculator $deliveryCalculator, StockAvailabilityService $stockService)
     {
         $this->deliveryCalculator = $deliveryCalculator;
+        $this->stockService = $stockService;
     }
 
     public function index()
@@ -234,6 +237,61 @@ class CheckoutController extends Controller
                     }
                 }
 
+                // ====================================================================
+                // STOCK AVAILABILITY VALIDATION
+                // ====================================================================
+                // Validate stock availability for all products in cart before creating order
+                $startDate = $validated['start_date'];
+                $endDate = $validated['end_date'];
+                $unavailableProducts = [];
+                
+                foreach ($cart as $productId => $quantity) {
+                    $stockCheck = $this->stockService->checkAvailability(
+                        $productId,
+                        $startDate,
+                        $endDate,
+                        $quantity
+                    );
+                    
+                    if (!$stockCheck['allowed']) {
+                        $product = Product::find($productId);
+                        $unavailableProducts[] = [
+                            'id' => $productId,
+                            'name' => $product ? $product->name : "Product #{$productId}",
+                            'requested' => $quantity,
+                            'available' => $stockCheck['available_stock'],
+                            'message' => $stockCheck['message']
+                        ];
+                    }
+                }
+                
+                if (!empty($unavailableProducts)) {
+                    Log::warning('Checkout blocked due to insufficient stock', [
+                        'unavailable_products' => $unavailableProducts,
+                        'start_date' => $startDate,
+                        'end_date' => $endDate
+                    ]);
+                    
+                    $errorMessage = 'Some products are not available for the selected dates.';
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => $errorMessage,
+                            'unavailable_products' => $unavailableProducts
+                        ], 422);
+                    }
+                    
+                    return redirect()->route('checkout')
+                        ->with('error', $errorMessage)
+                        ->with('unavailable_products', $unavailableProducts);
+                }
+                
+                Log::info('✅ Stock validation passed for all products', [
+                    'products_count' => count($cart),
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]);
+                
                 // Calculate subtotal estimate only (no taxes, no discounts)
                 // This is an estimate for reference - final totals are calculated in Odoo
                 $subtotal = $this->calculateSubtotal($cart, $productDays);
