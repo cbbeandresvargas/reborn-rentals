@@ -393,36 +393,46 @@
             const closeMenuBtn = document.getElementById('close-menu');
             const closeCartBtn = document.getElementById('close-cart');
             
-            // Initialize cart sidebar as open by default
-            if (cartSidebar && cartSidebar.classList.contains('translate-x-0')) {
-                // Set z-index for open cart sidebar
-                const nav = document.querySelector('nav');
-                if (nav) {
-                    nav.classList.add('sidebar-open');
-                    nav.style.zIndex = '5';
-                }
-                const cartContainer = document.getElementById('cart-sidebar-container');
-                if (cartContainer) {
-                    cartContainer.style.zIndex = '10';
-                }
-                cartSidebar.style.zIndex = '10';
-                
-                // Show step indicator
-                const stepIndicatorContainer = document.getElementById('step-indicator-container');
-                if (stepIndicatorContainer) {
-                    stepIndicatorContainer.style.display = 'block';
-                }
-                
-                // Add padding to main content
-                const mainContent = document.getElementById('main-content');
-                if (mainContent) {
-                    if (window.innerWidth >= 640) {
-                        mainContent.classList.add('pr-80');
+            // Initialize cart sidebar as open by default (only on desktop/tablet, not mobile)
+            // On mobile (< 640px), it starts closed via CSS classes (translate-x-full sm:translate-x-0)
+            // On desktop (>= 640px), it should be open, so initialize accordingly
+            if (cartSidebar) {
+                // Check if we're on desktop/tablet (>= 640px)
+                if (window.innerWidth >= 640) {
+                    // On desktop, the responsive class sm:translate-x-0 should make it open
+                    // But we need to ensure the classes are set correctly and configure z-index
+                    // The CSS classes handle the visibility, we just need to set up the z-index and padding
+                    
+                    // Set z-index for open cart sidebar (will be visible due to sm:translate-x-0)
+                    const nav = document.querySelector('nav');
+                    if (nav) {
+                        nav.classList.add('sidebar-open');
+                        nav.style.zIndex = '5';
                     }
-                    if (window.innerWidth >= 1024) {
-                        mainContent.classList.add('lg:pr-96');
+                    const cartContainer = document.getElementById('cart-sidebar-container');
+                    if (cartContainer) {
+                        cartContainer.style.zIndex = '10';
+                    }
+                    cartSidebar.style.zIndex = '10';
+                    
+                    // Show step indicator
+                    const stepIndicatorContainer = document.getElementById('step-indicator-container');
+                    if (stepIndicatorContainer) {
+                        stepIndicatorContainer.style.display = 'block';
+                    }
+                    
+                    // Add padding to main content
+                    const mainContent = document.getElementById('main-content');
+                    if (mainContent) {
+                        if (window.innerWidth >= 640) {
+                            mainContent.classList.add('pr-80');
+                        }
+                        if (window.innerWidth >= 1024) {
+                            mainContent.classList.add('lg:pr-96');
+                        }
                     }
                 }
+                // On mobile (< 640px), sidebar stays closed (translate-x-full) and we don't configure anything
             }
 
             // Open menu sidebar

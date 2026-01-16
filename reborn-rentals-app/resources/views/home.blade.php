@@ -2,125 +2,157 @@
 
 @section('title', 'Reborn Rentals - Home')
 
+@push('styles')
+<style>
+        /* Mobile optimizations for home page */
+    @media (max-width: 640px) {
+        /* Improve touch targets */
+        #filters-toggle-btn,
+        #search-toggle-btn {
+            min-width: 44px;
+            min-height: 44px;
+        }
+        
+        /* Better scroll behavior for filters dropdown */
+        #filters-dropdown {
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+        
+        /* Smooth animations for mobile */
+        #filters-dropdown {
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        
+        #filters-dropdown:not(.hidden) {
+            animation: slideDownMobile 0.2s ease-out;
+        }
+        
+        @keyframes slideDownMobile {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Better spacing for search input on mobile */
+        #search-form {
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+        
+        /* Improve product grid spacing on mobile */
+        #products-grid {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        /* Ensure dropdown is visible and properly positioned on mobile */
+        /* Dropdown should be below cart sidebar (z-10) but above subbar (z-8) */
+        #filters-dropdown {
+            position: fixed !important;
+            z-index: 9 !important;
+        }
+        
+        /* Ensure subbar stays below cart sidebar */
+        .bg-\\[\\#414141\\] {
+            z-index: 8 !important;
+        }
+    }
+    
+    /* Prevent horizontal scroll on mobile */
+    @media (max-width: 640px) {
+        body {
+            overflow-x: hidden;
+        }
+    }
+    
+    /* Improve pagination on mobile */
+    @media (max-width: 640px) {
+        .pagination {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .pagination a,
+        .pagination span {
+            min-width: 40px;
+            min-height: 40px;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
 <!-- Subnavbar -->
-<div class="bg-[#414141] py-2 sm:py-1 shadow-md">
-    <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6">
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center mt-2 gap-3 sm:gap-4 md:gap-5">
+<div class="bg-[#414141] py-3 sm:py-2 md:py-1 shadow-md sticky top-0 sm:relative z-[8]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-4 md:px-6">
+        <div class="flex flex-row items-center gap-3 sm:gap-4 md:gap-5">
             <!-- Filters Button with Dropdown -->
-            <div class="relative">
-                <button type="button" id="filters-toggle-btn" class="flex items-center justify-center gap-2 bg-transparent px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 shrink-0 group">
-                    <div class="relative w-6 h-6 sm:w-7 sm:h-7">
+            <div class="relative flex-shrink-0">
+                <button type="button" id="filters-toggle-btn" class="flex items-center justify-center gap-2 bg-transparent p-2.5 sm:px-3 sm:px-4 sm:py-2 sm:py-3 rounded-lg transition-all duration-200 shrink-0 group cursor-pointer touch-manipulation active:scale-95">
+                    <div class="relative w-7 h-7 sm:w-6 sm:h-6 md:w-7 md:h-7">
                         <img src="{{ asset('icons/filters.svg') }}" alt="Filters" class="absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ease-in-out group-hover:opacity-0" />
                         <img src="{{ asset('icons/filters-hover.svg') }}" alt="Filters Hover" class="absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100" />
                     </div>
                 </button>
 
                 <!-- Filters Dropdown -->
-                <div id="filters-dropdown" class="absolute top-full left-0 mt-2 w-80 bg-[#414141] shadow-2xl rounded-lg overflow-hidden z-50 hidden" style="max-height: 70vh; overflow-y: auto;">
-                    <form method="GET" action="{{ route('products.index') }}" id="filters-form" class="p-4 sm:p-6">
-                        <div class="flex flex-col gap-6">
-                            <!-- Category Filter -->
-                            <div>
-                                <h3 class="text-white font-bold text-sm uppercase mb-4 tracking-wider flex items-center gap-2">
-                                    <span class="w-2 h-2 bg-[#CE9704] rounded-full"></span>
-                                    CATEGORY
-                                </h3>
-                                <div class="flex flex-col gap-3 ml-4">
-                                    @foreach($categories as $category)
-                                    <label class="flex items-center gap-3 cursor-pointer group">
-                                        <input type="checkbox" name="categories[]" value="{{ $category->id }}" class="w-4 h-4 border-2 border-white rounded bg-transparent text-[#CE9704] focus:ring-[#CE9704] focus:ring-2 cursor-pointer" />
-                                        <span class="text-white text-sm group-hover:text-[#CE9704] transition-colors duration-300">{{ $category->name }}</span>
+                <div id="filters-dropdown" class="fixed sm:absolute top-auto sm:top-full left-4 sm:left-0 right-4 sm:right-auto mt-0 sm:mt-2 w-auto sm:w-80 max-w-none sm:max-w-none bg-[#414141] shadow-2xl rounded-lg overflow-hidden z-[9] hidden" style="max-height: calc(100vh - 150px); overflow-y: auto;">
+                    <div class="p-4 sm:p-6">
+                        <h3 class="text-white font-bold text-xs sm:text-sm uppercase mb-3 sm:mb-4 tracking-wider flex items-center gap-2">
+                            <span class="w-2 h-2 bg-[#CE9704] rounded-full"></span>
+                            PRODUCT DESCRIPTIONS
+                        </h3>
+                        <form id="filters-form">
+                            <div class="flex flex-col gap-2.5 sm:gap-3 max-h-[calc(100vh-300px)] sm:max-h-96 overflow-y-auto">
+                                @if(isset($productDescriptions) && count($productDescriptions) > 0)
+                                    @foreach($productDescriptions as $description)
+                                    <label class="flex items-start gap-2.5 sm:gap-3 cursor-pointer group hover:bg-[#4A4A4A] active:bg-[#4A4A4A] p-2.5 sm:p-2 rounded transition-colors touch-manipulation">
+                                        <input type="checkbox" name="descriptions[]" value="{{ $description }}" {{ in_array($description, request('descriptions', [])) ? 'checked' : '' }} class="w-5 h-5 sm:w-4 sm:h-4 border-2 border-white rounded bg-transparent text-[#CE9704] focus:ring-[#CE9704] focus:ring-2 cursor-pointer mt-0.5 sm:mt-1 flex-shrink-0 touch-manipulation" />
+                                        <span class="text-white text-sm sm:text-sm leading-relaxed group-hover:text-[#CE9704] transition-colors duration-300 flex-1">{{ $description }}</span>
                                     </label>
                                     @endforeach
-                                </div>
+                                @else
+                                    <p class="text-gray-400 text-sm py-2">No product descriptions available</p>
+                                @endif
                             </div>
-
-                            <!-- Dimensions Filter -->
-                            @if(isset($dimensions) && count($dimensions) > 0)
-                            <div>
-                                <h3 class="text-white font-bold text-sm uppercase mb-4 tracking-wider flex items-center gap-2">
-                                    <span class="w-2 h-2 bg-[#CE9704] rounded-full"></span>
-                                    DIMENSIONS
-                                </h3>
-                                <div class="flex flex-col gap-3 ml-4">
-                                    @foreach($dimensions as $dimension)
-                                    <label class="flex items-center gap-3 cursor-pointer group">
-                                        <input type="checkbox" name="dimensions[]" value="{{ $dimension }}" class="w-4 h-4 border-2 border-white rounded bg-transparent text-[#CE9704] focus:ring-[#CE9704] focus:ring-2 cursor-pointer" />
-                                        <span class="text-white text-sm group-hover:text-[#CE9704] transition-colors duration-300">{{ $dimension }}</span>
-                                    </label>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endif
-
-                            <!-- Tonnage Capacity Filter -->
-                            @if(isset($tonnageCapacities) && count($tonnageCapacities) > 0)
-                            <div>
-                                <h3 class="text-white font-bold text-sm uppercase mb-4 tracking-wider flex items-center gap-2">
-                                    <span class="w-2 h-2 bg-[#CE9704] rounded-full"></span>
-                                    TONNAGE CAPACITY
-                                </h3>
-                                <div class="flex flex-col gap-3 ml-4">
-                                    @foreach($tonnageCapacities as $tonnage)
-                                    <label class="flex items-center gap-3 cursor-pointer group">
-                                        <input type="checkbox" name="tonnage[]" value="{{ $tonnage }}" class="w-4 h-4 border-2 border-white rounded bg-transparent text-[#CE9704] focus:ring-[#CE9704] focus:ring-2 cursor-pointer" />
-                                        <span class="text-white text-sm group-hover:text-[#CE9704] transition-colors duration-300">{{ $tonnage }}</span>
-                                    </label>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endif
-
-                            <!-- Gallon Capacity Filter -->
-                            @if(isset($gallonCapacities) && count($gallonCapacities) > 0)
-                            <div>
-                                <h3 class="text-white font-bold text-sm uppercase mb-4 tracking-wider flex items-center gap-2">
-                                    <span class="w-2 h-2 bg-[#CE9704] rounded-full"></span>
-                                    GALLON CAPACITY
-                                </h3>
-                                <div class="flex flex-col gap-3 ml-4">
-                                    @foreach($gallonCapacities as $gallon)
-                                    <label class="flex items-center gap-3 cursor-pointer group">
-                                        <input type="checkbox" name="gallons[]" value="{{ $gallon }}" class="w-4 h-4 border-2 border-white rounded bg-transparent text-[#CE9704] focus:ring-[#CE9704] focus:ring-2 cursor-pointer" />
-                                        <span class="text-white text-sm group-hover:text-[#CE9704] transition-colors duration-300">{{ $gallon }}</span>
-                                    </label>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endif
-
-                            <!-- Apply Filters Button -->
-                            <div class="mt-4">
-                                <button type="submit" class="w-full bg-[#CE9704] text-white font-bold py-3 px-4 rounded-lg hover:bg-[#B8860B] transition-colors duration-200">
+                            <div class="mt-4 pt-4 border-t border-gray-600">
+                                <button type="button" id="apply-filters-btn" class="w-full bg-[#CE9704] text-white font-bold py-3.5 sm:py-3 px-4 rounded-lg hover:bg-[#B8860B] active:bg-[#B8860B] transition-colors duration-200 cursor-pointer touch-manipulation active:scale-[0.98] text-base sm:text-base">
                                     Apply Filters
                                 </button>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
 
             <!-- Search Icon Button -->
-            <button type="button" id="search-toggle-btn" class="flex items-center justify-center bg-transparent px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 shrink-0">
-                <svg class="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button type="button" id="search-toggle-btn" class="flex items-center justify-center bg-transparent p-2.5 sm:px-3 sm:px-4 sm:py-2 sm:py-3 rounded-lg transition-all duration-200 shrink-0 touch-manipulation active:scale-95">
+                <svg class="w-7 h-7 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
             </button>
 
             <!-- Search Bar (Hidden by default) -->
-            <form method="GET" action="{{ route('products.index') }}" class="flex-1 w-full sm:w-auto hidden" id="search-form">
+            <form method="GET" action="{{ route('home') }}" class="flex-1 w-full sm:w-auto hidden" id="search-form">
                 <div class="relative">
                     <input
                         type="text"
                         name="search"
                         placeholder="Search products..."
                         value="{{ request('search') }}"
-                        class="w-full pl-10 pr-4 py-2 sm:py-2 text-sm sm:text-base border bg-white border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
+                        class="w-full pl-11 pr-4 py-3 sm:pl-10 sm:py-2 text-base sm:text-sm md:text-base border bg-white border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CE9704] focus:border-transparent"
                         id="search-input"
                     />
-                    <button type="submit" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-[#CE9704] transition-colors duration-200">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="submit" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-[#CE9704] active:text-[#CE9704] transition-colors duration-200 touch-manipulation">
+                        <svg class="w-5 h-5 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </button>
@@ -131,72 +163,13 @@
 </div>
 
 <!-- Products -->
-<div class="max-w-7xl mx-auto px-5 sm:px-8 md:px-10 lg:px-12 xl:px-14 mt-10 sm:mt-14 md:mt-20 mb-16 sm:mb-20 md:mb-24">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 md:gap-7 lg:gap-8" id="products-grid">
-        @forelse($products as $product)
-        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-2xl shadow-[#CE9704]/20 transition-all duration-300 cursor-grab product-card flex flex-col h-full group" 
-             draggable="true" 
-             data-product-id="{{ $product->id }}" 
-             data-product-name="{{ $product->name }}" 
-             data-product-price="{{ $product->price }}">
-            <div class="relative bg-white p-5 sm:p-6">
-                <!-- Drag indicator badge -->
-                <div class="absolute top-2 right-2 bg-[#CE9704] text-white text-xs font-bold px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10 flex items-center gap-1">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                    </svg>
-                    Drag
-                </div>
-                <button class="absolute top-2 left-2 bg-[#CE9704] p-2 rounded hover:bg-[#B8860B] transition-all duration-200 z-0 add-to-cart-btn hover:scale-110 hover:shadow-lg" 
-                        data-product-id="{{ $product->id }}" 
-                        data-product-name="{{ $product->name }}" 
-                        data-product-price="{{ $product->price }}" 
-                        style="z-index: 1;"
-                        title="Click to add to cart or drag and drop the item into the cart">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle cx="9" cy="21" r="1"></circle>
-                        <circle cx="20" cy="21" r="1"></circle>
-                        <path d="m1 1 4 4 13 1 2 8H6l-2-8z"></path>
-                    </svg>
-                </button>
-                <img src="{{ $product->image_url ? asset($product->image_url) : asset('Product1.png') }}" alt="{{ $product->name }}" class="w-full h-48 sm:h-56 md:h-64 object-contain transition-transform duration-300 group-hover:scale-105" />
-            </div>
-            <div class="bg-[#4A4A4A] px-4 sm:px-5 py-3 sm:py-4 text-center">
-                <h3 class="text-white font-bold text-base sm:text-lg">{{ $product->name }}</h3>
-            </div>
-            <div class="border-t border-gray-500"></div>
-            <div class="bg-[#4A4A4A] px-4 sm:px-5 py-3 sm:py-4 space-y-2 flex-1">
-                <div class="flex justify-between items-center flex-wrap gap-1 sm:gap-0">
-                    <span class="text-white text-sm sm:text-base">ID: <span class="text-[#CE9704]">{{ $product->id }}</span></span>
-                    <span class="text-white font-bold text-base sm:text-lg">${{ number_format($product->price, 2) }}/day*</span>
-                </div>
-                @if($product->description)
-                <div>
-                    <span class="text-gray-300">Description:</span>
-                    <div class="text-white text-sm line-clamp-2">{{ $product->description }}</div>
-                </div>
-                @endif
-                @if($product->category)
-                <div>
-                    <span class="text-gray-300">Category:</span>
-                    <div class="text-white text-sm">{{ $product->category->name }}</div>
-                </div>
-                @endif
-            </div>
-            <a href="{{ route('products.show', $product->id) }}" class="block w-full bg-[#CE9704] text-white font-bold py-3 sm:py-3.5 px-4 sm:px-5 rounded text-sm sm:text-base hover:bg-[#B8860B] transition-colors duration-200 text-center mt-auto">
-                SEE SPECIFICATION
-            </a>
-        </div>
-        @empty
-        <div class="col-span-full text-center py-12">
-            <p class="text-gray-600 text-lg">No products found.</p>
-            <a href="{{ route('products.index') }}" class="text-[#CE9704] hover:underline mt-4 inline-block">View all products</a>
-        </div>
-        @endforelse
+<div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 xl:px-14 mt-6 sm:mt-10 md:mt-14 lg:mt-20 mb-12 sm:mb-16 md:mb-20 lg:mb-24">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6 lg:gap-7 xl:gap-8" id="products-grid">
+        @include('partials.products-grid', ['products' => $products])
     </div>
 
     @if($products->hasPages())
-    <div class="mt-10 sm:mt-12 md:mt-16">
+    <div class="mt-8 sm:mt-10 md:mt-12 lg:mt-16 px-2" id="pagination-container">
         {{ $products->links() }}
     </div>
     @endif
@@ -207,60 +180,434 @@
 @push('scripts')
 <script src="{{ asset('js/cart.js') }}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+(function() {
+    'use strict';
+    
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+    function init() {
+        console.log('🚀 Initializing home page scripts...');
+        
+        // Initialize search toggle
+        initSearchToggle();
+        
+        // Initialize filters dropdown
+        initFiltersDropdown();
+        
+        // Initialize form submissions
+        initFormSubmissions();
+        
+        // Initialize pagination
+        initPagination();
+        
+        console.log('✅ All initializations complete');
+    }
+
+    function initSearchToggle() {
         const searchToggleBtn = document.getElementById('search-toggle-btn');
         const searchForm = document.getElementById('search-form');
         const searchInput = document.getElementById('search-input');
 
-        if (searchToggleBtn && searchForm) {
-            searchToggleBtn.addEventListener('click', function() {
-                searchForm.classList.toggle('hidden');
-                if (!searchForm.classList.contains('hidden')) {
-                    // Focus on input when shown
-                    setTimeout(() => {
-                        searchInput.focus();
-                    }, 100);
-                }
-            });
+        if (!searchToggleBtn || !searchForm) return;
 
-            // Hide search form when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!searchForm.contains(event.target) && !searchToggleBtn.contains(event.target)) {
-                    if (!searchForm.classList.contains('hidden') && !searchInput.value) {
+        searchToggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            searchForm.classList.toggle('hidden');
+            if (!searchForm.classList.contains('hidden') && searchInput) {
+                setTimeout(() => searchInput.focus(), 100);
+            }
+        });
+
+        // Hide search form when clicking outside
+        document.addEventListener('click', function(event) {
+            if (searchForm && !searchForm.contains(event.target) && !searchToggleBtn.contains(event.target)) {
+                if (!searchForm.classList.contains('hidden')) {
+                    // On mobile, close if input is empty. On desktop, keep it open
+                    if (window.innerWidth < 640 && searchInput && !searchInput.value) {
                         searchForm.classList.add('hidden');
                     }
                 }
-            });
-        }
+            }
+        });
+    }
 
-        // Filters Dropdown Toggle
+    function initFiltersDropdown() {
         const filtersToggleBtn = document.getElementById('filters-toggle-btn');
         const filtersDropdown = document.getElementById('filters-dropdown');
 
-        if (filtersToggleBtn && filtersDropdown) {
-            filtersToggleBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                filtersDropdown.classList.toggle('hidden');
-            });
+        console.log('🔧 Initializing filters dropdown...');
+        console.log('Filters toggle button:', filtersToggleBtn);
+        console.log('Filters dropdown:', filtersDropdown);
+
+        if (!filtersToggleBtn || !filtersDropdown) {
+            console.error('❌ Filters toggle button or dropdown not found!');
+            return;
         }
 
-        // Close filters dropdown when clicking outside
+        // Change cursor on hover
+        filtersToggleBtn.style.cursor = 'pointer';
+
+        // Test if button is clickable
+        console.log('Testing button clickability...');
+        console.log('Button disabled:', filtersToggleBtn.disabled);
+        console.log('Button pointer-events:', window.getComputedStyle(filtersToggleBtn).pointerEvents);
+        
+        // Add multiple event listeners to ensure we catch the click
+        const handleToggleClick = function(e) {
+            console.log('🖱️ Filters button clicked - Event:', e);
+            console.log('Event type:', e.type);
+            console.log('Event target:', e.target);
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const isHidden = filtersDropdown.classList.contains('hidden');
+            console.log('Dropdown is hidden before toggle:', isHidden);
+            
+            // Force remove/add hidden class and display
+            if (isHidden) {
+                filtersDropdown.classList.remove('hidden');
+                filtersDropdown.style.display = 'block';
+                filtersDropdown.style.visibility = 'visible';
+                
+                // On mobile, set dropdown to fixed positioning and calculate top position
+                if (window.innerWidth < 640) {
+                    const rect = filtersToggleBtn.getBoundingClientRect();
+                    // Position dropdown below the button with some margin
+                    filtersDropdown.style.top = (rect.bottom + 8) + 'px';
+                    filtersDropdown.style.left = '1rem';
+                    filtersDropdown.style.right = '1rem';
+                    filtersDropdown.style.width = 'auto';
+                    
+                    // Prevent body scroll when dropdown is open on mobile
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    // On desktop, reset to default positioning
+                    filtersDropdown.style.top = '';
+                    filtersDropdown.style.left = '';
+                    filtersDropdown.style.right = '';
+                    filtersDropdown.style.width = '';
+                }
+                
+                console.log('✅ Dropdown OPENED');
+            } else {
+                filtersDropdown.classList.add('hidden');
+                filtersDropdown.style.display = 'none';
+                
+                // Restore body scroll and reset styles on mobile when dropdown closes
+                if (window.innerWidth < 640) {
+                    document.body.style.overflow = '';
+                    filtersDropdown.style.top = '';
+                    filtersDropdown.style.left = '';
+                    filtersDropdown.style.right = '';
+                    filtersDropdown.style.width = '';
+                }
+                
+                console.log('✅ Dropdown CLOSED');
+            }
+            
+            // Verify after a short delay
+            setTimeout(() => {
+                const stillHidden = filtersDropdown.classList.contains('hidden');
+                const computedDisplay = window.getComputedStyle(filtersDropdown).display;
+                const computedVisibility = window.getComputedStyle(filtersDropdown).visibility;
+                console.log('After toggle - Hidden class:', stillHidden);
+                console.log('After toggle - Computed display:', computedDisplay);
+                console.log('After toggle - Computed visibility:', computedVisibility);
+                console.log('After toggle - Element visible:', filtersDropdown.offsetParent !== null);
+            }, 50);
+        };
+
+        // Try multiple ways to attach the event
+        filtersToggleBtn.onclick = handleToggleClick;
+        filtersToggleBtn.addEventListener('click', handleToggleClick, false);
+        filtersToggleBtn.addEventListener('click', handleToggleClick, true);
+        filtersToggleBtn.addEventListener('mousedown', function(e) {
+            console.log('🖱️ Mouse down on filters button');
+            e.preventDefault();
+        });
+        
+        console.log('✅ Event listeners attached to filters button');
+
+        // Close filters dropdown when clicking outside (with delay to allow toggle to work first)
         document.addEventListener('click', function(event) {
-            if (filtersDropdown && !filtersDropdown.contains(event.target) && !filtersToggleBtn.contains(event.target)) {
-                if (!filtersDropdown.classList.contains('hidden')) {
-                    filtersDropdown.classList.add('hidden');
+            // Small delay to allow the toggle click to process first
+            setTimeout(() => {
+                if (filtersDropdown && !filtersDropdown.contains(event.target) && !filtersToggleBtn.contains(event.target)) {
+                    if (!filtersDropdown.classList.contains('hidden')) {
+                        console.log('🔄 Closing dropdown - clicked outside');
+                        filtersDropdown.classList.add('hidden');
+                        filtersDropdown.style.display = 'none';
+                        
+                        // Restore body scroll and reset styles on mobile when dropdown closes
+                        if (window.innerWidth < 640) {
+                            document.body.style.overflow = '';
+                            filtersDropdown.style.top = '';
+                            filtersDropdown.style.left = '';
+                            filtersDropdown.style.right = '';
+                            filtersDropdown.style.width = '';
+                        }
+                    }
+                }
+            }, 10);
+        }, true);
+        
+        // Adjust dropdown position on window resize
+        window.addEventListener('resize', function() {
+            if (filtersDropdown && !filtersDropdown.classList.contains('hidden')) {
+                if (window.innerWidth < 640) {
+                    const rect = filtersToggleBtn.getBoundingClientRect();
+                    filtersDropdown.style.top = (rect.bottom + 8) + 'px';
+                    filtersDropdown.style.left = '1rem';
+                    filtersDropdown.style.right = '1rem';
+                    filtersDropdown.style.width = 'auto';
+                } else {
+                    // On desktop, reset to default positioning
+                    filtersDropdown.style.top = '';
+                    filtersDropdown.style.left = '';
+                    filtersDropdown.style.right = '';
+                    filtersDropdown.style.width = '';
                 }
             }
         });
 
-        // Close filters dropdown with Escape key
+        // Close with Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && filtersDropdown && !filtersDropdown.classList.contains('hidden')) {
                 filtersDropdown.classList.add('hidden');
+                filtersDropdown.style.display = 'none';
+                
+                // Restore body scroll and reset styles on mobile when dropdown closes
+                if (window.innerWidth < 640) {
+                    document.body.style.overflow = '';
+                    filtersDropdown.style.top = '';
+                    filtersDropdown.style.left = '';
+                    filtersDropdown.style.right = '';
+                    filtersDropdown.style.width = '';
+                }
             }
         });
-    });
+    }
+
+    function initFormSubmissions() {
+        const filtersForm = document.getElementById('filters-form');
+        const searchForm = document.getElementById('search-form');
+        const applyButton = document.getElementById('apply-filters-btn');
+
+        console.log('🔧 Initializing form submissions...');
+        console.log('Filters form found:', filtersForm);
+        console.log('Search form found:', searchForm);
+        console.log('Apply button found:', applyButton);
+
+        // Handle Apply Filters button click
+        if (applyButton) {
+            console.log('✅ Adding click listener to Apply Filters button');
+            applyButton.addEventListener('click', function(e) {
+                console.log('🖱️ Apply Filters button clicked!');
+                e.preventDefault();
+                e.stopPropagation();
+                applyFilters();
+                return false;
+            });
+        } else {
+            console.error('❌ Apply Filters button not found!');
+        }
+
+        // Also prevent form submission if it happens
+        if (filtersForm) {
+            filtersForm.addEventListener('submit', function(e) {
+                console.log('🚫 Filters form submit prevented');
+                e.preventDefault();
+                e.stopPropagation();
+                applyFilters();
+                return false;
+            });
+        } else {
+            console.error('❌ Filters form not found!');
+        }
+
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                applyFilters();
+            });
+        }
+    }
+
+    function applyFilters() {
+        console.log('🔍 applyFilters() called');
+        const params = new URLSearchParams();
+        
+        // Get search value
+        const searchInput = document.getElementById('search-input');
+        if (searchInput && searchInput.value.trim()) {
+            params.append('search', searchInput.value.trim());
+            console.log('📝 Search term:', searchInput.value.trim());
+        }
+
+        // Get filter values from checkboxes
+        const filterForm = document.getElementById('filters-form');
+        console.log('📋 Filter form found:', filterForm);
+        
+        if (filterForm) {
+            // Descriptions
+            const descriptionCheckboxes = filterForm.querySelectorAll('input[name="descriptions[]"]:checked');
+            console.log('📝 Descriptions checked:', descriptionCheckboxes.length);
+            descriptionCheckboxes.forEach(cb => {
+                params.append('descriptions[]', cb.value);
+                console.log('  - Description:', cb.value);
+            });
+        } else {
+            console.error('❌ Filter form not found in applyFilters()');
+        }
+
+        console.log('📊 Total params:', params.toString());
+
+        // Show loading
+        const productsGrid = document.getElementById('products-grid');
+        const paginationContainer = document.getElementById('pagination-container');
+        
+        if (productsGrid) {
+            productsGrid.innerHTML = '<div class="col-span-full text-center py-12 sm:py-16"><div class="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-[#CE9704]"></div><p class="text-gray-600 mt-4 text-sm sm:text-base">Loading products...</p></div>';
+        }
+
+        // Make request
+        const requestUrl = '{{ route("home") }}?' + params.toString();
+        
+        fetch(requestUrl, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP error! status: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.html && productsGrid) {
+                productsGrid.innerHTML = data.html;
+            }
+            
+            if (data.pagination) {
+                if (paginationContainer) {
+                    paginationContainer.innerHTML = data.pagination;
+                } else if (data.pagination.trim() !== '') {
+                    const newPaginationContainer = document.createElement('div');
+                    newPaginationContainer.className = 'mt-10 sm:mt-12 md:mt-16';
+                    newPaginationContainer.id = 'pagination-container';
+                    newPaginationContainer.innerHTML = data.pagination;
+                    if (productsGrid && productsGrid.parentElement) {
+                        productsGrid.parentElement.appendChild(newPaginationContainer);
+                    }
+                }
+            } else {
+                if (paginationContainer) {
+                    paginationContainer.remove();
+                }
+            }
+
+            // Scroll to products
+            if (productsGrid) {
+                setTimeout(() => {
+                    productsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+
+            // Close filters dropdown
+            const filtersDropdown = document.getElementById('filters-dropdown');
+            if (filtersDropdown) {
+                filtersDropdown.classList.add('hidden');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (productsGrid) {
+                productsGrid.innerHTML = '<div class="col-span-full text-center py-12 sm:py-16"><p class="text-gray-600 text-base sm:text-lg px-4">Error loading products. Please refresh the page.</p></div>';
+            }
+        });
+
+        // Update URL
+        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        window.history.pushState({path: newUrl}, '', newUrl);
+    }
+
+    function initPagination() {
+        document.addEventListener('click', function(e) {
+            const paginationLink = e.target.closest('.pagination a');
+            if (!paginationLink) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const url = paginationLink.href;
+            const urlObj = new URL(url);
+            const params = urlObj.searchParams;
+            
+            // Preserve current filters and search
+            const currentParams = new URLSearchParams(window.location.search);
+            const searchParam = currentParams.get('search');
+            if (searchParam) {
+                params.set('search', searchParam);
+            }
+
+            const descriptions = currentParams.getAll('descriptions[]');
+            descriptions.forEach(desc => params.append('descriptions[]', desc));
+
+            // Show loading
+            const productsGrid = document.getElementById('products-grid');
+            const paginationContainer = document.getElementById('pagination-container');
+            
+            if (productsGrid) {
+                productsGrid.innerHTML = '<div class="col-span-full text-center py-12 sm:py-16"><div class="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-[#CE9704]"></div><p class="text-gray-600 mt-4 text-sm sm:text-base">Loading products...</p></div>';
+            }
+
+            // Make request
+            fetch(urlObj.pathname + '?' + params.toString(), {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.html && productsGrid) {
+                    productsGrid.innerHTML = data.html;
+                }
+                if (data.pagination) {
+                    if (paginationContainer) {
+                        paginationContainer.innerHTML = data.pagination;
+                    }
+                } else {
+                    if (paginationContainer) {
+                        paginationContainer.remove();
+                    }
+                }
+
+                if (productsGrid) {
+                    setTimeout(() => {
+                        productsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    }
+})();
 </script>
 @endpush
 

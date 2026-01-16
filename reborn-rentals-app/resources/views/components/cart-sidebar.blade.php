@@ -1,7 +1,7 @@
 <!-- Cart Sidebar (Right) -->
 <div id="cart-sidebar-container" class="fixed top-0 right-0 h-screen z-10 overflow-visible">
     <div id="cart-sidebar"
-        class="text-white w-full sm:w-80 lg:w-96 max-w-[100vw] sm:max-w-[85vw] bg-transparent shadow-2xl translate-x-0 transition-transform duration-300 ease-in-out h-full relative flex overflow-visible">
+        class="text-white w-full sm:w-80 lg:w-96 max-w-[100vw] sm:max-w-[85vw] bg-transparent shadow-2xl translate-x-full sm:translate-x-0 transition-transform duration-300 ease-in-out h-full relative flex overflow-visible">
 
         <!-- CONTENIDO PRINCIPAL -->
         <div

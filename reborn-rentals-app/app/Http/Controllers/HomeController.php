@@ -8,49 +8,65 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::visible()
-            ->with('category')
-            ->latest()
-            ->paginate(12);
-        
-        $categories = Category::all();
+        $query = Product::with('category')
+            ->visible(); // Solo productos visibles (activos y no ocultos)
 
-        // Extract filter options from product descriptions (solo productos visibles)
-        $allProducts = Product::visible()->get();
-        $dimensions = [];
-        $tonnageCapacities = [];
-        $gallonCapacities = [];
-
-        foreach ($allProducts as $product) {
-            if ($product->description) {
-                // Extract dimensions (format: 7'x7'x27" or similar)
-                if (preg_match("/(\d+'x\d+'x\d+\")/", $product->description, $matches)) {
-                    $dimensions[] = $matches[1];
-                }
-                
-                // Extract tonnage capacity (format: 18.25 ton or similar)
-                if (preg_match("/([\d.]+)\s*ton/i", $product->description, $matches)) {
-                    $tonnageCapacities[] = $matches[1] . ' Ton capacity';
-                }
-                
-                // Extract gallon capacity (format: 587 gallons or similar)
-                if (preg_match("/(\d+)\s*gallons?/i", $product->description, $matches)) {
-                    $gallonCapacities[] = $matches[1] . ' Gallon capacity';
-                }
-            }
+        // Búsqueda - busca en nombre y descripción de productos
+        if ($request->has('search') && !empty(trim($request->search))) {
+            $searchTerm = trim($request->search);
+            $query->search($searchTerm);
         }
 
-        // Get unique values and sort
-        $dimensions = array_unique($dimensions);
-        sort($dimensions);
-        $tonnageCapacities = array_unique($tonnageCapacities);
-        sort($tonnageCapacities);
-        $gallonCapacities = array_unique($gallonCapacities);
-        sort($gallonCapacities);
+        // Filtro por categoría (array)
+        if ($request->has('categories') && is_array($request->categories)) {
+            $query->whereIn('category_id', $request->categories);
+        } elseif ($request->has('category_id')) {
+            $query->byCategory($request->category_id);
+        }
 
-        return view('home', compact('products', 'categories', 'dimensions', 'tonnageCapacities', 'gallonCapacities'));
+        // Filtro por descripciones - busca descripciones exactas o similares
+        if ($request->has('descriptions') && is_array($request->descriptions) && count($request->descriptions) > 0) {
+            $query->where(function($q) use ($request) {
+                foreach ($request->descriptions as $description) {
+                    $q->orWhere('description', 'like', '%' . $description . '%');
+                }
+            });
+        }
+
+        // Filtro por precio
+        if ($request->has('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+
+        if ($request->has('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        $products = $query->latest()->paginate(12);
+        $categories = Category::all();
+
+        // Get all unique descriptions from visible products for filters
+        $productDescriptions = Product::visible()
+            ->whereNotNull('description')
+            ->where('description', '!=', '')
+            ->distinct()
+            ->orderBy('description')
+            ->pluck('description')
+            ->filter()
+            ->values()
+            ->toArray();
+
+        // Si es una petición AJAX o espera JSON, devolver solo el HTML de los productos
+        if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+            return response()->json([
+                'html' => view('partials.products-grid', compact('products'))->render(),
+                'pagination' => $products->hasPages() ? $products->links()->render() : ''
+            ]);
+        }
+
+        return view('home', compact('products', 'categories', 'productDescriptions'));
     }
 }
 

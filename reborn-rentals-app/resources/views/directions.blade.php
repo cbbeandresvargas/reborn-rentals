@@ -763,31 +763,38 @@ function toggleSelfPickup() {
 
 // Make checkboxes work like radio buttons (only one selected at a time)
 function initDirectionsPage() {
-    // Open cart sidebar immediately when on directions page (no delay to avoid layout shift)
+    // Open cart sidebar immediately when on directions page (only on desktop/tablet, not mobile)
     const cartSidebar = document.getElementById('cart-sidebar');
     
     if (cartSidebar) {
-        // Ensure sidebar is open from the start
-        cartSidebar.classList.remove('translate-x-full');
-        cartSidebar.classList.add('translate-x-0');
-        
-        // Show step indicator
-        const stepIndicatorContainer = document.getElementById('step-indicator-container');
-        if (stepIndicatorContainer) {
-            stepIndicatorContainer.style.display = 'block';
+        // Only open sidebar on desktop/tablet (>= 640px), keep closed on mobile
+        if (window.innerWidth >= 640) {
+            // Ensure sidebar is open from the start (desktop only)
+            cartSidebar.classList.remove('translate-x-full');
+            cartSidebar.classList.add('translate-x-0');
+            
+            // Show step indicator
+            const stepIndicatorContainer = document.getElementById('step-indicator-container');
+            if (stepIndicatorContainer) {
+                stepIndicatorContainer.style.display = 'block';
+            }
+            
+            // Set z-index for open cart sidebar (same as in app.blade.php)
+            const nav = document.querySelector('nav');
+            if (nav) {
+                nav.classList.add('sidebar-open');
+                nav.style.zIndex = '5';
+            }
+            const cartContainer = document.getElementById('cart-sidebar-container');
+            if (cartContainer) {
+                cartContainer.style.zIndex = '10';
+            }
+            cartSidebar.style.zIndex = '10';
+        } else {
+            // On mobile, ensure sidebar stays closed
+            cartSidebar.classList.remove('translate-x-0');
+            cartSidebar.classList.add('translate-x-full');
         }
-        
-        // Set z-index for open cart sidebar (same as in app.blade.php)
-        const nav = document.querySelector('nav');
-        if (nav) {
-            nav.classList.add('sidebar-open');
-            nav.style.zIndex = '5';
-        }
-        const cartContainer = document.getElementById('cart-sidebar-container');
-        if (cartContainer) {
-            cartContainer.style.zIndex = '10';
-        }
-        cartSidebar.style.zIndex = '10';
         
         // Use Tailwind classes that are already handled in app.blade.php
         // Don't modify margins here to avoid layout shift

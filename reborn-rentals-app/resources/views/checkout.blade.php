@@ -191,18 +191,25 @@
 @include('components.success-modal')
 
 <script>
-// Open cart sidebar automatically when on checkout page
+// Open cart sidebar automatically when on checkout page (only on desktop/tablet, not mobile)
 setTimeout(() => {
     const cartSidebar = document.getElementById('cart-sidebar');
     
     if (cartSidebar) {
-        cartSidebar.classList.remove('translate-x-full');
-        cartSidebar.classList.add('translate-x-0');
-        
-        // Show step indicator
-        const stepIndicatorContainer = document.getElementById('step-indicator-container');
-        if (stepIndicatorContainer) {
-            stepIndicatorContainer.style.display = 'block';
+        // Only open sidebar on desktop/tablet (>= 640px), keep closed on mobile
+        if (window.innerWidth >= 640) {
+            cartSidebar.classList.remove('translate-x-full');
+            cartSidebar.classList.add('translate-x-0');
+            
+            // Show step indicator
+            const stepIndicatorContainer = document.getElementById('step-indicator-container');
+            if (stepIndicatorContainer) {
+                stepIndicatorContainer.style.display = 'block';
+            }
+        } else {
+            // On mobile, ensure sidebar stays closed
+            cartSidebar.classList.remove('translate-x-0');
+            cartSidebar.classList.add('translate-x-full');
         }
         
         // Hide cart header and proceed button on checkout page
