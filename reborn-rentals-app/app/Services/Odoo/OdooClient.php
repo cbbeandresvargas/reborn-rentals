@@ -1421,12 +1421,13 @@ $this->call('account.move.send', 'send_and_print', [[$wizardId]]);
      * Creates rental order lines from Laravel order items.
      * Rules:
      * - Uses mapped odoo_product_id from Laravel products
-     * - Quantity (product_uom_qty) reflects billable rental days (minimum 30)
+     * - Quantity (product_uom_qty) reflects number of equipment units
      * - Price (price_unit) is daily rental price
+     * - Rental dates (rental_start_date, rental_end_date) from JobLocation
      * - One line per product (items of same product are grouped)
      * 
      * @param \App\Models\Order $order
-     * @return array Order lines formatted for Odoo
+     * @return array Order lines formatted for Odoo rental
      */
     protected function buildOrderLines(\App\Models\Order $order): array
     {
@@ -1472,47 +1473,46 @@ $this->call('account.move.send', 'send_and_print', [[$wizardId]]);
                 );
             }
 
-            // Calculate billable rental days from line total
-            // Formula: line_total = unit_price * quantity * days
-            // Therefore: days = line_total / (unit_price * quantity)
-            // We use the first item's unit_price as all items of same product have same price
+            // Get unit price from first item (all items of same product have same price)
             $unitPrice = $items[0]->unit_price;
-            
-            $rentalDays = 30; // Default minimum
-            if ($unitPrice > 0 && $totalQuantity > 0) {
-                $calculatedDays = $totalLineTotal / ($unitPrice * $totalQuantity);
-                // Enforce minimum 30 days for billing
-                $rentalDays = max(30, (int) round($calculatedDays));
-            }
 
             // Build product description with rental information
             $description = $product->name;
             if ($product->description) {
                 $description .= "\n" . $product->description;
             }
-            $description .= "\nRental Period: {$rentalDays} day(s)";
             $description .= "\nEquipment Quantity: {$totalQuantity} unit(s)";
 
+            // Get rental dates from JobLocation
+            $rentalStartDate = $order->job->date->format('Y-m-d H:i:s');
+            $rentalEndDate = $order->job->end_date->format('Y-m-d H:i:s');
+
             // Create order line for rental
-            // - product_uom_qty: rental days (billable period, minimum 30)
+            // - product_uom_qty: number of equipment units
             // - price_unit: daily rental price
             // - product_id: mapped Odoo product ID
+            // - is_rental: marks this as a rental order line
+            // - rental_start_date: start date of rental period
+            // - rental_end_date: end date of rental period
             $orderLine = [
                 'product_id' => (int) $odooProductId,
-                'product_uom_qty' => $rentalDays, // Billable rental days (minimum 30)
+                'product_uom_qty' => $totalQuantity, // Number of equipment units
                 'price_unit' => (float) $unitPrice, // Daily rental price
                 'name' => $description,
+                'is_rental' => true,
+                'rental_start_date' => $rentalStartDate,
+                'rental_end_date' => $rentalEndDate,
             ];
 
             Log::debug('📝 [ODOO] Building rental order line', [
                 'laravel_product_id' => $product->id,
                 'product_name' => $product->name,
                 'odoo_product_id' => $odooProductId,
-                'rental_days' => $rentalDays,
-                'daily_price' => $unitPrice,
                 'equipment_quantity' => $totalQuantity,
+                'daily_price' => $unitPrice,
                 'line_total' => $totalLineTotal,
-                'calculation' => "{$rentalDays} days × {$unitPrice} × {$totalQuantity} units = {$totalLineTotal}",
+                'rental_start_date' => $rentalStartDate,
+                'rental_end_date' => $rentalEndDate,
             ]);
 
             $orderLines[] = [0, 0, $orderLine]; // Odoo format: [0, 0, values] for create
