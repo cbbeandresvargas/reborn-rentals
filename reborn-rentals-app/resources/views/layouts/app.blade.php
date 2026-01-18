@@ -466,8 +466,12 @@
                 cartBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
+                    // Force sidebar to open by removing translate-x-full and adding translate-x-0/sm:translate-x-0
                     cartSidebar.classList.remove('translate-x-full');
-                    cartSidebar.classList.add('translate-x-0');
+                    cartSidebar.classList.add('translate-x-0', 'sm:translate-x-0');
+                    // Clear inline transform to allow CSS classes to work
+                    cartSidebar.style.transform = '';
+                    
                     // Cambiar z-index: header baja a 5, sidebar sube a 10
                     const nav = document.querySelector('nav');
                     if (nav) {
@@ -528,8 +532,12 @@
             // Close cart sidebar
             if (closeCartBtn && cartSidebar) {
                 closeCartBtn.addEventListener('click', function() {
-                    cartSidebar.classList.remove('translate-x-0');
+                    // Force sidebar to close by removing sm:translate-x-0 and adding translate-x-full
+                    cartSidebar.classList.remove('translate-x-0', 'sm:translate-x-0');
                     cartSidebar.classList.add('translate-x-full');
+                    // Force transform with inline style to override responsive classes
+                    cartSidebar.style.transform = 'translateX(100%)';
+                    
                     // Restaurar z-index: header vuelve a 10, sidebar a 9
                     const nav = document.querySelector('nav');
                     if (nav) {

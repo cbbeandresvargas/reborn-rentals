@@ -10,26 +10,30 @@
 
             <!-- STEP TABS - Desktop (SOBRESALIDOS) -->
             <div
-                class="hidden sm:flex absolute top-1/2 -translate-y-1/2 -left-10 flex-col items-center z-20 gap-1.5">
+                class="hidden sm:flex absolute top-1/2 -translate-y-1/2 -left-10 flex-col items-center z-20 gap-1.5"
+                style="pointer-events: auto;">
                 <button
                     type="button"
                     id="step-tab-1"
                     data-step="1"
-                    class="step-tab w-8 h-8 flex items-center justify-center text-sm font-semibold bg-gradient-to-br from-[#CE9704] to-[#B8860B] hover:scale-110 text-white rounded-t-lg backdrop-blur-sm shadow-lg transition-all duration-200 border border-[#CE9704]">
+                    class="step-tab w-8 h-8 flex items-center justify-center text-sm font-semibold bg-gradient-to-br from-[#CE9704] to-[#B8860B] hover:scale-110 text-white rounded-t-lg backdrop-blur-sm shadow-lg transition-all duration-200 border border-[#CE9704]"
+                    style="pointer-events: auto; cursor: pointer;">
                     1
                 </button>
                 <button
                     type="button"
                     id="step-tab-2"
                     data-step="2"
-                    class="step-tab w-8 h-8 flex items-center justify-center text-sm font-semibold bg-gray-800/80 hover:bg-[#CE9704] hover:scale-110 text-gray-300 hover:text-white backdrop-blur-sm shadow-lg transition-all duration-200 border border-gray-700/50 hover:border-[#CE9704]">
+                    class="step-tab w-8 h-8 flex items-center justify-center text-sm font-semibold bg-gray-800/80 hover:bg-[#CE9704] hover:scale-110 text-gray-300 hover:text-white backdrop-blur-sm shadow-lg transition-all duration-200 border border-gray-700/50 hover:border-[#CE9704]"
+                    style="pointer-events: auto; cursor: pointer;">
                     2
                 </button>
                 <button
                     type="button"
                     id="step-tab-3"
                     data-step="3"
-                    class="step-tab w-8 h-8 flex items-center justify-center text-sm font-semibold bg-gray-800/80 hover:bg-[#CE9704] hover:scale-110 text-gray-300 hover:text-white rounded-b-lg backdrop-blur-sm shadow-lg transition-all duration-200 border border-gray-700/50 hover:border-[#CE9704]">
+                    class="step-tab w-8 h-8 flex items-center justify-center text-sm font-semibold bg-gray-800/80 hover:bg-[#CE9704] hover:scale-110 text-gray-300 hover:text-white rounded-b-lg backdrop-blur-sm shadow-lg transition-all duration-200 border border-gray-700/50 hover:border-[#CE9704]"
+                    style="pointer-events: auto; cursor: pointer;">
                     3
                 </button>
             </div>
@@ -71,7 +75,8 @@
                     type="button"
                     class="p-2.5 sm:p-2 rounded-lg sm:rounded transition-all active:scale-95 hover:bg-gray-700/50 sm:hover:bg-gray-200 text-white sm:text-black touch-manipulation"
                     id="close-cart"
-                    aria-label="Close cart">
+                    aria-label="Close cart"
+                    style="pointer-events: auto; cursor: pointer;">
                     <svg width="22" height="22" class="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2.5"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -82,7 +87,7 @@
             </div>
 
             <!-- CART ITEMS -->
-            <div class="flex-1 cart-items flex flex-col overflow-y-auto text-center min-h-0 -mx-3 sm:mx-0 px-3 sm:px-0">
+            <div class="flex-1 cart-items flex flex-col overflow-y-auto text-center min-h-0 -mx-3 sm:mx-0 px-3 sm:px-0" style="pointer-events: auto;">
                 <!-- Contenido renderizado dinámicamente por JavaScript -->
             </div>
 

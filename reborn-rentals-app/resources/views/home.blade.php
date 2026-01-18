@@ -241,154 +241,52 @@
         const filtersToggleBtn = document.getElementById('filters-toggle-btn');
         const filtersDropdown = document.getElementById('filters-dropdown');
 
-        console.log('🔧 Initializing filters dropdown...');
-        console.log('Filters toggle button:', filtersToggleBtn);
-        console.log('Filters dropdown:', filtersDropdown);
-
         if (!filtersToggleBtn || !filtersDropdown) {
-            console.error('❌ Filters toggle button or dropdown not found!');
             return;
         }
 
-        // Change cursor on hover
-        filtersToggleBtn.style.cursor = 'pointer';
-
-        // Test if button is clickable
-        console.log('Testing button clickability...');
-        console.log('Button disabled:', filtersToggleBtn.disabled);
-        console.log('Button pointer-events:', window.getComputedStyle(filtersToggleBtn).pointerEvents);
-        
-        // Add multiple event listeners to ensure we catch the click
-        const handleToggleClick = function(e) {
-            console.log('🖱️ Filters button clicked - Event:', e);
-            console.log('Event type:', e.type);
-            console.log('Event target:', e.target);
-            e.preventDefault();
+        // Toggle dropdown on button click
+        filtersToggleBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            
             const isHidden = filtersDropdown.classList.contains('hidden');
-            console.log('Dropdown is hidden before toggle:', isHidden);
             
-            // Force remove/add hidden class and display
             if (isHidden) {
                 filtersDropdown.classList.remove('hidden');
-                filtersDropdown.style.display = 'block';
-                filtersDropdown.style.visibility = 'visible';
-                
-                // On mobile, set dropdown to fixed positioning and calculate top position
+                // Lock body scroll on mobile when dropdown opens
                 if (window.innerWidth < 640) {
-                    const rect = filtersToggleBtn.getBoundingClientRect();
-                    // Position dropdown below the button with some margin
-                    filtersDropdown.style.top = (rect.bottom + 8) + 'px';
-                    filtersDropdown.style.left = '1rem';
-                    filtersDropdown.style.right = '1rem';
-                    filtersDropdown.style.width = 'auto';
-                    
-                    // Prevent body scroll when dropdown is open on mobile
                     document.body.style.overflow = 'hidden';
-                } else {
-                    // On desktop, reset to default positioning
-                    filtersDropdown.style.top = '';
-                    filtersDropdown.style.left = '';
-                    filtersDropdown.style.right = '';
-                    filtersDropdown.style.width = '';
                 }
-                
-                console.log('✅ Dropdown OPENED');
             } else {
                 filtersDropdown.classList.add('hidden');
-                filtersDropdown.style.display = 'none';
-                
-                // Restore body scroll and reset styles on mobile when dropdown closes
+                // Restore body scroll on mobile when dropdown closes
                 if (window.innerWidth < 640) {
                     document.body.style.overflow = '';
-                    filtersDropdown.style.top = '';
-                    filtersDropdown.style.left = '';
-                    filtersDropdown.style.right = '';
-                    filtersDropdown.style.width = '';
                 }
-                
-                console.log('✅ Dropdown CLOSED');
             }
-            
-            // Verify after a short delay
-            setTimeout(() => {
-                const stillHidden = filtersDropdown.classList.contains('hidden');
-                const computedDisplay = window.getComputedStyle(filtersDropdown).display;
-                const computedVisibility = window.getComputedStyle(filtersDropdown).visibility;
-                console.log('After toggle - Hidden class:', stillHidden);
-                console.log('After toggle - Computed display:', computedDisplay);
-                console.log('After toggle - Computed visibility:', computedVisibility);
-                console.log('After toggle - Element visible:', filtersDropdown.offsetParent !== null);
-            }, 50);
-        };
-
-        // Try multiple ways to attach the event
-        filtersToggleBtn.onclick = handleToggleClick;
-        filtersToggleBtn.addEventListener('click', handleToggleClick, false);
-        filtersToggleBtn.addEventListener('click', handleToggleClick, true);
-        filtersToggleBtn.addEventListener('mousedown', function(e) {
-            console.log('🖱️ Mouse down on filters button');
-            e.preventDefault();
         });
-        
-        console.log('✅ Event listeners attached to filters button');
 
-        // Close filters dropdown when clicking outside (with delay to allow toggle to work first)
+        // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
-            // Small delay to allow the toggle click to process first
-            setTimeout(() => {
-                if (filtersDropdown && !filtersDropdown.contains(event.target) && !filtersToggleBtn.contains(event.target)) {
-                    if (!filtersDropdown.classList.contains('hidden')) {
-                        console.log('🔄 Closing dropdown - clicked outside');
-                        filtersDropdown.classList.add('hidden');
-                        filtersDropdown.style.display = 'none';
-                        
-                        // Restore body scroll and reset styles on mobile when dropdown closes
-                        if (window.innerWidth < 640) {
-                            document.body.style.overflow = '';
-                            filtersDropdown.style.top = '';
-                            filtersDropdown.style.left = '';
-                            filtersDropdown.style.right = '';
-                            filtersDropdown.style.width = '';
-                        }
+            if (filtersDropdown && 
+                !filtersDropdown.contains(event.target) && 
+                !filtersToggleBtn.contains(event.target)) {
+                if (!filtersDropdown.classList.contains('hidden')) {
+                    filtersDropdown.classList.add('hidden');
+                    // Restore body scroll on mobile when dropdown closes
+                    if (window.innerWidth < 640) {
+                        document.body.style.overflow = '';
                     }
                 }
-            }, 10);
-        }, true);
-        
-        // Adjust dropdown position on window resize
-        window.addEventListener('resize', function() {
-            if (filtersDropdown && !filtersDropdown.classList.contains('hidden')) {
-                if (window.innerWidth < 640) {
-                    const rect = filtersToggleBtn.getBoundingClientRect();
-                    filtersDropdown.style.top = (rect.bottom + 8) + 'px';
-                    filtersDropdown.style.left = '1rem';
-                    filtersDropdown.style.right = '1rem';
-                    filtersDropdown.style.width = 'auto';
-                } else {
-                    // On desktop, reset to default positioning
-                    filtersDropdown.style.top = '';
-                    filtersDropdown.style.left = '';
-                    filtersDropdown.style.right = '';
-                    filtersDropdown.style.width = '';
-                }
             }
         });
 
-        // Close with Escape key
+        // Close dropdown with Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && filtersDropdown && !filtersDropdown.classList.contains('hidden')) {
                 filtersDropdown.classList.add('hidden');
-                filtersDropdown.style.display = 'none';
-                
-                // Restore body scroll and reset styles on mobile when dropdown closes
+                // Restore body scroll on mobile when dropdown closes
                 if (window.innerWidth < 640) {
                     document.body.style.overflow = '';
-                    filtersDropdown.style.top = '';
-                    filtersDropdown.style.left = '';
-                    filtersDropdown.style.right = '';
-                    filtersDropdown.style.width = '';
                 }
             }
         });
@@ -497,6 +395,27 @@
         .then(data => {
             if (data.html && productsGrid) {
                 productsGrid.innerHTML = data.html;
+                
+                // Reinicializar drag and drop y botones Add to Cart después de actualizar productos
+                if (typeof setupDragAndDrop === 'function') {
+                    setupDragAndDrop();
+                }
+                
+                // Reinicializar botones Add to Cart
+                document.querySelectorAll('.add-to-cart-btn:not([data-listener-set])').forEach(btn => {
+                    btn.setAttribute('data-listener-set', 'true');
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const productId = this.dataset.productId;
+                        const productName = this.dataset.productName;
+                        const productPrice = this.dataset.productPrice;
+                        
+                        if (typeof addToCart === 'function') {
+                            addToCart(productId, productName, productPrice);
+                        }
+                    });
+                });
             }
             
             if (data.pagination) {
@@ -585,6 +504,27 @@
             .then(data => {
                 if (data.html && productsGrid) {
                     productsGrid.innerHTML = data.html;
+                    
+                    // Reinicializar drag and drop y botones Add to Cart después de actualizar productos
+                    if (typeof setupDragAndDrop === 'function') {
+                        setupDragAndDrop();
+                    }
+                    
+                    // Reinicializar botones Add to Cart
+                    document.querySelectorAll('.add-to-cart-btn:not([data-listener-set])').forEach(btn => {
+                        btn.setAttribute('data-listener-set', 'true');
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const productId = this.dataset.productId;
+                            const productName = this.dataset.productName;
+                            const productPrice = this.dataset.productPrice;
+                            
+                            if (typeof addToCart === 'function') {
+                                addToCart(productId, productName, productPrice);
+                            }
+                        });
+                    });
                 }
                 if (data.pagination) {
                     if (paginationContainer) {

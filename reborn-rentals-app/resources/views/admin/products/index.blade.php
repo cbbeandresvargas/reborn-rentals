@@ -258,6 +258,23 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Stock <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" name="stock" id="product-stock" value="{{ old('stock', 0) }}" min="0" required
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] transition-all {{ $errors->has('stock') ? 'border-red-500' : '' }}"
+                        placeholder="0">
+                    <p class="text-xs text-gray-500 mt-1">Total available units for rent</p>
+                    <div id="stock-error" class="text-red-600 text-sm mt-1 font-medium {{ $errors->has('stock') ? '' : 'hidden' }}">
+                        @if($errors->has('stock'))
+                            {{ $errors->first('stock') }}
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Category</label>
                     <select name="category_id" id="product-category"
                         class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] transition-all bg-white">
@@ -268,6 +285,22 @@
                             </option>
                         @endforeach
                     </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Odoo Product ID
+                        <span class="text-xs text-gray-500 font-normal">(Required for Odoo integration)</span>
+                    </label>
+                    <input type="number" name="odoo_product_id" id="product-odoo-id" value="{{ old('odoo_product_id') }}" min="1"
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CE9704] focus:border-[#CE9704] transition-all {{ $errors->has('odoo_product_id') ? 'border-red-500' : '' }}"
+                        placeholder="Enter Odoo product ID">
+                    <p class="text-xs text-gray-500 mt-1">The ID of the corresponding product in Odoo</p>
+                    <div id="odoo-product-id-error" class="text-red-600 text-sm mt-1 font-medium {{ $errors->has('odoo_product_id') ? '' : 'hidden' }}">
+                        @if($errors->has('odoo_product_id'))
+                            {{ $errors->first('odoo_product_id') }}
+                        @endif
+                    </div>
                 </div>
             </div>
 
@@ -338,6 +371,11 @@ function openCreateProductModal() {
         const form = document.getElementById('create-product-form');
         if (form) {
             form.reset();
+        }
+        // Reset stock to default
+        const stockInput = document.getElementById('product-stock');
+        if (stockInput) {
+            stockInput.value = '0';
         }
         // Clear image preview
         clearImagePreview();
@@ -570,6 +608,11 @@ document.addEventListener('DOMContentLoaded', function() {
             closeDeleteProductModal();
         }
     });
+    
+    // Abrir modal automáticamente si hay errores de validación
+    @if($errors->any() && old('_token'))
+        openCreateProductModal();
+    @endif
 });
 </script>
 @endsection

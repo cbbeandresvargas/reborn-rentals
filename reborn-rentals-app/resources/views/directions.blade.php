@@ -142,7 +142,7 @@
                         </div>
                         
                         <!-- Map Controls -->
-                        <div class="absolute top-3 sm:top-4 md:top-5 right-3 sm:right-4 md:right-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 sm:p-2.5 md:p-3 space-y-2 border border-gray-200">
+                        <div id="map-controls" class="absolute top-3 sm:top-4 md:top-5 right-3 sm:right-4 md:right-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 sm:p-2.5 md:p-3 space-y-2 border border-gray-200">
                             <button 
                                 type="button"
                                 id="center-map-btn" 
@@ -180,43 +180,7 @@
                         </div>
                     </div>
                     
-                    <!-- Map Instructions -->
-                    <div class="mt-4 sm:mt-5 md:mt-6 p-4 sm:p-5 md:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 shadow-lg">
-                        <div class="flex items-start">
-                            <div class="shrink-0">
-                                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            </div>
-                            <div class="ml-3 sm:ml-4 flex-1">
-                                <h4 class="text-sm sm:text-base font-bold text-blue-900 mb-2">How to use the map:</h4>
-                                <ul class="text-xs sm:text-sm md:text-base text-blue-800 mt-2 space-y-1.5 sm:space-y-2">
-                                    <li class="flex items-start">
-                                        <span class="text-blue-500 mr-2 font-bold">•</span>
-                                        <span>Click anywhere on the map to select your delivery location</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span class="text-blue-500 mr-2 font-bold">•</span>
-                                        <span>The map will automatically show the route from our office to your location</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span class="text-blue-500 mr-2 font-bold">•</span>
-                                        <span>Use "📍 Our Office" to center the map on our location</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span class="text-blue-500 mr-2 font-bold">•</span>
-                                        <span>Use "🗑️ Clear Route" to remove the current route and start over</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span class="text-blue-500 mr-2 font-bold">•</span>
-                                        <span>Click "Use This Location" to set the address in the form above</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
                 
                 <!-- Self-Pickup Dropdown -->
@@ -245,22 +209,7 @@
                         </div>
                     </div>
                     
-                    <!-- Map -->
-                    <div class="mt-4 sm:mt-6">
-                        <h4 class="text-sm sm:text-base font-semibold text-gray-900 mb-2 sm:mb-3">Location Map</h4>
-                        <div class="rounded-lg overflow-hidden border border-gray-300">
-                            <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3077.576787884259!2d-119.80605779999999!3d39.5240405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x809940b3fe48bd53%3A0x4e3afeee9f24c1bc!2s401%20Ryland%20St%20Suite%20200-A%2C%20Reno%2C%20NV%2089502%2C%20EE.%20UU.!5e0!3m2!1ses-419!2sbo!4v1761325010616!5m2!1ses-419!2sbo" 
-                                width="100%" 
-                                height="300" 
-                                style="border:0;" 
-                                allowfullscreen="" 
-                                loading="lazy" 
-                                referrerpolicy="no-referrer-when-downgrade"
-                                class="w-full h-48 sm:h-56 md:h-64"
-                            ></iframe>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -325,6 +274,7 @@ let selectedMarker;
 let officeMarker;
 let directionsService;
 let directionsRenderer;
+let fallbackPolyline = null;
 
 // Expose map globally for invalidateSize calls
 window.map = null;
@@ -399,8 +349,11 @@ function initGoogleMap() {
             }
         });
         
-        // Add click listener to map
+        // Add click listener to map (prevent clicks when self-pickup is active)
         map.addListener('click', function(event) {
+            const selfPickup = document.getElementById('self-pickup');
+            if (selfPickup && selfPickup.checked) return;
+            
             const clickedLocation = {
                 lat: event.latLng.lat(),
                 lng: event.latLng.lng()
@@ -532,8 +485,6 @@ function initGoogleMap() {
 
 // Select location on map
 function selectLocation(location) {
-    window.selectLocation = selectLocation;
-    
     if (!map) {
         console.error('Map not initialized');
         return;
@@ -603,6 +554,9 @@ function selectLocation(location) {
     });
 }
 
+// Make selectLocation globally accessible (only once, after function definition)
+window.selectLocation = selectLocation;
+
 // Calculate route and distance using Google Directions API
 function calculateRoute(destination, address) {
     if (!directionsService || !directionsRenderer || !map) {
@@ -626,6 +580,12 @@ function calculateRoute(destination, address) {
 
     directionsService.route(request, function(result, status) {
         if (status === 'OK') {
+            // Remove any fallback polyline before drawing the real route
+            if (fallbackPolyline) {
+                fallbackPolyline.setMap(null);
+                fallbackPolyline = null;
+            }
+            
             // Display the route on the map (this automatically draws the route line like Google Maps)
             // The DirectionsRenderer will show:
             // - A route line from office to destination
@@ -673,7 +633,12 @@ function calculateRoute(destination, address) {
                 }
                 
                 // Fallback: draw a simple line between points
-                const routeLine = new google.maps.Polyline({
+                // Remove previous fallback polyline if it exists
+                if (fallbackPolyline) {
+                    fallbackPolyline.setMap(null);
+                }
+                
+                fallbackPolyline = new google.maps.Polyline({
                     path: [
                         { lat: officeLocation.lat, lng: officeLocation.lng },
                         { lat: destination.lat, lng: destination.lng }
@@ -683,7 +648,7 @@ function calculateRoute(destination, address) {
                     strokeOpacity: 0.6,
                     strokeWeight: 4
                 });
-                routeLine.setMap(map);
+                fallbackPolyline.setMap(map);
                 
                 // Calculate straight line distance
                 const distance = calculateDistance(officeLocation, destination);
@@ -723,10 +688,10 @@ function toggleSelfPickup() {
     const jobsiteAddress = document.getElementById('jobsite-address');
     const interactiveMap = document.getElementById('delivery-map');
     const googleMaps = document.getElementById('google-maps-static');
-    const mapControls = document.querySelector('.absolute.top-4.right-4');
+    const mapControls = document.getElementById('map-controls');
     const locationInfo = document.getElementById('selected-location-info');
     
-    if (selfPickup.checked || noAddress.checked) {
+    if (selfPickup && selfPickup.checked || (noAddress && noAddress.checked)) {
         // Auto-fill company address when self-pickup or no-address is selected
         if (jobsiteAddress) {
             jobsiteAddress.value = '39°43\'34.9"N 105°03\'20.7"W, Denver, CO, USA';
@@ -734,12 +699,10 @@ function toggleSelfPickup() {
             jobsiteAddress.placeholder = 'Optional: Additional delivery instructions...';
         }
         
-        // Hide details and Google Maps
-        if (details) details.classList.add('hidden');
-        if (googleMaps) googleMaps.classList.add('hidden');
-        
-        // Keep interactive map but hide controls and location info
+        // Show details dropdown (horarios de atención), keep main interactive map, hide extra Google Maps iframe
+        if (details) details.classList.remove('hidden');
         if (interactiveMap) interactiveMap.classList.remove('hidden');
+        if (googleMaps) googleMaps.classList.add('hidden');
         if (mapControls) mapControls.style.display = 'none';
         if (locationInfo) locationInfo.style.display = 'none';
     } else {
@@ -750,7 +713,7 @@ function toggleSelfPickup() {
             jobsiteAddress.placeholder = 'Start typing and select from suggestions...';
         }
         
-        // Hide details and Google Maps
+        // Hide details and Google Maps static iframe
         if (details) details.classList.add('hidden');
         if (googleMaps) googleMaps.classList.add('hidden');
         
@@ -816,6 +779,21 @@ function initDirectionsPage() {
                 google.maps.event.trigger(window.map, 'resize');
             }
         }, 100);
+        
+        // Restore selected location from localStorage if available
+        setTimeout(() => {
+            const saved = localStorage.getItem('reborn-rentals-directions');
+            if (saved && map && typeof selectLocation === 'function') {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data.latitude && data.longitude) {
+                        selectLocation({ lat: data.latitude, lng: data.longitude });
+                    }
+                } catch (e) {
+                    console.error('Error restoring location from localStorage:', e);
+                }
+            }
+        }, 500);
     }
     
     const selfPickup = document.getElementById('self-pickup');
@@ -1095,12 +1073,7 @@ function checkStockAvailability() {
     const loader = document.getElementById('stock-validation-loader');
     const resultsDiv = document.getElementById('stock-availability-results');
     
-    // Check if both dates are selected
-    if (!startDate || !endDate || !startDate.value || !endDate.value) {
-        if (loader) loader.classList.add('hidden');
-        if (resultsDiv) resultsDiv.classList.add('hidden');
-        return;
-    }
+    if (!startDate.value || !endDate.value) return;
     
     // Validate dates
     if (new Date(startDate.value) >= new Date(endDate.value)) {
@@ -1128,6 +1101,7 @@ function checkStockAvailability() {
     .then(cartData => {
         if (!cartData.cart || Object.keys(cartData.cart).length === 0) {
             if (loader) loader.classList.add('hidden');
+            if (resultsDiv) resultsDiv.classList.add('hidden');
             return;
         }
         

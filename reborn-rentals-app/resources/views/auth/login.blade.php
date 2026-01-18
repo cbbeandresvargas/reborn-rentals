@@ -65,12 +65,7 @@
                 </button>
             </div>
             
-            <div class="text-center">
-                <p class="text-sm text-white/90">
-                    Don't have an account? 
-                    <a href="{{ route('register') }}" class="font-medium text-white hover:text-white/80 underline">Register here</a>
-                </p>
-            </div>
+        
         </form>
     </div>
 </div>
