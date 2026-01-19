@@ -20,33 +20,6 @@
         
         <form method="POST" action="{{ route('checkout.store') }}">
             @csrf
-            
-            <!-- Payment Notice - At the top of form -->
-            <div class="mb-6 p-4 sm:p-6 bg-yellow-50 border-2 border-yellow-400 rounded-lg">
-                <div class="flex items-start">
-                    <svg class="w-6 h-6 text-yellow-600 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                    <div class="flex-1">
-                        <h4 class="text-yellow-900 font-bold text-base sm:text-lg mb-3">Important Payment Information</h4>
-                        <ul class="text-yellow-800 text-sm sm:text-base space-y-2">
-                            <li class="flex items-start">
-                                <span class="mr-2 font-bold">•</span>
-                                <span><strong>No payment is collected on this website.</strong> This website only collects rental requests.</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="mr-2 font-bold">•</span>
-                                <span><strong>Payment details will be sent to you by email via invoice</strong> after your request is processed.</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="mr-2 font-bold">•</span>
-                                <span><strong>Taxes will be calculated separately</strong> and included in your final invoice.</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
             <!-- Checkout Content -->
             <div>
                 <!-- Rental Period Section -->
@@ -178,8 +151,6 @@
                     
                     <!-- Message about invoice -->
                     <div class="text-center text-gray-600 text-sm sm:text-base py-4 border-t border-gray-200 mt-4">
-                        <p class="mb-2 font-semibold">This is a subtotal estimate only.</p>
-                        <p class="mb-2">Final totals, taxes, and discounts will be calculated in Odoo.</p>
                         <p>An invoice with final amounts will be sent to you via email after your request is processed.</p>
                     </div>
                 </div>
