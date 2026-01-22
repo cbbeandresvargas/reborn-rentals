@@ -7,33 +7,46 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * Odoo JSON-RPC Client
+ * Odoo JSON-RPC Client - Optimizado para Rental Module
  * 
- * Reusable client for interacting with Odoo ERP via JSON-RPC 2.0.
- * Handles authentication, error management, and provides a generic interface
- * for calling any Odoo model and method.
+ * Cliente reutilizable para interactuar con Odoo ERP vía JSON-RPC 2.0.
+ * Maneja autenticación, gestión de errores, y provee interfaz genérica
+ * para llamar cualquier modelo y método de Odoo.
+ * 
+ * ⚠️ ESPECIALIZADO PARA MÓDULO DE RENTALS/ALQUILERES
+ * 
+ * Características principales:
+ * - Detección automática de versión Odoo (16+ vs 15-)
+ * - Validación de productos alquilables (rent_ok = true)
+ * - Cálculo automático de precios por Odoo
+ * - Soporte para fechas de alquiler
+ * - No requiere creación automática de productos
+ * 
+ * @version 2.0.0
+ * @author Tu Nombre
+ * @link https://docs.odoo.com/
  */
 class OdooClient
 {
     /**
      * Odoo base URL
      */
-    protected string $url;
+    protected ?string $url;
 
     /**
      * Odoo database name
      */
-    protected string $database;
+    protected ?string $database;
 
     /**
      * Odoo username
      */
-    protected string $username;
+    protected ?string $username;
 
     /**
      * Odoo API key (password)
      */
-    protected string $apiKey;
+    protected ?string $apiKey;
 
     /**
      * Authenticated user ID (uid)
@@ -56,6 +69,11 @@ class OdooClient
     protected int $authCacheTtl = 3600;
 
     /**
+     * Odoo version (detected automatically)
+     */
+    protected ?string $odooVersion = null;
+
+    /**
      * Get HTTP client with proper SSL configuration
      * 
      * @param int $timeout Request timeout in seconds
@@ -72,7 +90,7 @@ class OdooClient
         // WARNING: Only use this in development, never in production
         if (config('app.env') === 'local' || config('app.debug')) {
             $client = $client->withOptions([
-                'verify' => false, // Disable SSL certificate verification
+                'verify' => false,
             ]);
         }
         
@@ -84,10 +102,10 @@ class OdooClient
      */
     public function __construct()
     {
-        $this->url = rtrim(config('services.odoo.url', ''), '/');
-        $this->database = config('services.odoo.database', '');
-        $this->username = config('services.odoo.username', '');
-        $this->apiKey = config('services.odoo.api_key', '');
+        $this->url = config('services.odoo.url') ? rtrim(config('services.odoo.url'), '/') : null;
+        $this->database = config('services.odoo.database');
+        $this->username = config('services.odoo.username');
+        $this->apiKey = config('services.odoo.api_key');
 
         // Validate configuration
         if (empty($this->url) || empty($this->database) || empty($this->username) || empty($this->apiKey)) {
@@ -114,9 +132,11 @@ class OdooClient
         if ($cachedAuth && isset($cachedAuth['uid']) && isset($cachedAuth['session_id'])) {
             $this->uid = $cachedAuth['uid'];
             $this->sessionId = $cachedAuth['session_id'];
+            $this->odooVersion = $cachedAuth['version'] ?? null;
             Log::info('🔐 [ODOO] Using cached authentication', [
                 'uid' => $this->uid,
                 'database' => $this->database,
+                'version' => $this->odooVersion,
             ]);
             return true;
         }
@@ -128,8 +148,6 @@ class OdooClient
                 'username' => $this->username,
             ]);
 
-            // Authenticate using JSON-RPC common endpoint
-            // Odoo uses /jsonrpc endpoint with authenticate method
             $requestId = rand(1000, 9999);
             $payload = [
                 'jsonrpc' => '2.0',
@@ -147,8 +165,7 @@ class OdooClient
                 'id' => $requestId,
             ];
 
-            $response = $this->getHttpClient(30)
-                ->post($this->url . '/jsonrpc', $payload);
+            $response = $this->getHttpClient(30)->post($this->url . '/jsonrpc', $payload);
 
             if (!$response->successful()) {
                 throw new \Exception('Odoo authentication failed: HTTP ' . $response->status());
@@ -156,28 +173,29 @@ class OdooClient
 
             $data = $response->json();
 
-            // Check for JSON-RPC error
             if (isset($data['error'])) {
-                Log::error('OdooClient: Authentication error', [
-                    'error' => $data['error'],
-                ]);
+                Log::error('OdooClient: Authentication error', ['error' => $data['error']]);
                 throw new \Exception('Odoo authentication failed: ' . ($data['error']['message'] ?? 'Unknown error'));
             }
 
-            // Extract uid from result
             if (isset($data['result']) && $data['result'] !== false) {
                 $this->uid = (int) $data['result'];
+
+                // Detect Odoo version
+                $this->detectOdooVersion();
 
                 // Cache authentication data
                 Cache::put($this->cacheKey, [
                     'uid' => $this->uid,
-                    'session_id' => null, // Not used in JSON-RPC
+                    'session_id' => null,
+                    'version' => $this->odooVersion,
                 ], $this->authCacheTtl);
 
                 Log::info('✅ [ODOO] Authentication successful', [
                     'uid' => $this->uid,
                     'database' => $this->database,
                     'username' => $this->username,
+                    'version' => $this->odooVersion,
                     'cache_ttl' => $this->authCacheTtl . ' seconds',
                 ]);
 
@@ -198,10 +216,28 @@ class OdooClient
     }
 
     /**
+     * Detect Odoo version for compatibility
+     * 
+     * @return void
+     */
+    protected function detectOdooVersion(): void
+    {
+        try {
+            $version = $this->call('ir.config_parameter', 'get_param', ['base.version_info']);
+            if ($version) {
+                $this->odooVersion = is_array($version) ? implode('.', array_slice($version, 0, 2)) : $version;
+            }
+        } catch (\Exception $e) {
+            Log::warning('OdooClient: Could not detect Odoo version', ['error' => $e->getMessage()]);
+            $this->odooVersion = 'unknown';
+        }
+    }
+
+    /**
      * Call an Odoo model method
      * 
-     * @param string $model Odoo model name (e.g., 'sale.order', 'res.partner')
-     * @param string $method Method to call (e.g., 'create', 'write', 'search_read')
+     * @param string $model Odoo model name
+     * @param string $method Method to call
      * @param array $args Arguments for the method
      * @param array $kwargs Optional keyword arguments
      * @return mixed Response from Odoo
@@ -209,13 +245,11 @@ class OdooClient
      */
     public function call(string $model, string $method, array $args = [], array $kwargs = [])
     {
-        // Ensure we're authenticated
         if ($this->uid === null) {
             $this->authenticate();
         }
 
         try {
-            // Build JSON-RPC request
             $requestId = rand(1000, 9999);
             $params = [
                 $this->database,
@@ -242,12 +276,9 @@ class OdooClient
                 'model' => $model,
                 'method' => $method,
                 'request_id' => $requestId,
-                'uid' => $this->uid,
             ]);
 
-            // Make the request
-            $response = $this->getHttpClient(60)
-                ->post($this->url . '/jsonrpc', $payload);
+            $response = $this->getHttpClient(60)->post($this->url . '/jsonrpc', $payload);
 
             if (!$response->successful()) {
                 throw new \Exception('Odoo RPC call failed: HTTP ' . $response->status());
@@ -255,32 +286,24 @@ class OdooClient
 
             $data = $response->json();
 
-            // Check for JSON-RPC error
             if (isset($data['error'])) {
                 $errorMessage = $data['error']['message'] ?? 'Unknown error';
                 $errorCode = $data['error']['code'] ?? null;
-                $errorData = $data['error']['data'] ?? null;
 
                 Log::error('OdooClient: RPC call error', [
                     'model' => $model,
                     'method' => $method,
                     'error_code' => $errorCode,
                     'error_message' => $errorMessage,
-                    'error_data' => $errorData,
                 ]);
 
                 throw new \Exception("Odoo error ({$errorCode}): {$errorMessage}", $errorCode ?? 0);
             }
 
-            // Return result
             if (isset($data['result'])) {
                 Log::debug('✅ [ODOO] RPC call successful', [
                     'model' => $model,
                     'method' => $method,
-                    'request_id' => $requestId,
-                    'result_type' => gettype($data['result']),
-                    'result_is_array' => is_array($data['result']),
-                    'result_count' => is_array($data['result']) ? count($data['result']) : null,
                 ]);
                 return $data['result'];
             }
@@ -294,13 +317,11 @@ class OdooClient
                 'message' => $e->getMessage(),
             ]);
 
-            // If authentication error, clear cache and retry once
             if (str_contains($e->getMessage(), 'authentication') || str_contains($e->getMessage(), 'session')) {
                 Cache::forget($this->cacheKey);
                 $this->uid = null;
                 $this->sessionId = null;
                 
-                // Retry authentication and call
                 $this->authenticate();
                 return $this->call($model, $method, $args, $kwargs);
             }
@@ -319,6 +340,7 @@ class OdooClient
         Cache::forget($this->cacheKey);
         $this->uid = null;
         $this->sessionId = null;
+        $this->odooVersion = null;
         Log::info('OdooClient: Authentication cache cleared');
     }
 
@@ -343,6 +365,16 @@ class OdooClient
     }
 
     /**
+     * Get Odoo version
+     * 
+     * @return string|null
+     */
+    public function getOdooVersion(): ?string
+    {
+        return $this->odooVersion;
+    }
+
+    /**
      * Set authentication cache TTL
      * 
      * @param int $seconds
@@ -357,31 +389,12 @@ class OdooClient
     /**
      * Find or create a customer (res.partner) in Odoo
      * 
-     * Searches for a partner by email. If found, returns the existing partner ID.
-     * If not found, creates a new partner with the provided billing details.
-     * 
      * @param array $billingDetails Billing details from Laravel checkout form
-     *   Expected keys:
-     *   - email (required): Email address to search/create
-     *   - firstName: First name
-     *   - lastName: Last name
-     *   - phone: Phone number
-     *   - addressLine1: Street address line 1
-     *   - addressLine2: Street address line 2 (optional)
-     *   - city: City name
-     *   - state: State/Province name
-     *   - zip: ZIP/Postal code
-     *   - country: Country name
-     *   - isCompany: Boolean indicating if this is a company
-     *   - companyName: Company name (if isCompany is true)
-     *   - jobTitle: Job title (optional)
-     * 
      * @return int Partner ID in Odoo
      * @throws \Exception If email is missing or creation fails
      */
     public function findOrCreatePartner(array $billingDetails): int
     {
-        // Validate required email
         if (empty($billingDetails['email'])) {
             throw new \InvalidArgumentException('Email is required to find or create a partner');
         }
@@ -389,10 +402,7 @@ class OdooClient
         $email = trim($billingDetails['email']);
 
         try {
-            // Search for existing partner by email
-            Log::info('👤 [ODOO] Searching for partner by email', [
-                'email' => $email,
-            ]);
+            Log::info('👤 [ODOO] Searching for partner by email', ['email' => $email]);
             
             $existingPartners = $this->call('res.partner', 'search_read', [
                 [['email', '=', $email]],
@@ -401,26 +411,18 @@ class OdooClient
                 'limit' => 1,
             ]);
 
-            // If partner found, return the ID
             if (!empty($existingPartners) && isset($existingPartners[0]['id'])) {
                 $partnerId = (int) $existingPartners[0]['id'];
                 Log::info('✅ [ODOO] Found existing partner', [
                     'partner_id' => $partnerId,
                     'email' => $email,
-                    'note' => 'Reusing existing partner in Odoo',
                 ]);
                 return $partnerId;
             }
 
-            // Partner not found, create a new one
-            Log::info('➕ [ODOO] Partner not found, creating new partner', [
-                'email' => $email,
-            ]);
+            Log::info('➕ [ODOO] Partner not found, creating new partner', ['email' => $email]);
 
-            // Map Laravel billing fields to Odoo partner fields
             $partnerData = $this->mapBillingToPartner($billingDetails);
-
-            // Create the partner
             $partnerId = $this->call('res.partner', 'create', [$partnerData]);
 
             if (empty($partnerId)) {
@@ -430,8 +432,6 @@ class OdooClient
             Log::info('✅ [ODOO] Partner created successfully', [
                 'partner_id' => $partnerId,
                 'email' => $email,
-                'is_company' => $partnerData['is_company'] ?? false,
-                'note' => 'New partner created in Odoo',
             ]);
 
             return (int) $partnerId;
@@ -448,14 +448,13 @@ class OdooClient
     /**
      * Map Laravel billing details to Odoo partner fields
      * 
-     * @param array $billingDetails Billing details from Laravel
+     * @param array $billingDetails
      * @return array Partner data formatted for Odoo
      */
     protected function mapBillingToPartner(array $billingDetails): array
     {
         $partnerData = [];
 
-        // Name: Use company name if company, otherwise first + last name
         if (!empty($billingDetails['isCompany']) && !empty($billingDetails['companyName'])) {
             $partnerData['name'] = trim($billingDetails['companyName']);
             $partnerData['is_company'] = true;
@@ -466,17 +465,14 @@ class OdooClient
             $partnerData['is_company'] = false;
         }
 
-        // Email (required)
         if (!empty($billingDetails['email'])) {
             $partnerData['email'] = trim($billingDetails['email']);
         }
 
-        // Phone
         if (!empty($billingDetails['phone'])) {
             $partnerData['phone'] = trim($billingDetails['phone']);
         }
 
-        // Address fields
         if (!empty($billingDetails['addressLine1'])) {
             $partnerData['street'] = trim($billingDetails['addressLine1']);
         }
@@ -493,43 +489,25 @@ class OdooClient
             $partnerData['zip'] = trim($billingDetails['zip']);
         }
 
-        // State: Try to find state by name and set state_id
         if (!empty($billingDetails['state'])) {
             $stateId = $this->findStateId($billingDetails['state']);
             if ($stateId) {
                 $partnerData['state_id'] = $stateId;
-            } else {
-                // If state not found, store as string in comment or custom field
-                // Odoo may have a 'comment' field for notes
-                Log::warning('OdooClient: State not found in Odoo', [
-                    'state' => $billingDetails['state'],
-                ]);
             }
         }
 
-        // Country: Try to find country by name and set country_id
         if (!empty($billingDetails['country'])) {
             $countryId = $this->findCountryId($billingDetails['country']);
             if ($countryId) {
                 $partnerData['country_id'] = $countryId;
-            } else {
-                Log::warning('OdooClient: Country not found in Odoo', [
-                    'country' => $billingDetails['country'],
-                ]);
             }
         }
 
-        // Job title (function field in Odoo)
         if (!empty($billingDetails['jobTitle'])) {
             $partnerData['function'] = trim($billingDetails['jobTitle']);
         }
 
-        // Customer type: Set as customer by default
         $partnerData['customer_rank'] = 1;
-
-        Log::debug('OdooClient: Mapped billing details to partner data', [
-            'partner_data' => $partnerData,
-        ]);
 
         return $partnerData;
     }
@@ -537,8 +515,8 @@ class OdooClient
     /**
      * Find Odoo state ID by name
      * 
-     * @param string $stateName State name
-     * @return int|null State ID or null if not found
+     * @param string $stateName
+     * @return int|null
      */
     protected function findStateId(string $stateName): ?int
     {
@@ -550,11 +528,7 @@ class OdooClient
                 'limit' => 1,
             ]);
 
-            if (!empty($states) && isset($states[0]['id'])) {
-                return (int) $states[0]['id'];
-            }
-
-            return null;
+            return !empty($states) && isset($states[0]['id']) ? (int) $states[0]['id'] : null;
         } catch (\Exception $e) {
             Log::warning('OdooClient: Error finding state', [
                 'state' => $stateName,
@@ -567,13 +541,12 @@ class OdooClient
     /**
      * Find Odoo country ID by name
      * 
-     * @param string $countryName Country name
-     * @return int|null Country ID or null if not found
+     * @param string $countryName
+     * @return int|null
      */
     protected function findCountryId(string $countryName): ?int
     {
         try {
-            // Try exact match first
             $countries = $this->call('res.country', 'search_read', [
                 [['name', '=', trim($countryName)]],
             ], [
@@ -585,7 +558,6 @@ class OdooClient
                 return (int) $countries[0]['id'];
             }
 
-            // Try case-insensitive match
             $countries = $this->call('res.country', 'search_read', [
                 [['name', 'ilike', trim($countryName)]],
             ], [
@@ -593,11 +565,7 @@ class OdooClient
                 'limit' => 1,
             ]);
 
-            if (!empty($countries) && isset($countries[0]['id'])) {
-                return (int) $countries[0]['id'];
-            }
-
-            return null;
+            return !empty($countries) && isset($countries[0]['id']) ? (int) $countries[0]['id'] : null;
         } catch (\Exception $e) {
             Log::warning('OdooClient: Error finding country', [
                 'country' => $countryName,
@@ -608,87 +576,85 @@ class OdooClient
     }
 
     /**
-     * Create a draft Sale Order in Odoo from a Laravel Order
+     * Create a draft RENTAL Order in Odoo from a Laravel Order
      * 
-     * Creates a sale.order in Odoo in draft state with:
-     * - Partner (customer) from billing details
-     * - Laravel order ID in origin field
-     * - Jobsite address and notes
-     * - Order lines from Laravel order items
+     * ⚠️ IMPORTANTE: Este método crea órdenes de ALQUILER (Rental), no ventas normales.
      * 
-     * The order is NOT confirmed - it remains in draft state for manual review.
+     * Características:
+     * - Crea sale.order marcada como is_rental_order = true
+     * - Usa fechas de inicio/fin del JobLocation
+     * - NO incluye precios manualmente (Odoo los calcula)
+     * - Valida que productos sean alquilables (rent_ok = true)
+     * - Queda en estado DRAFT para revisión manual
      * 
      * @param \App\Models\Order $order Laravel Order model
      * @return int Sale Order ID in Odoo
      * @throws \Exception If order data is invalid or creation fails
      */
-    public function createDraftSaleOrder(\App\Models\Order $order): int
+    public function createDraftRentalOrder(\App\Models\Order $order): int
     {
         try {
-            Log::info('📦 [ODOO] Creating draft sale order', [
+            Log::info('🏗️ [ODOO] Creating draft RENTAL order', [
                 'laravel_order_id' => $order->id,
                 'order_status' => $order->status,
-                'order_subtotal' => $order->subtotal,
                 'items_count' => $order->items->count(),
+                'odoo_version' => $this->odooVersion,
             ]);
 
-            // Load relationships
             $order->load(['items.product', 'job', 'user']);
 
-            // Get or create partner from billing details
             $billingDetails = $order->billing_details_json 
                 ? json_decode($order->billing_details_json, true) 
                 : null;
 
             if (empty($billingDetails) || empty($billingDetails['email'])) {
                 throw new \InvalidArgumentException(
-                    'Billing details with email are required to create a sale order'
+                    'Billing details with email are required to create a rental order'
                 );
             }
 
             $partnerId = $this->findOrCreatePartner($billingDetails);
-
-            // Build jobsite address and notes
             $jobsiteInfo = $this->buildJobsiteInfo($order);
+            $orderLines = $this->buildRentalOrderLines($order);
 
-            // Build order lines
-            $orderLines = $this->buildOrderLines($order);
-
-            // Create sale order data
             $saleOrderData = [
                 'partner_id' => $partnerId,
                 'origin' => "Laravel Order #{$order->id}",
-                'date_order' => $order->ordered_at ? $order->ordered_at->format('Y-m-d H:i:s') : now()->format('Y-m-d H:i:s'),
+                'date_order' => $order->ordered_at 
+                    ? $order->ordered_at->format('Y-m-d H:i:s') 
+                    : now()->format('Y-m-d H:i:s'),
                 'note' => $jobsiteInfo,
                 'order_line' => $orderLines,
-                // State is 'draft' by default in Odoo, but we can explicitly set it
-                // Note: We do NOT confirm the order - it remains in draft
+                'is_rental_order' => true,
             ];
 
-            Log::debug('OdooClient: Sale order data prepared', [
+            $rentalOrderTypeId = $this->findRentalOrderType();
+            if ($rentalOrderTypeId) {
+                $saleOrderData['type_id'] = $rentalOrderTypeId;
+            }
+
+            Log::debug('OdooClient: Rental order data prepared', [
                 'partner_id' => $partnerId,
-                'origin' => $saleOrderData['origin'],
+                'is_rental_order' => true,
                 'lines_count' => count($orderLines),
             ]);
 
-            // Create the sale order in Odoo
             $saleOrderId = $this->call('sale.order', 'create', [$saleOrderData]);
 
             if (empty($saleOrderId)) {
-                throw new \Exception('Failed to create sale order in Odoo: No ID returned');
+                throw new \Exception('Failed to create rental order in Odoo: No ID returned');
             }
 
-            Log::info('✅ [ODOO] Draft sale order created successfully', [
+            Log::info('✅ [ODOO] Draft RENTAL order created successfully', [
                 'odoo_sale_order_id' => $saleOrderId,
                 'laravel_order_id' => $order->id,
                 'partner_id' => $partnerId,
-                'order_lines_count' => count($orderLines),
             ]);
 
             return (int) $saleOrderId;
 
         } catch (\Exception $e) {
-            Log::error('OdooClient: Error creating draft sale order', [
+            Log::error('OdooClient: Error creating draft rental order', [
                 'laravel_order_id' => $order->id ?? null,
                 'error' => $e->getMessage(),
             ]);
@@ -697,68 +663,245 @@ class OdooClient
     }
 
     /**
-     * Confirm a Sale Order in Odoo
+     * Build RENTAL order lines for Odoo
      * 
-     * Confirms a sale.order in Odoo, which:
-     * - Triggers tax calculation
-     * - Prepares the order for invoicing
-     * - Changes state from 'draft' to 'sale'
+     * ⚠️ REGLAS CRÍTICAS PARA RENTALS:
      * 
-     * Note: This does NOT collect payment in Laravel.
-     * All payment processing is handled in Odoo.
+     * 1. NO incluir price_unit - Odoo lo calcula automáticamente
+     * 2. Usar start_date y return_date (Odoo 16+) o reservation_begin/end (Odoo 15-)
+     * 3. Validar que producto tenga rent_ok = true
+     * 4. product_uom_qty = cantidad de equipos
+     * 5. Odoo calcula precio basado en: días × tarifa diaria × cantidad
+     * 
+     * @param \App\Models\Order $order
+     * @return array Order lines formatted for Odoo rental
+     * @throws \Exception If product mapping or validation fails
+     */
+    protected function buildRentalOrderLines(\App\Models\Order $order): array
+    {
+        $productGroups = [];
+        
+        foreach ($order->items as $item) {
+            $productId = $item->product_id;
+            
+            if (!isset($productGroups[$productId])) {
+                $productGroups[$productId] = [
+                    'product' => $item->product,
+                    'items' => [],
+                    'total_quantity' => 0,
+                ];
+            }
+            
+            $productGroups[$productId]['items'][] = $item;
+            $productGroups[$productId]['total_quantity'] += $item->quantity;
+        }
+
+        $orderLines = [];
+
+        if (!$order->job || !$order->job->date || !$order->job->end_date) {
+            throw new \Exception(
+                'Rental dates are required. Job must have both start date and end date.'
+            );
+        }
+
+        $rentalStartDate = $order->job->date->format('Y-m-d H:i:s');
+        $rentalEndDate = $order->job->end_date->format('Y-m-d H:i:s');
+        $rentalDays = $order->job->date->diffInDays($order->job->end_date);
+
+        Log::info('📅 [ODOO] Rental period', [
+            'start_date' => $rentalStartDate,
+            'end_date' => $rentalEndDate,
+            'total_days' => $rentalDays,
+        ]);
+
+        foreach ($productGroups as $productId => $group) {
+            $product = $group['product'];
+            $totalQuantity = $group['total_quantity'];
+
+            $odooProductId = $product->odoo_product_id;
+
+            if (empty($odooProductId)) {
+                throw new \Exception(
+                    "Product '{$product->name}' (ID: {$product->id}) does not have an odoo_product_id mapped. " .
+                    "Please map the product to Odoo before creating rental orders."
+                );
+            }
+
+            // 🔥 VALIDACIÓN CRÍTICA: Verificar que el producto es alquilable
+            try {
+                $odooProduct = $this->call('product.product', 'read', [[(int) $odooProductId]], [
+                    'fields' => ['id', 'name', 'rent_ok', 'active', 'list_price'],
+                ]);
+
+                if (empty($odooProduct)) {
+                    throw new \Exception("Odoo product ID {$odooProductId} not found");
+                }
+
+                $odooProductData = $odooProduct[0];
+
+                if (!$odooProductData['active']) {
+                    throw new \Exception(
+                        "Odoo product '{$odooProductData['name']}' (ID: {$odooProductId}) is archived"
+                    );
+                }
+
+                if (!$odooProductData['rent_ok']) {
+                    throw new \Exception(
+                        "Odoo product '{$odooProductData['name']}' (ID: {$odooProductId}) is NOT configured for rental. " .
+                        "Please enable 'Can be Rented' in Odoo product settings."
+                    );
+                }
+
+                Log::debug('✅ [ODOO] Product validated for rental', [
+                    'laravel_product_id' => $product->id,
+                    'odoo_product_id' => $odooProductId,
+                    'product_name' => $odooProductData['name'],
+                    'rent_ok' => $odooProductData['rent_ok'],
+                ]);
+
+            } catch (\Exception $e) {
+                Log::error('OdooClient: Product validation failed', [
+                    'laravel_product_id' => $product->id,
+                    'odoo_product_id' => $odooProductId,
+                    'error' => $e->getMessage(),
+                ]);
+                throw $e;
+            }
+
+            $description = $product->name;
+            if ($product->description) {
+                $description .= "\n" . $product->description;
+            }
+            $description .= "\n📦 Equipment Quantity: {$totalQuantity} unit(s)";
+            $description .= "\n📅 Rental Period: {$rentalDays} day(s)";
+
+            $isOdoo16Plus = version_compare($this->odooVersion ?? '16.0', '16.0', '>=');
+
+            $orderLine = [
+                'product_id' => (int) $odooProductId,
+                'product_uom_qty' => $totalQuantity,
+                'name' => $description,
+            ];
+
+            if ($isOdoo16Plus || $this->odooVersion === 'unknown') {
+                $orderLine['start_date'] = $rentalStartDate;
+                $orderLine['return_date'] = $rentalEndDate;
+            } else {
+                $orderLine['reservation_begin'] = $rentalStartDate;
+                $orderLine['reservation_end'] = $rentalEndDate;
+            }
+
+            Log::debug('📝 [ODOO] Building rental order line', [
+                'product_name' => $product->name,
+                'odoo_product_id' => $odooProductId,
+                'equipment_quantity' => $totalQuantity,
+                'rental_days' => $rentalDays,
+            ]);
+
+            $orderLines[] = [0, 0, $orderLine];
+        }
+
+        if (empty($orderLines)) {
+            throw new \Exception('No rental order lines could be created.');
+        }
+
+        Log::info('✅ [ODOO] Rental order lines prepared', [
+            'total_lines' => count($orderLines),
+            'total_products' => count($productGroups),
+            'rental_days' => $rentalDays,
+        ]);
+
+        return $orderLines;
+    }
+
+    /**
+     * Find Rental order type ID (for Odoo 15 and earlier)
+     * 
+     * @return int|null
+     */
+    protected function findRentalOrderType(): ?int
+    {
+        try {
+            $orderTypes = $this->call('sale.order.type', 'search_read', [
+                ['|', ['name', '=', 'Rental'], ['name', '=', 'Alquiler']],
+            ], [
+                'fields' => ['id', 'name'],
+                'limit' => 1,
+            ]);
+            
+            if (!empty($orderTypes) && isset($orderTypes[0]['id'])) {
+                Log::debug('OdooClient: Found rental order type', [
+                    'type_id' => $orderTypes[0]['id'],
+                    'type_name' => $orderTypes[0]['name'],
+                ]);
+                return (int) $orderTypes[0]['id'];
+            }
+            
+            return null;
+            
+        } catch (\Exception $e) {
+            Log::debug('OdooClient: sale.order.type model not available');
+            return null;
+        }
+    }
+
+    /**
+     * Confirm a RENTAL Order in Odoo
      * 
      * @param int $saleOrderId Odoo Sale Order ID
      * @return bool True if confirmation successful
      * @throws \Exception If confirmation fails
      */
-    public function confirmSaleOrder(int $saleOrderId): bool
+    public function confirmRentalOrder(int $saleOrderId): bool
     {
         try {
-            Log::info('✅ [ODOO] Confirming sale order', [
+            Log::info('✅ [ODOO] Confirming RENTAL order', [
                 'odoo_sale_order_id' => $saleOrderId,
             ]);
 
-            // Call action_confirm on the sale order
-            // This triggers tax calculation and prepares the order for invoicing
-            $result = $this->call('sale.order', 'action_confirm', [[$saleOrderId]]);
+            $confirmed = false;
+            
+            try {
+                $result = $this->call('sale.order', 'action_confirm_rental', [[$saleOrderId]]);
+                $confirmed = true;
+                Log::debug('OdooClient: Used action_confirm_rental method');
+            } catch (\Exception $e) {
+                Log::debug('OdooClient: action_confirm_rental not available, using standard confirmation');
+            }
 
-            // Verify the order was confirmed by checking its state
+            if (!$confirmed) {
+                $result = $this->call('sale.order', 'action_confirm', [[$saleOrderId]]);
+            }
+
             $orderData = $this->call('sale.order', 'read', [[$saleOrderId]], [
-                'fields' => ['id', 'name', 'state'],
+                'fields' => ['id', 'name', 'state', 'is_rental_order', 'rental_status', 'amount_total'],
             ]);
 
             if (empty($orderData) || !isset($orderData[0])) {
-                throw new \Exception('Failed to verify sale order confirmation: Order not found');
+                throw new \Exception('Failed to verify rental order confirmation');
             }
 
-            $orderState = $orderData[0]['state'] ?? null;
+            $order = $orderData[0];
+            $orderState = $order['state'] ?? null;
 
-            // Check if order is confirmed (state should be 'sale')
-            if ($orderState !== 'sale') {
-                Log::warning('OdooClient: Sale order confirmation may have failed', [
-                    'odoo_sale_order_id' => $saleOrderId,
-                    'current_state' => $orderState,
-                    'expected_state' => 'sale',
-                ]);
-                // Still return true if state is 'sent' (some Odoo versions use this)
-                if ($orderState !== 'sent') {
-                    throw new \Exception(
-                        "Sale order confirmation failed. Current state: {$orderState}, expected: 'sale'"
-                    );
-                }
+            if ($orderState !== 'sale' && $orderState !== 'sent') {
+                throw new \Exception(
+                    "Rental order confirmation failed. Current state: {$orderState}"
+                );
             }
 
-            Log::info('✅ [ODOO] Sale order confirmed successfully', [
+            Log::info('✅ [ODOO] RENTAL order confirmed successfully', [
                 'odoo_sale_order_id' => $saleOrderId,
-                'order_name' => $orderData[0]['name'] ?? null,
+                'order_name' => $order['name'] ?? null,
                 'state' => $orderState,
-                'note' => 'Tax calculation triggered, order ready for invoicing',
+                'rental_status' => $order['rental_status'] ?? null,
+                'amount_total' => $order['amount_total'] ?? 0,
             ]);
 
             return true;
 
         } catch (\Exception $e) {
-            Log::error('OdooClient: Error confirming sale order', [
+            Log::error('OdooClient: Error confirming rental order', [
                 'odoo_sale_order_id' => $saleOrderId,
                 'error' => $e->getMessage(),
             ]);
@@ -767,30 +910,19 @@ class OdooClient
     }
 
     /**
-     * Create and confirm a Sale Order in Odoo from a Laravel Order
-     * 
-     * Creates a sale.order in Odoo and immediately confirms it.
-     * This is a convenience method that combines createDraftSaleOrder() and confirmSaleOrder().
-     * 
-     * After confirmation:
-     * - Tax calculation is triggered
-     * - Order is prepared for invoicing
-     * - Payment is NOT collected in Laravel (handled in Odoo)
+     * Create and confirm a RENTAL Order in Odoo
      * 
      * @param \App\Models\Order $order Laravel Order model
      * @return int Sale Order ID in Odoo
      * @throws \Exception If creation or confirmation fails
      */
-    public function createAndConfirmSaleOrder(\App\Models\Order $order): int
+    public function createAndConfirmRentalOrder(\App\Models\Order $order): int
     {
         try {
-            // Create draft sale order
-            $saleOrderId = $this->createDraftSaleOrder($order);
+            $saleOrderId = $this->createDraftRentalOrder($order);
+            $this->confirmRentalOrder($saleOrderId);
 
-            // Confirm the sale order
-            $this->confirmSaleOrder($saleOrderId);
-
-            Log::info('OdooClient: Sale order created and confirmed successfully', [
+            Log::info('✅ [ODOO] Rental order created and confirmed successfully', [
                 'odoo_sale_order_id' => $saleOrderId,
                 'laravel_order_id' => $order->id,
             ]);
@@ -798,7 +930,7 @@ class OdooClient
             return $saleOrderId;
 
         } catch (\Exception $e) {
-            Log::error('OdooClient: Error creating and confirming sale order', [
+            Log::error('OdooClient: Error creating and confirming rental order', [
                 'laravel_order_id' => $order->id ?? null,
                 'error' => $e->getMessage(),
             ]);
@@ -807,131 +939,69 @@ class OdooClient
     }
 
     /**
-     * Generate an invoice from a confirmed Sale Order in Odoo
-     * 
-     * Creates an invoice (account.move) from a confirmed sale.order.
-     * The invoice:
-     * - Includes all taxes calculated from the sale order
-     * - Is linked to the sale order
-     * - Is left unpaid (draft or posted state, not paid)
-     * 
-     * Note: The sale order must be confirmed before creating an invoice.
+     * Generate an invoice from a confirmed RENTAL Order
      * 
      * @param int $saleOrderId Odoo Sale Order ID (must be confirmed)
      * @return int Invoice ID (account.move ID) in Odoo
-     * @throws \Exception If invoice creation fails or sale order is not confirmed
+     * @throws \Exception If invoice creation fails
      */
-    public function createInvoiceFromSaleOrder(int $saleOrderId): int
+    public function createInvoiceFromRentalOrder(int $saleOrderId): int
     {
         try {
-            Log::info('📄 [ODOO] Creating invoice from sale order', [
+            Log::info('📄 [ODOO] Creating invoice from RENTAL order', [
                 'odoo_sale_order_id' => $saleOrderId,
             ]);
 
-            // Verify the sale order exists and is confirmed
             $orderData = $this->call('sale.order', 'read', [[$saleOrderId]], [
-                'fields' => ['id', 'name', 'state', 'invoice_ids', 'invoice_count'],
+                'fields' => ['id', 'name', 'state', 'is_rental_order', 'invoice_ids'],
             ]);
 
             if (empty($orderData) || !isset($orderData[0])) {
                 throw new \Exception("Sale order {$saleOrderId} not found in Odoo");
             }
 
-            $orderState = $orderData[0]['state'] ?? null;
+            $order = $orderData[0];
+            $orderState = $order['state'] ?? null;
+
             if ($orderState !== 'sale' && $orderState !== 'sent') {
                 throw new \Exception(
                     "Sale order {$saleOrderId} must be confirmed before creating invoice. Current state: {$orderState}"
                 );
             }
 
-            // Check if invoice already exists
-            $existingInvoices = $orderData[0]['invoice_ids'] ?? [];
+            $existingInvoices = $order['invoice_ids'] ?? [];
             if (!empty($existingInvoices)) {
-                Log::warning('OdooClient: Invoice already exists for sale order', [
+                Log::warning('OdooClient: Invoice already exists for rental order', [
                     'odoo_sale_order_id' => $saleOrderId,
                     'existing_invoice_ids' => $existingInvoices,
                 ]);
-                // Return the first existing invoice ID
                 return (int) $existingInvoices[0];
             }
 
-            // Create invoice from sale order
-            // Use action_invoice_create (public method) instead of _create_invoices (private)
-            // This method may return a wizard ID or directly create invoices depending on Odoo version
-            $result = $this->call('sale.order', 'action_invoice_create', [[$saleOrderId]]);
-            
-            // action_invoice_create may return:
-            // - A dictionary with 'res_id' (invoice ID) and 'res_model' (account.move)
-            // - A list of invoice IDs
-            // - A wizard ID (in older versions)
-            // - True/False (in some versions)
+            $result = $this->call('sale.order', '_create_invoices', [[$saleOrderId]]);
             
             $invoiceId = null;
             
-            if (is_array($result)) {
-                // If it's an array, it might be a list of invoice IDs or a dictionary
-                if (isset($result['res_id']) && isset($result['res_model']) && $result['res_model'] === 'account.move') {
-                    // Dictionary format: {'res_id': invoice_id, 'res_model': 'account.move'}
-                    $invoiceId = (int) $result['res_id'];
-                } elseif (isset($result[0]) && is_numeric($result[0])) {
-                    // List of invoice IDs
-                    $invoiceId = (int) $result[0];
-                } elseif (count($result) > 0 && is_numeric($result[0])) {
-                    // Array of invoice IDs
-                    $invoiceId = (int) $result[0];
-                }
+            if (is_array($result) && !empty($result)) {
+                $invoiceId = (int) $result[0];
             } elseif (is_numeric($result) && $result > 0) {
-                // Might be a wizard ID - try to read the invoice from the sale order
-                // First, check if invoice was created by reading the sale order again
                 $orderDataAfter = $this->call('sale.order', 'read', [[$saleOrderId]], [
                     'fields' => ['invoice_ids'],
                 ]);
                 
-                if (!empty($orderDataAfter) && isset($orderDataAfter[0]['invoice_ids']) && !empty($orderDataAfter[0]['invoice_ids'])) {
+                if (!empty($orderDataAfter[0]['invoice_ids'])) {
                     $invoiceId = (int) $orderDataAfter[0]['invoice_ids'][0];
-                } else {
-                    // If no invoice found, the result might be a wizard ID
-                    // In this case, we need to confirm the wizard (if applicable)
-                    // For now, throw an error asking to check Odoo manually
-                    throw new \Exception(
-                        "action_invoice_create returned a wizard ID ({$result}). " .
-                        "Invoice creation may require manual confirmation in Odoo. " .
-                        "Please check the sale order in Odoo and create invoice manually if needed."
-                    );
-                }
-            } elseif ($result === true) {
-                // If it returns true, read the invoice from the sale order
-                $orderDataAfter = $this->call('sale.order', 'read', [[$saleOrderId]], [
-                    'fields' => ['invoice_ids'],
-                ]);
-                
-                if (!empty($orderDataAfter) && isset($orderDataAfter[0]['invoice_ids']) && !empty($orderDataAfter[0]['invoice_ids'])) {
-                    $invoiceId = (int) $orderDataAfter[0]['invoice_ids'][0];
-                } else {
-                    throw new \Exception('action_invoice_create returned true but no invoice was found');
                 }
             }
             
             if (empty($invoiceId)) {
-                // Last attempt: read the sale order to check if invoice was created
-                $orderDataAfter = $this->call('sale.order', 'read', [[$saleOrderId]], [
-                    'fields' => ['invoice_ids'],
-                ]);
-                
-                if (!empty($orderDataAfter) && isset($orderDataAfter[0]['invoice_ids']) && !empty($orderDataAfter[0]['invoice_ids'])) {
-                    $invoiceId = (int) $orderDataAfter[0]['invoice_ids'][0];
-                } else {
-                    throw new \Exception(
-                        'Failed to create invoice: action_invoice_create did not return a valid invoice ID. ' .
-                        "Result: " . json_encode($result) . ". " .
-                        "Please check the sale order in Odoo and create invoice manually if needed."
-                    );
-                }
+                throw new \Exception('Failed to create invoice from rental order');
             }
 
-            // Verify the invoice was created and get its details
+            $this->call('account.move', 'action_post', [[$invoiceId]]);
+
             $invoiceData = $this->call('account.move', 'read', [[$invoiceId]], [
-                'fields' => ['id', 'name', 'state', 'amount_total', 'invoice_line_ids', 'invoice_origin'],
+                'fields' => ['id', 'name', 'state', 'amount_total', 'invoice_origin'],
             ]);
 
             if (empty($invoiceData) || !isset($invoiceData[0])) {
@@ -940,76 +1010,18 @@ class OdooClient
 
             $invoice = $invoiceData[0];
 
-            // Verify invoice is linked to sale order
-            $invoiceOrigin = $invoice['invoice_origin'] ?? '';
-            if (empty($invoiceOrigin) || !str_contains($invoiceOrigin, $orderData[0]['name'])) {
-                Log::warning('OdooClient: Invoice origin may not match sale order', [
-                    'invoice_id' => $invoiceId,
-                    'invoice_origin' => $invoiceOrigin,
-                    'sale_order_name' => $orderData[0]['name'] ?? null,
-                ]);
-            }
-
-            // Verify invoice includes taxes (check invoice lines)
-            $invoiceLineIds = $invoice['invoice_line_ids'] ?? [];
-            if (empty($invoiceLineIds)) {
-                throw new \Exception("Invoice {$invoiceId} was created but has no invoice lines");
-            }
-
-            // Read invoice lines to verify taxes
-            $invoiceLines = $this->call('account.move.line', 'read', [$invoiceLineIds], [
-                'fields' => ['id', 'tax_ids', 'price_subtotal', 'price_total'],
-            ]);
-
-            $hasTaxes = false;
-            foreach ($invoiceLines as $line) {
-                $taxIds = $line['tax_ids'] ?? [];
-                if (!empty($taxIds)) {
-                    $hasTaxes = true;
-                    break;
-                }
-            }
-
-            if (!$hasTaxes) {
-                Log::warning('OdooClient: Invoice created but no taxes found on invoice lines', [
-                    'invoice_id' => $invoiceId,
-                    'sale_order_id' => $saleOrderId,
-                ]);
-                // Don't throw exception - taxes might be calculated at invoice validation
-            }
-
-            // Verify invoice is unpaid
-            $invoiceState = $invoice['state'] ?? null;
-            if ($invoiceState === 'paid') {
-                Log::warning('OdooClient: Invoice was created in paid state', [
-                    'invoice_id' => $invoiceId,
-                    'state' => $invoiceState,
-                ]);
-            }
-            
-            $this->call('account.move', 'action_post', [[$invoiceId]]);
-
-            $invoiceAfterPost = $this->call('account.move', 'read', [[$invoiceId]], [
-                'fields' => ['state'],
-            ]);
-            
-            $invoiceState = $invoiceAfterPost[0]['state'] ?? null;
-            
-            Log::info('✅ [ODOO] Invoice created successfully from sale order', [
+            Log::info('✅ [ODOO] Invoice created from RENTAL order', [
                 'invoice_id' => $invoiceId,
                 'invoice_name' => $invoice['name'] ?? null,
-                'invoice_state' => $invoiceState,
+                'invoice_state' => $invoice['state'] ?? null,
                 'amount_total' => $invoice['amount_total'] ?? null,
                 'sale_order_id' => $saleOrderId,
-                'has_taxes' => $hasTaxes,
-                'invoice_lines_count' => count($invoiceLineIds),
-                'note' => 'Invoice is unpaid and ready for customer payment',
             ]);
 
             return (int) $invoiceId;
 
         } catch (\Exception $e) {
-            Log::error('OdooClient: Error creating invoice from sale order', [
+            Log::error('OdooClient: Error creating invoice from rental order', [
                 'odoo_sale_order_id' => $saleOrderId,
                 'error' => $e->getMessage(),
             ]);
@@ -1019,13 +1031,6 @@ class OdooClient
 
     /**
      * Generate a payment link from an Odoo invoice
-     * 
-     * Creates a payment link for the invoice that supports:
-     * - Card payments
-     * - ACH / Wire transfers (if enabled in Odoo)
-     * 
-     * The payment link is returned for logging purposes only.
-     * It should NOT be exposed in the Laravel UI.
      * 
      * @param int $invoiceId Odoo Invoice ID (account.move)
      * @return string Payment link URL
@@ -1038,9 +1043,8 @@ class OdooClient
                 'invoice_id' => $invoiceId,
             ]);
 
-            // Verify the invoice exists
             $invoiceData = $this->call('account.move', 'read', [[$invoiceId]], [
-                'fields' => ['id', 'name', 'state', 'amount_total', 'payment_state'],
+                'fields' => ['id', 'name', 'state', 'amount_total', 'payment_state', 'partner_id', 'currency_id', 'amount_residual'],
             ]);
 
             if (empty($invoiceData) || !isset($invoiceData[0])) {
@@ -1048,36 +1052,13 @@ class OdooClient
             }
 
             $invoice = $invoiceData[0];
-            $invoiceState = $invoice['state'] ?? null;
+            $partnerId = $invoice['partner_id'][0] ?? null;
+            $currencyId = $invoice['currency_id'][0] ?? null;
+            $amount = (float) ($invoice['amount_residual'] ?? $invoice['amount_total'] ?? 0);
 
-            // Check if invoice is already paid
-            $paymentState = $invoice['payment_state'] ?? null;
-            if ($paymentState === 'paid') {
-                Log::warning('OdooClient: Invoice is already paid, payment link may not be needed', [
-                    'invoice_id' => $invoiceId,
-                    'payment_state' => $paymentState,
-                ]);
-            }
-
-            // Get invoice details including partner and currency
-            $invoiceDetails = $this->call('account.move', 'read', [[$invoiceId]], [
-                'fields' => ['id', 'name', 'partner_id', 'currency_id', 'amount_total', 'amount_residual'],
-            ]);
-
-            if (empty($invoiceDetails) || !isset($invoiceDetails[0])) {
-                throw new \Exception('Failed to retrieve invoice details');
-            }
-
-            $invoiceDetail = $invoiceDetails[0];
-            $partnerId = $invoiceDetail['partner_id'][0] ?? null;
-            $currencyId = $invoiceDetail['currency_id'][0] ?? null;
-            $amount = (float) ($invoiceDetail['amount_residual'] ?? $invoiceDetail['amount_total'] ?? 0);
-
-            // Method 1: Try using payment.link.wizard (Odoo 14+)
             $paymentLink = null;
             
             try {
-                // Create payment link wizard
                 $wizardData = [
                     'res_id' => $invoiceId,
                     'res_model' => 'account.move',
@@ -1095,10 +1076,8 @@ class OdooClient
                 $wizardId = $this->call('payment.link.wizard', 'create', [$wizardData]);
 
                 if (!empty($wizardId)) {
-                    // Call action_generate_link to generate the payment link
                     $this->call('payment.link.wizard', 'action_generate_link', [[$wizardId]]);
 
-                    // Read the generated link
                     $wizardResult = $this->call('payment.link.wizard', 'read', [[$wizardId]], [
                         'fields' => ['link'],
                     ]);
@@ -1108,42 +1087,10 @@ class OdooClient
                     }
                 }
             } catch (\Exception $e) {
-                Log::debug('OdooClient: payment.link.wizard method failed, trying alternatives', [
-                    'error' => $e->getMessage(),
-                ]);
+                Log::debug('OdooClient: payment.link.wizard failed');
             }
 
-            // Method 2: Try _get_payment_url method (if available)
             if (empty($paymentLink)) {
-                try {
-                    $paymentLink = $this->call('account.move', '_get_payment_url', [[$invoiceId]]);
-                } catch (\Exception $e) {
-                    Log::debug('OdooClient: _get_payment_url method not available', [
-                        'error' => $e->getMessage(),
-                    ]);
-                }
-            }
-
-            // Method 3: Try to get payment link from invoice's payment_link field
-            if (empty($paymentLink)) {
-                try {
-                    $invoiceWithLink = $this->call('account.move', 'read', [[$invoiceId]], [
-                        'fields' => ['payment_link'],
-                    ]);
-
-                    if (!empty($invoiceWithLink) && isset($invoiceWithLink[0]['payment_link'])) {
-                        $paymentLink = $invoiceWithLink[0]['payment_link'];
-                    }
-                } catch (\Exception $e) {
-                    Log::debug('OdooClient: payment_link field not available', [
-                        'error' => $e->getMessage(),
-                    ]);
-                }
-            }
-
-            // Method 4: Construct payment link manually using Odoo's payment portal
-            if (empty($paymentLink)) {
-                // Get invoice access token for secure payment link
                 try {
                     $invoiceAccess = $this->call('account.move', 'read', [[$invoiceId]], [
                         'fields' => ['access_token', 'name'],
@@ -1154,10 +1101,8 @@ class OdooClient
                         $invoiceName = $invoiceAccess[0]['name'] ?? '';
 
                         if ($accessToken) {
-                            // Construct payment link with access token
                             $paymentLink = rtrim($this->url, '/') . '/my/invoices/' . $invoiceId . '?access_token=' . $accessToken;
                         } else {
-                            // Fallback: Construct basic payment link
                             $paymentLink = rtrim($this->url, '/') . '/payment/pay?' . http_build_query([
                                 'reference' => $invoiceName,
                                 'amount' => $amount,
@@ -1165,24 +1110,17 @@ class OdooClient
                         }
                     }
                 } catch (\Exception $e) {
-                    Log::warning('OdooClient: Failed to construct payment link manually', [
-                        'error' => $e->getMessage(),
-                    ]);
+                    Log::warning('OdooClient: Failed to construct payment link manually');
                 }
             }
 
             if (empty($paymentLink)) {
-                throw new \Exception('Failed to generate payment link: All methods failed');
+                throw new \Exception('Failed to generate payment link');
             }
 
-            // Log the payment link (for logging purposes only)
-            Log::info('✅ [ODOO] Payment link generated successfully', [
+            Log::info('✅ [ODOO] Payment link generated', [
                 'invoice_id' => $invoiceId,
                 'invoice_name' => $invoice['name'] ?? null,
-                'amount_total' => $invoice['amount_total'] ?? null,
-                'payment_link_length' => strlen($paymentLink),
-                'payment_link_preview' => substr($paymentLink, 0, 50) . '...',
-                'note' => 'Payment link is for logging purposes only. Do NOT expose in Laravel UI.',
             ]);
 
             return $paymentLink;
@@ -1197,13 +1135,7 @@ class OdooClient
     }
 
     /**
-     * Send invoice email to customer using Odoo's email templates
-     * 
-     * Triggers Odoo to send the invoice email to the customer.
-     * The email includes the payment link automatically (handled by Odoo).
-     * 
-     * Important: Laravel does NOT send payment links.
-     * All email sending is handled by Odoo using its email templates.
+     * Send invoice email to customer using Odoo's templates
      * 
      * @param int $invoiceId Odoo Invoice ID (account.move)
      * @return bool True if email was sent successfully
@@ -1216,9 +1148,8 @@ class OdooClient
                 'invoice_id' => $invoiceId,
             ]);
 
-            // Verify the invoice exists and get customer email
             $invoiceData = $this->call('account.move', 'read', [[$invoiceId]], [
-                'fields' => ['id', 'name', 'state', 'partner_id', 'email_from', 'invoice_sent'],
+                'fields' => ['id', 'name', 'state', 'partner_id'],
             ]);
 
             if (empty($invoiceData) || !isset($invoiceData[0])) {
@@ -1229,16 +1160,15 @@ class OdooClient
             $partnerId = $invoice['partner_id'][0] ?? null;
 
             if (empty($partnerId)) {
-                throw new \Exception("Invoice {$invoiceId} has no partner (customer) assigned");
+                throw new \Exception("Invoice {$invoiceId} has no partner assigned");
             }
 
-            // Get partner email
             $partnerData = $this->call('res.partner', 'read', [[$partnerId]], [
                 'fields' => ['id', 'name', 'email'],
             ]);
 
             if (empty($partnerData) || !isset($partnerData[0])) {
-                throw new \Exception("Partner {$partnerId} not found in Odoo");
+                throw new \Exception("Partner {$partnerId} not found");
             }
 
             $partnerEmail = $partnerData[0]['email'] ?? null;
@@ -1247,104 +1177,35 @@ class OdooClient
                 throw new \Exception("Partner {$partnerId} has no email address");
             }
 
-            // Method 1: Use action_invoice_send (Odoo standard method)
-            // This uses Odoo's email templates and includes payment link automatically
             try {
+                $action = $this->call('account.move', 'action_invoice_send', [[$invoiceId]]);
 
+                $wizardId = null;
 
-// 2️⃣ Crear wizard de envío
-$action = $this->call('account.move', 'action_invoice_send', [[$invoiceId]]);
+                if (is_array($action) && isset($action['res_id'])) {
+                    $wizardId = (int) $action['res_id'];
+                }
 
-// 3️⃣ Extraer wizard ID correctamente
-$wizardId = null;
+                if (!$wizardId) {
+                    throw new \Exception('Invoice send wizard was not created');
+                }
 
-if (is_array($action) && isset($action['res_id'])) {
-    $wizardId = (int) $action['res_id'];
-}
+                $this->call('account.move.send', 'send_and_print', [[$wizardId]]);
 
-if (!$wizardId) {
-    throw new \Exception('Invoice send wizard was not created');
-}
-
-// 4️⃣ Enviar email
-$this->call('account.move.send', 'send_and_print', [[$wizardId]]);
-
-
-                Log::info('✅ [ODOO] Invoice email sent successfully via action_invoice_send', [
+                Log::info('✅ [ODOO] Invoice email sent successfully', [
                     'invoice_id' => $invoiceId,
                     'customer_email' => $partnerEmail,
                     'invoice_name' => $invoice['name'] ?? null,
-                    'note' => 'Email includes payment link automatically via Odoo templates',
                 ]);
 
                 return true;
 
             } catch (\Exception $e) {
-                Log::debug('OdooClient: action_invoice_send failed, trying alternative method', [
+                Log::error('OdooClient: Email sending failed', [
+                    'invoice_id' => $invoiceId,
                     'error' => $e->getMessage(),
                 ]);
-
-                // Method 2: Use message_post_with_template
-                // This sends email using a specific template
-                try {
-                    // Find the default invoice email template
-                    $template = $this->call('mail.template', 'search_read', [
-                        [['model', '=', 'account.move'], ['name', 'ilike', 'invoice']],
-                    ], [
-                        'fields' => ['id', 'name'],
-                        'limit' => 1,
-                    ]);
-
-                    $templateId = null;
-                    if (!empty($template) && isset($template[0]['id'])) {
-                        $templateId = (int) $template[0]['id'];
-                    }
-
-                    // Send email using message_post_with_template
-                    $emailValues = [
-                        'email_from' => $partnerEmail, // Will be overridden by Odoo
-                        'email_to' => $partnerEmail,
-                        'subject' => "Invoice {$invoice['name']}",
-                    ];
-
-                    if ($templateId) {
-                        $this->call('account.move', 'message_post_with_template', [
-                            [$invoiceId],
-                            $templateId,
-                        ]);
-                    } else {
-                        // Fallback: Use message_post directly
-                        $this->call('account.move', 'message_post', [
-                            [$invoiceId],
-                            [
-                                'body' => "Invoice {$invoice['name']} has been sent.",
-                                'subject' => "Invoice {$invoice['name']}",
-                                'partner_ids' => [[6, 0, [$partnerId]]],
-                                'email_from' => null, // Odoo will use system email
-                            ],
-                        ]);
-                    }
-
-                    Log::info('✅ [ODOO] Invoice email sent successfully via message_post', [
-                        'invoice_id' => $invoiceId,
-                        'customer_email' => $partnerEmail,
-                        'template_id' => $templateId,
-                        'note' => 'Email sent using Odoo email template',
-                    ]);
-
-                    return true;
-
-                } catch (\Exception $e2) {
-                    Log::error('OdooClient: All email sending methods failed', [
-                        'invoice_id' => $invoiceId,
-                        'action_invoice_send_error' => $e->getMessage(),
-                        'message_post_error' => $e2->getMessage(),
-                    ]);
-                    throw new \Exception(
-                        "Failed to send invoice email. Tried action_invoice_send and message_post. " .
-                        "Last error: {$e2->getMessage()}"
-                    );
-                }
+                throw $e;
             }
 
         } catch (\Exception $e) {
@@ -1357,42 +1218,35 @@ $this->call('account.move.send', 'send_and_print', [[$wizardId]]);
     }
 
     /**
-     * Build jobsite information string from order
+     * Build jobsite information from order
      * 
      * @param \App\Models\Order $order
-     * @return string Jobsite information formatted for Odoo notes
+     * @return string
      */
     protected function buildJobsiteInfo(\App\Models\Order $order): string
     {
         $info = [];
 
-        // Add jobsite address
         if ($order->job && $order->job->notes) {
             $info[] = "Jobsite Address: " . $order->job->notes;
         }
 
-        // Add dates
         if ($order->job && $order->job->date) {
-            $startDate = $order->job->date->format('Y-m-d');
-            $info[] = "Start Date: {$startDate}";
+            $info[] = "Start Date: " . $order->job->date->format('Y-m-d');
         }
 
         if ($order->job && $order->job->end_date) {
-            $endDate = $order->job->end_date->format('Y-m-d');
-            $info[] = "End Date: {$endDate}";
+            $info[] = "End Date: " . $order->job->end_date->format('Y-m-d');
         }
 
-        // Add coordinates if available
         if ($order->job && $order->job->latitude && $order->job->longitude) {
             $info[] = "Coordinates: {$order->job->latitude}, {$order->job->longitude}";
         }
 
-        // Add order notes
         if ($order->notes) {
             $info[] = "Order Notes: " . $order->notes;
         }
 
-        // Add foreman details if available
         if ($order->foreman_details_json) {
             $foremanDetails = json_decode($order->foreman_details_json, true);
             if ($foremanDetails) {
@@ -1407,7 +1261,7 @@ $this->call('account.move.send', 'send_and_print', [[$wizardId]]);
                     $foremanInfo[] = "Email: " . $foremanDetails['email'];
                 }
                 if (!empty($foremanInfo)) {
-                    $info[] = "Foreman/Receiving Person: " . implode(', ', $foremanInfo);
+                    $info[] = "Foreman: " . implode(', ', $foremanInfo);
                 }
             }
         }
@@ -1415,118 +1269,61 @@ $this->call('account.move.send', 'send_and_print', [[$wizardId]]);
         return implode("\n", $info);
     }
 
+    // ==================== MÉTODOS LEGACY (Deprecados pero conservados) ====================
+    
     /**
-     * Build order lines for Odoo sale order
-     * 
-     * Creates rental order lines from Laravel order items.
-     * Rules:
-     * - Uses mapped odoo_product_id from Laravel products
-     * - Quantity (product_uom_qty) reflects number of equipment units
-     * - Price (price_unit) is daily rental price
-     * - Rental dates (rental_start_date, rental_end_date) from JobLocation
-     * - One line per product (items of same product are grouped)
-     * 
-     * @param \App\Models\Order $order
-     * @return array Order lines formatted for Odoo rental
+     * @deprecated Use createDraftRentalOrder() instead
+     * Conservado para compatibilidad con código legacy
      */
-    protected function buildOrderLines(\App\Models\Order $order): array
+    public function createDraftSaleOrder(\App\Models\Order $order): int
     {
-        // Group items by product to create one line per product
-        $productGroups = [];
-        
-        foreach ($order->items as $item) {
-            $productId = $item->product_id;
-            
-            if (!isset($productGroups[$productId])) {
-                $productGroups[$productId] = [
-                    'product' => $item->product,
-                    'items' => [],
-                    'total_quantity' => 0,
-                    'total_line_total' => 0,
-                ];
-            }
-            
-            $productGroups[$productId]['items'][] = $item;
-            $productGroups[$productId]['total_quantity'] += $item->quantity;
-            $productGroups[$productId]['total_line_total'] += $item->line_total;
-        }
-
-        $orderLines = [];
-
-        foreach ($productGroups as $productId => $group) {
-            $product = $group['product'];
-            $items = $group['items'];
-            $totalQuantity = $group['total_quantity'];
-            $totalLineTotal = $group['total_line_total'];
-
-            // Get Odoo product ID from mapped field
-            $odooProductId = $product->odoo_product_id;
-
-            if (empty($odooProductId)) {
-                Log::warning('OdooClient: Product missing odoo_product_id', [
-                    'laravel_product_id' => $product->id,
-                    'product_name' => $product->name,
-                ]);
-                throw new \Exception(
-                    "Product '{$product->name}' (ID: {$product->id}) does not have an odoo_product_id mapped. " .
-                    "Please map the product to Odoo before creating sale orders."
-                );
-            }
-
-            // Get unit price from first item (all items of same product have same price)
-            $unitPrice = $items[0]->unit_price;
-
-            // Build product description with rental information
-            $description = $product->name;
-            if ($product->description) {
-                $description .= "\n" . $product->description;
-            }
-            $description .= "\nEquipment Quantity: {$totalQuantity} unit(s)";
-
-            // Get rental dates from JobLocation
-            $rentalStartDate = $order->job->date->format('Y-m-d H:i:s');
-            $rentalEndDate = $order->job->end_date->format('Y-m-d H:i:s');
-
-            // Create order line for rental
-            // - product_uom_qty: number of equipment units
-            // - price_unit: daily rental price
-            // - product_id: mapped Odoo product ID
-            // - is_rental: marks this as a rental order line
-            // - rental_start_date: start date of rental period
-            // - rental_end_date: end date of rental period
-            $orderLine = [
-                'product_id' => (int) $odooProductId,
-                'product_uom_qty' => $totalQuantity, // Number of equipment units
-                'price_unit' => (float) $unitPrice, // Daily rental price
-                'name' => $description,
-                'is_rental' => true,
-                'rental_start_date' => $rentalStartDate,
-                'rental_end_date' => $rentalEndDate,
-            ];
-
-            Log::debug('📝 [ODOO] Building rental order line', [
-                'laravel_product_id' => $product->id,
-                'product_name' => $product->name,
-                'odoo_product_id' => $odooProductId,
-                'equipment_quantity' => $totalQuantity,
-                'daily_price' => $unitPrice,
-                'line_total' => $totalLineTotal,
-                'rental_start_date' => $rentalStartDate,
-                'rental_end_date' => $rentalEndDate,
-            ]);
-
-            $orderLines[] = [0, 0, $orderLine]; // Odoo format: [0, 0, values] for create
-        }
-
-        return $orderLines;
+        Log::warning('OdooClient: createDraftSaleOrder() is deprecated. Use createDraftRentalOrder() for rental orders.');
+        return $this->createDraftRentalOrder($order);
     }
 
     /**
+     * @deprecated Use confirmRentalOrder() instead
+     * Conservado para compatibilidad con código legacy
+     */
+    public function confirmSaleOrder(int $saleOrderId): bool
+    {
+        Log::warning('OdooClient: confirmSaleOrder() is deprecated. Use confirmRentalOrder() for rental orders.');
+        return $this->confirmRentalOrder($saleOrderId);
+    }
+
+    /**
+     * @deprecated Use createAndConfirmRentalOrder() instead
+     * Conservado para compatibilidad con código legacy
+     */
+    public function createAndConfirmSaleOrder(\App\Models\Order $order): int
+    {
+        Log::warning('OdooClient: createAndConfirmSaleOrder() is deprecated. Use createAndConfirmRentalOrder() for rental orders.');
+        return $this->createAndConfirmRentalOrder($order);
+    }
+
+    /**
+     * @deprecated Use createInvoiceFromRentalOrder() instead
+     * Conservado para compatibilidad con código legacy
+     */
+    public function createInvoiceFromSaleOrder(int $saleOrderId): int
+    {
+        Log::warning('OdooClient: createInvoiceFromSaleOrder() is deprecated. Use createInvoiceFromRentalOrder() for rental orders.');
+        return $this->createInvoiceFromRentalOrder($saleOrderId);
+    }
+
+    // ==================== MÉTODOS HELPER (Comentados - NO eliminados) ====================
+    
+    /**
      * Find product in Odoo by name
+     * 
+     * 
+     * ⚠️ MÉTODO CONSERVADO PERO NO USADO
+     * Puede ser útil para scripts de migración o sincronización manual
      * 
      * @param string $productName
      * @return int|null Product ID or null if not found
      */
+    /*
     protected function findProductByName(string $productName): ?int
     {
         try {
@@ -1550,82 +1347,5 @@ $this->call('account.move.send', 'send_and_print', [[$wizardId]]);
             return null;
         }
     }
-
-    /**
-     * Find or create service product category in Odoo
-     * 
-     * @return int Category ID
-     */
-    protected function findOrCreateServiceCategory(): int
-    {
-        try {
-            // Try to find existing "Services" category
-            $categories = $this->call('product.category', 'search_read', [
-                [['name', '=', 'Services']],
-            ], [
-                'fields' => ['id'],
-                'limit' => 1,
-            ]);
-
-            if (!empty($categories) && isset($categories[0]['id'])) {
-                return (int) $categories[0]['id'];
-            }
-
-            // Create category if not found
-            $categoryId = $this->call('product.category', 'create', [[
-                'name' => 'Services',
-            ]]);
-
-            return (int) $categoryId;
-        } catch (\Exception $e) {
-            Log::warning('OdooClient: Error finding/creating service category', [
-                'error' => $e->getMessage(),
-            ]);
-            // Return a default category or handle error
-            throw new \Exception('Failed to find or create service category: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Create a service product in Odoo for rental items
-     * 
-     * @param \App\Models\Product $product Laravel product
-     * @param int $categoryId Odoo category ID
-     * @return int Product ID in Odoo
-     */
-    protected function createServiceProduct(\App\Models\Product $product, int $categoryId): int
-    {
-        try {
-            // Find or create product template
-            $templateId = $this->call('product.template', 'create', [[
-                'name' => $product->name,
-                'description' => $product->description ?? '',
-                'categ_id' => $categoryId,
-                'type' => 'service', // Service type for rentals
-                'sale_ok' => true,
-                'purchase_ok' => false,
-                'list_price' => (float) $product->price,
-            ]]);
-
-            // Get the product variant
-            $products = $this->call('product.product', 'search_read', [
-                [['product_tmpl_id', '=', $templateId]],
-            ], [
-                'fields' => ['id'],
-                'limit' => 1,
-            ]);
-
-            if (!empty($products) && isset($products[0]['id'])) {
-                return (int) $products[0]['id'];
-            }
-
-            throw new \Exception('Failed to get product variant after creating template');
-        } catch (\Exception $e) {
-            Log::error('OdooClient: Error creating service product', [
-                'product_name' => $product->name,
-                'error' => $e->getMessage(),
-            ]);
-            throw $e;
-        }
-    }
+    */
 }
