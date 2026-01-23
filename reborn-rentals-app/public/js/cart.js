@@ -765,7 +765,7 @@ function renderCart(cart, products, total) {
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex justify-between items-start mb-2">
-                                <h4 class="text-white font-bold text-base uppercase leading-tight pr-2 truncate">${escapedName}</h4>
+                                <h4 class="text-white font-bold text-base uppercase leading-tight pr-2 line-clamp-2">${escapedName}</h4>
                                 ${!isCheckoutPage ? `<button onclick="removeFromCart(${safeProductId})" class="text-gray-400 hover:text-red-400 p-1 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
