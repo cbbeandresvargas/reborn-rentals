@@ -118,13 +118,17 @@
 
                 <!-- Delivery Fees Section -->
                 <div id="delivery-fees-section" class="p-4 sm:p-6 border-b border-gray-200 hidden">
-                    <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Delivery & Pickup Fees</h3>
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Logistics Fees</h3>
                     <div class="space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-700 text-sm sm:text-base">Delivery & Pickup (Combined):</span>
-                            <span class="text-gray-900 font-bold text-base sm:text-lg" id="total-delivery-fees">$0.00</span>
+                        <div class="flex justify-between items-center group">
+                            <span class="text-gray-700 text-sm sm:text-base">Delivery (<span id="delivery-date-display">Date</span>):</span>
+                            <span class="text-gray-900 font-bold text-base sm:text-lg" id="delivery-fee-display">$0.00</span>
                         </div>
-                        <div id="delivery-distance-info" class="text-xs sm:text-sm text-gray-500 italic hidden"></div>
+                        <div class="flex justify-between items-center group">
+                            <span class="text-gray-700 text-sm sm:text-base">Pick-Up (<span id="pickup-date-display">Date</span>):</span>
+                            <span class="text-gray-900 font-bold text-base sm:text-lg" id="pickup-fee-display">$0.00</span>
+                        </div>
+                        <div id="delivery-distance-info" class="text-xs sm:text-sm text-gray-500 italic pt-2 border-t border-gray-100 hidden"></div>
                     </div>
                 </div>
 
@@ -358,7 +362,11 @@ function calculateAndDisplayDeliveryFees() {
 // Display delivery fees
 function displayDeliveryFees(fees) {
     const deliverySection = document.getElementById('delivery-fees-section');
-    const totalDeliveryFees = document.getElementById('total-delivery-fees');
+    const deliveryFeeDisplay = document.getElementById('delivery-fee-display');
+    const pickupFeeDisplay = document.getElementById('pickup-fee-display');
+    const deliveryDateDisplay = document.getElementById('delivery-date-display');
+    const pickupDateDisplay = document.getElementById('pickup-date-display');
+    
     const deliveryFeesTotalRow = document.getElementById('delivery-fees-total-row');
     const deliveryFeesTotalDisplay = document.getElementById('delivery-fees-total-display');
     const distanceInfo = document.getElementById('delivery-distance-info');
@@ -367,9 +375,22 @@ function displayDeliveryFees(fees) {
         deliverySection.classList.remove('hidden');
     }
     
-    // Display total fees (delivery + pickup combined)
-    if (totalDeliveryFees) {
-        totalDeliveryFees.textContent = '$' + parseFloat(fees.total_fees || 0).toFixed(2);
+    // Get dates from localStorage
+    const directionsData = localStorage.getItem('reborn-rentals-directions');
+    if (directionsData) {
+        try {
+            const directions = JSON.parse(directionsData);
+            if (deliveryDateDisplay) deliveryDateDisplay.textContent = directions.startDate || 'Date';
+            if (pickupDateDisplay) pickupDateDisplay.textContent = directions.endDate || 'Date';
+        } catch(e) {}
+    }
+    
+    // Display separate fees
+    if (deliveryFeeDisplay) {
+        deliveryFeeDisplay.textContent = '$' + parseFloat(fees.delivery_fee || 0).toFixed(2);
+    }
+    if (pickupFeeDisplay) {
+        pickupFeeDisplay.textContent = '$' + parseFloat(fees.pickup_fee || 0).toFixed(2);
     }
     
     if (deliveryFeesTotalRow) {
@@ -382,7 +403,7 @@ function displayDeliveryFees(fees) {
     
     // Show distance info if available
     if (distanceInfo && fees.distance_miles > 0) {
-        distanceInfo.textContent = `Distance: ${fees.distance_miles.toFixed(1)} miles (${fees.calculation_method === 'flat_rate_inside_loop' ? 'Metropolitan Area' : 'Outside Metropolitan Area'})`;
+        distanceInfo.textContent = `Distance: ${fees.distance_miles.toFixed(1)} miles (${fees.calculation_method === 'distance_based_outside_loop' ? 'Long Distance' : 'Standard Loop'})`;
         distanceInfo.classList.remove('hidden');
     } else if (distanceInfo) {
         distanceInfo.classList.add('hidden');

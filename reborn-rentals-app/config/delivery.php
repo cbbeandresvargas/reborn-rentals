@@ -23,7 +23,8 @@ return [
     |
     */
     'flat_rate_inside_loop' => env('DELIVERY_FLAT_RATE_INSIDE_LOOP', 500.00),
-    'rate_per_mile' => env('DELIVERY_RATE_PER_MILE', 4.00),
+    'rate_per_mile' => env('DELIVERY_RATE_PER_MILE', 8.99),
+    'mile_threshold' => env('DELIVERY_MILE_THRESHOLD', 55.6),
 
     /*
     |--------------------------------------------------------------------------

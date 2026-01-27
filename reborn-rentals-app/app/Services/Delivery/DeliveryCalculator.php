@@ -11,6 +11,7 @@ class DeliveryCalculator
     protected array $loopPolygon;
     protected float $flatRateInside;
     protected float $ratePerMile;
+    protected float $mileThreshold;
 
     public function __construct()
     {
@@ -19,6 +20,7 @@ class DeliveryCalculator
         $this->loopPolygon = config('delivery.denver_loop_polygon');
         $this->flatRateInside = config('delivery.flat_rate_inside_loop');
         $this->ratePerMile = config('delivery.rate_per_mile');
+        $this->mileThreshold = config('delivery.mile_threshold');
     }
 
     /**
@@ -93,28 +95,20 @@ class DeliveryCalculator
         $isInside = $this->isInsideLoop($lat, $lon);
         $result['is_inside_loop'] = $isInside;
 
-        if ($isInside) {
-            // Rule 1: $500 total for delivery + pickup combined
-            $totalFee = $this->flatRateInside;
-            // Split equally between delivery and pickup for display purposes
-            $result['delivery_fee'] = round($totalFee / 2, 2);
-            $result['pickup_fee'] = round($totalFee / 2, 2);
-            $result['calculation_method'] = 'flat_rate_inside_loop';
-        } else {
-            // Rule 2: Outside Loop => Rate per mile * Miles (total for delivery + pickup combined)
-            $miles = $this->getDistanceMiles($this->shopLat, $this->shopLon, $lat, $lon);
-            $result['distance_miles'] = round($miles, 2);
-            
-            $totalFee = $miles * $this->ratePerMile;
-            
-            // Round to 2 decimals
-            $totalFee = round($totalFee, 2);
-            
-            // Split equally between delivery and pickup for display purposes
-            $result['delivery_fee'] = round($totalFee / 2, 2);
-            $result['pickup_fee'] = round($totalFee / 2, 2);
-            $result['calculation_method'] = 'distance_based_outside_loop';
-        }
+        $miles = $this->getDistanceMiles($this->shopLat, $this->shopLon, $lat, $lon);
+        $result['distance_miles'] = round($miles, 2);
+
+        // Rule: Base (500) + Max(0, Distance - 55.6) * 8.99 for EACH way
+        $baseFee = $this->flatRateInside;
+        $additionalMiles = max(0, $miles - $this->mileThreshold);
+        $feePerWay = $baseFee + ($additionalMiles * $this->ratePerMile);
+        
+        // Round to 2 decimals
+        $feePerWay = round($feePerWay, 2);
+
+        $result['delivery_fee'] = $feePerWay;
+        $result['pickup_fee'] = $feePerWay;
+        $result['calculation_method'] = $isInside ? 'flat_rate_inside_loop' : 'distance_based_outside_loop';
 
         // Rule 3: If self-pickup (re-read carefully) -> "Si el cliente selecciona self-pickup, no se cobra nada por recolección."
         // My previous assumption was "Self-pickup" = 0 for everything.

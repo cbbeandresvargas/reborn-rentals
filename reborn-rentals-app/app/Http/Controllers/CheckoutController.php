@@ -344,7 +344,9 @@ class CheckoutController extends Controller
                 // NOTE: Using a notes field or handling fee storage is not explicit in the existing schema
                 // so we will append the fee breakdown to the 'notes' field for reference in the admin panel/Odoo.
                 $notes = $validated['notes'] ?? '';
-                $feeNote = "\n\n[Delivery Fees]: Delivery: \${$deliveryFee}, Pickup: \${$pickupFee}. Method: {$fees['calculation_method']}. " . 
+                $deliveryDate = $validated['start_date'];
+                $pickupDate = $validated['end_date'];
+                $feeNote = "\n\n[Delivery Fees]:\n- Delivery ({$deliveryDate}): \${$deliveryFee}\n- Pick-Up ({$pickupDate}): \${$pickupFee}\nMethod: {$fees['calculation_method']}. " . 
                            ($fees['distance_miles'] > 0 ? "Distance: {$fees['distance_miles']} miles." : "");
                 $finalNotes = trim($notes . $feeNote);
 
