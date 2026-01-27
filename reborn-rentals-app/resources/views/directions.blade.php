@@ -596,15 +596,15 @@ function calculateRoute(destination, address) {
             // Get route information
             const route = result.routes[0];
             const leg = route.legs[0];
-            const distance = (leg.distance.value / 1000).toFixed(1); // Convert to km
-            const duration = Math.round(leg.duration.value / 60); // Convert to minutes
-            
-            // Update distance info (like Google Maps shows)
-            if (distanceInfo) {
-                distanceInfo.textContent = `Distance: ${distance} km • Duration: ${duration} min`;
-                distanceInfo.style.color = '#CE9704';
-                distanceInfo.style.fontWeight = '600';
-            }
+const distanceMiles = (leg.distance.value / 1609.34).toFixed(1); // meters → miles
+const duration = Math.round(leg.duration.value / 60); // seconds → minutes
+
+if (distanceInfo) {
+    distanceInfo.textContent = `Distance: ${distanceMiles} mi • Duration: ${duration} min`;
+    distanceInfo.style.color = '#CE9704';
+    distanceInfo.style.fontWeight = '600';
+}
+
             
             // Fit map to show entire route (office to destination) with padding
             // This ensures both origin and destination are visible, just like Google Maps
@@ -651,18 +651,23 @@ function calculateRoute(destination, address) {
                 fallbackPolyline.setMap(map);
                 
                 // Calculate straight line distance
-                const distance = calculateDistance(officeLocation, destination);
-                if (distanceInfo) {
-                    distanceInfo.innerHTML = `<span style="color: #ef4444;">API not enabled. Straight line: ${distance.toFixed(1)} km (approximate)</span>`;
-                }
+const distanceKm = calculateDistance(officeLocation, destination);
+const distanceMiles = (distanceKm * 0.621371).toFixed(1);
+
+if (distanceInfo) {
+    distanceInfo.innerHTML = `<span style="color: #ef4444;">API not enabled. Straight line: ${distanceMiles} mi (approximate)</span>`;
+}
+
             } else {
                 // Fallback: calculate straight line distance
-                const distance = calculateDistance(officeLocation, destination);
-                
-                if (distanceInfo) {
-                    distanceInfo.textContent = `Straight line distance: ${distance.toFixed(1)} km (approximate)`;
-                    distanceInfo.style.color = '#ef4444';
-                }
+             const distanceKm = calculateDistance(officeLocation, destination);
+const distanceMiles = (distanceKm * 0.621371).toFixed(1);
+
+if (distanceInfo) {
+    distanceInfo.textContent = `Straight line distance: ${distanceMiles} mi (approximate)`;
+    distanceInfo.style.color = '#ef4444';
+}
+
             }
         }
     });
