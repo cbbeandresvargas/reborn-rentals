@@ -1,236 +1,135 @@
-Reborn Rentals
+# Reborn Rentals
 
-Reborn Rentals is a full-stack rental management web application built with Laravel that allows users to rent products and synchronizes data with Odoo ERP.
-The project follows Laravel’s MVC architecture and is designed to be scalable, clean, and production-ready.
+A complete heavy machinery rental web application built with **Laravel 12**, **Tailwind CSS**, and **MVC architecture**.
 
-🚀 Overview
+## 🚀 Features
 
-Product rental platform
+- **Full Backend**: Complete implementation of Models, Controllers, and Routes.
+- **Integrated Frontend**: Blade templates styled with Tailwind CSS (via CDN).
+- **Shopping Cart**: Session-based shopping cart system (no localStorage).
+- **Authentication**: Secure Login/Registration using Laravel's native session authentication.
+- **Checkout System**: Full checkout process with validation, date selection, and delivery address.
+- **Order Management**: Users can view their order history and details.
+- **Database**: SQLite configuration with comprehensive migrations and seeders.
+- **QR Code Generation**: Integrated QR code functionality for orders/products.
 
-Shopping cart & checkout flow
+## 📋 Requirements
 
-User authentication
+- PHP >= 8.2
+- Composer
+- SQLite
 
-Order management
+## 🛠️ Installation
 
-Integration with Odoo for product, customer, and operational data
+Follow these steps to set up the project locally:
 
-SQLite by default for fast local setup
+1.  **Install PHP Dependencies**:
+    ```bash
+    composer install
+    ```
 
-✨ Features
+2.  **Environment Configuration**:
+    Copy the example environment file and generate the application key.
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
 
-✅ Laravel 12 MVC Architecture
+3.  **Database Setup**:
+    Create the SQLite database file and run migrations with seeders.
+    ```bash
+    # Linux/Mac
+    touch database/database.sqlite
+    
+    # Windows (PowerShell)
+    New-Item -ItemType File -Path database/database.sqlite
+    
+    # Run migrations and seeds
+    php artisan migrate --seed
+    ```
 
-✅ User Authentication (Login / Register)
+4.  **Start the Server**:
+    You can use the Laravel Artisan serve command:
+    ```bash
+    php artisan serve
+    ```
+    Or the built-in PHP server:
+    ```bash
+    php -S localhost:8000 -t public
+    ```
 
-✅ Product Catalog
+    The application will be available at `http://localhost:8000`.
 
-✅ Rental Cart (Session-based)
+## 👤 Test Users
 
-✅ Checkout System
+You can use the following credentials to test the application:
 
-✅ Order History & Details
+- **Admin User**:
+  - Email: `admin@rebornrentals.com`
+  - Password: `password`
 
-✅ Database Migrations & Seeders
+- **Standard User**:
+  - Email: `john@example.com`
+  - Password: `password`
 
-✅ Odoo ERP Integration
+## 📁 Project Structure
 
-✅ Tailwind CSS (via CDN)
-
-🧰 Tech Stack
-
-Backend: Laravel 12, PHP 8.2+
-
-Frontend: Blade + Tailwind CSS
-
-Database: SQLite (default)
-
-Sessions / Cache / Queue: Database
-
-ERP Integration: Odoo (API)
-
-Maps: Google Maps API (optional)
-
-📋 Requirements
-
-PHP >= 8.2
-
-Composer
-
-SQLite
-
-Node.js (optional, only if extending frontend tooling)
-
-🔧 Environment Configuration
-
-Create a .env file based on .env.example and configure the following:
-
-APP_NAME=Laravel
-APP_ENV=local
-APP_DEBUG=true
-APP_URL=http://localhost
-
-DB_CONNECTION=sqlite
-
-SESSION_DRIVER=database
-CACHE_STORE=database
-QUEUE_CONNECTION=database
-
-ODOO_URL=https://yourcompany.odoo.com
-ODOO_DB=yourcompany
-ODOO_USER=youruser@email.com
-ODOO_API_KEY=your_api_key
-
-
-⚠️ Never commit real API keys or credentials to GitHub.
-
-🛠️ Installation & Setup
-
-Follow these steps to run the project locally:
-
-# 1. Install dependencies
-composer install
-
-# 2. Create environment file
-cp .env.example .env
-
-# 3. Generate application key
-php artisan key:generate
-
-# 4. Run migrations
-php artisan migrate
-
-# 5. Seed database with demo data
-php artisan migrate --seed
-
-# 6. Start development server
-php artisan serve
-
-
-The app will be available at:
-
-http://localhost:8000
-
-👤 Demo Users
-
-Admin
-
-Email: admin@rebornrentals.com
-
-Password: password
-
-Standard User
-
-Email: john@example.com
-
-Password: password
-
-📁 Project Structure
+```text
 app/
 ├── Http/Controllers/
-│   ├── Auth/                  # Authentication
-│   ├── CartController.php     # Cart logic
-│   ├── CheckoutController.php # Checkout flow
-│   ├── HomeController.php     # Landing page
-│   ├── OrderController.php    # Orders
-│   └── ProductController.php # Products
-├── Models/                    # Eloquent models
+│   ├── Auth/               # Authentication (Login/Register)
+│   ├── CartController.php  # Shopping Cart Logic
+│   ├── CheckoutController.php # Checkout Process
+│   ├── HomeController.php  # Landing Page
+│   ├── OrderController.php # Order Management
+│   └── ProductController.php # Product Listing/Details
+├── Models/                 # Eloquent Models with Relationships
 └── ...
 
 resources/views/
 ├── layouts/
-│   └── app.blade.php
-├── auth/
-├── products/
-├── checkout/
-├── orders/
-└── home.blade.php
+│   └── app.blade.php       # Main Layout Template
+├── auth/                   # Authentication Views
+├── checkout/               # Checkout Views
+├── orders/                 # Order History Views
+├── products/               # Product Views
+└── home.blade.php          # Homepage
 
 routes/
-└── web.php
+└── web.php                 # Web Routes Defined Here
+```
 
-🛒 Core Functionality
-Cart
+## 🎨 Design & UI
 
-Add / remove products
+- **Framework**: Tailwind CSS (loaded via CDN, no Node.js build step required for styles).
+- **Color Palette**:
+  - **Primary**: `#CE9704` (Gold/Amber)
+  - **Dark Background**: `#4A4A4A`
+  - **Cart Background**: `#2F2F2F`
+  - **Light Gray**: `#BBBBBB`
 
-Update quantities
+## 🛒 Core Functionalities
 
-Persisted using Laravel sessions
+### Shopping Cart
+- Add products with quantity selection.
+- Update quantities or remove items.
+- Persistent cart state using Laravel Sessions.
+- Sidebar view for quick access.
 
-Sidebar-style cart UI
+### Checkout
+- **Rental Period**: Select start and end dates.
+- **Delivery**: Input delivery address information.
+- **Payment Methods**: Placeholder for payment method selection.
+- **Summary**: Automatic calculation of taxes and totals.
 
-Checkout
+### Orders
+- **History**: View list of past rental orders.
+- **Details**: Detailed view of specific orders including status and items.
 
-Rental date selection
+## 📝 Notes
 
-Delivery information
+- **Sessions**: The cart uses server-side Laravel sessions, ensuring data persists across different devices if logged in (depending on session driver), and is more secure than client-side storage.
+- **Assets**: Images are served from the `public/` directory.
+- **Tailwind**: implementation uses the CDN script for simplicity in this demo environment. For production, a build step with Vite is recommended.
 
-Order validation
 
-Tax calculations
-
-Orders
-
-User order list
-
-Order detail view
-
-Full order history
-
-🔐 Authentication
-
-Laravel session-based authentication
-
-Protected routes via middleware
-
-Login & registration flows
-
-🔗 Odoo Integration
-
-The application connects to Odoo via API to enable:
-
-Product synchronization
-
-Customer data management
-
-Operational consistency with ERP workflows
-
-Configuration is handled via .env variables.
-
-🎨 UI / Design
-
-Tailwind CSS via CDN
-
-Dark-themed UI
-
-Modular Blade layouts
-
-📝 Notes
-
-The cart uses Laravel sessions, not localStorage
-
-Images are stored in public/
-
-SQLite is used by default for simplicity
-
-Tailwind is loaded via CDN (no build step required)
-
-🚀 Roadmap
-
-Admin dashboard
-
-Real payment gateways (Stripe / PayPal)
-
-Email notifications
-
-Advanced Odoo sync (orders & inventory)
-
-Improved mobile responsiveness
-
-Role-based access control
-
-📄 License
-
-This project is private and proprietary.
-All rights reserved.
