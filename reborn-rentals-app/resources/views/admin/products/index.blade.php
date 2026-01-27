@@ -197,7 +197,7 @@
 
 
 <!-- Create Product Modal -->
-<div id="create-product-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none; pointer-events: none;">
+<div id="create-product-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hide-scrollbar" style="display: none; pointer-events: none;">
     <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-[#CE9704]/20">
         <!-- Header -->
         <div class="bg-gradient-to-r from-[#CE9704] to-[#B8860B] p-6 sticky top-0 z-10">
